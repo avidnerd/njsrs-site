@@ -36,6 +36,7 @@ export default function StudentRegistrationForm() {
     } else {
       setSRAs([]);
       setFormData({ ...formData, sraId: "" });
+      setError(""); // Clear error when school is deselected
     }
   }, [formData.schoolId]);
 
@@ -54,6 +55,8 @@ export default function StudentRegistrationForm() {
       setSRAs(schoolSRAs);
       if (schoolSRAs.length === 0) {
         setError("No Science Research Advisors found for this school. Please contact your school to register an SRA first.");
+      } else {
+        setError(""); // Clear error when SRAs are successfully loaded
       }
     } catch (err) {
       console.error("Error loading SRAs:", err);
