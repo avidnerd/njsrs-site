@@ -1,0 +1,20 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Students can upload to their own folder
+    match /students/{studentId}/{allPaths=**} {
+      allow read: if request.auth != null && 
+                     (request.auth.uid == studentId || 
+                      // Allow SRA to read if they are the student's SRA
+                      // This will be checked via Firestore in a Cloud Function if needed
+                      // For now, allow authenticated users to read (can be restricted further)
+                      true);
+      allow write: if request.auth != null && request.auth.uid == studentId;
+    }
+    
+    // SRAs can read files from their students
+    match /sras/{sraId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == sraId;
+    }
+  }
+}

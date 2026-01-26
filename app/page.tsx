@@ -1,0 +1,92 @@
+import Link from "next/link";
+import MicroscopeIllustration from "@/components/illustrations/MicroscopeIllustration";
+import EnvelopeIllustration from "@/components/illustrations/EnvelopeIllustration";
+import GiftBoxIllustration from "@/components/illustrations/GiftBoxIllustration";
+import ScienceIllustration from "@/components/illustrations/ScienceIllustration";
+
+export default function HomePage() {
+  return (
+    <div>
+      {/* Hero Section */}
+      <section className="bg-primary-blue text-white py-16 md:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+                The New Jersey Science Research Symposium (NJSRS) is a research competition that brings together high school scientists from across New Jersey to present original STEM research projects.
+              </h1>
+              <p className="text-lg md:text-xl mb-8 text-blue-100">
+                Hosted at Millburn High School, this invitational is designed to fill the gap left by suspended regional fairs and to give more students a platform to share, defend, and advance their research.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link
+                  href="/register/student"
+                  className="bg-primary-green text-white px-6 py-3 rounded-md hover:bg-primary-darkGreen font-semibold text-center transition-colors"
+                >
+                  COMPETE
+                </Link>
+                <Link
+                  href="/register/judge"
+                  className="bg-white text-primary-green px-6 py-3 rounded-md hover:bg-gray-100 font-semibold text-center transition-colors"
+                >
+                  ARE YOU A QUALIFIED SCIENTIST OR ENGINEER? BECOME A JUDGE!
+                </Link>
+              </div>
+            </div>
+            <div className="hidden lg:block">
+              <div className="relative bg-gradient-to-br from-blue-100 via-blue-50 to-blue-200 rounded-lg p-8 h-96 flex items-center justify-center overflow-hidden">
+                <ScienceIllustration />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Three Column Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* The Competition */}
+            <div className="bg-white rounded-lg shadow-md p-8">
+              <div className="mb-4 flex justify-center">
+                <MicroscopeIllustration />
+              </div>
+              <h2 className="text-2xl font-bold text-primary-blue mb-4 text-center">
+                The Competition
+              </h2>
+              <p className="text-gray-600">
+                NJSRS is for high school students who have conducted experimental STEM research within the past year. Competitors give an oral presentation in front of slides and are scored by STEM professionals.
+              </p>
+            </div>
+
+            {/* How to Participate */}
+            <div className="bg-white rounded-lg shadow-md p-8">
+              <div className="mb-4 flex justify-center">
+                <EnvelopeIllustration />
+              </div>
+              <h2 className="text-2xl font-bold text-primary-blue mb-4 text-center">
+                How to Participate
+              </h2>
+              <p className="text-gray-600">
+                NJSRS is open to any high school student currently attending a high school in New Jersey. Each student must have an adult sponsor (teacher, mentor, parent) in order to participate.
+              </p>
+            </div>
+
+            {/* Donate */}
+            <div className="bg-white rounded-lg shadow-md p-8">
+              <div className="mb-4 flex justify-center">
+                <GiftBoxIllustration />
+              </div>
+              <h2 className="text-2xl font-bold text-primary-blue mb-4 text-center">
+                Donate
+              </h2>
+              <p className="text-gray-600">
+                Donations support event costs, judging, and student awards so that this fair can happen! All contributions go directly toward running the symposium and expanding opportunities for New Jersey student researchers.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

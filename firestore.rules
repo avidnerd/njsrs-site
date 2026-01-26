@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+    
+    // Schools collection
+    match /schools/{schoolId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Only admins can update/delete (add admin check later)
+    }
+    
+    // SRAs collection
+    match /sras/{sraId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(sraId);
+      allow update: if isOwner(sraId);
+    }
+    
+    // Students collection
+    match /students/{studentId} {
+      allow read: if isOwner(studentId) || 
+                     (isAuthenticated() && 
+                      getUserRole() == 'sra' && 
+                      get(/databases/$(database)/documents/students/$(studentId)).data.sraId == request.auth.uid);
+      allow create: if isOwner(studentId);
+      allow update: if isOwner(studentId) || 
+                        (isAuthenticated() && 
+                         getUserRole() == 'sra' && 
+                         get(/databases/$(database)/documents/students/$(studentId)).data.sraId == request.auth.uid);
+    }
+    
+    // Judges collection
+    match /judges/{judgeId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(judgeId);
+      allow update: if isOwner(judgeId);
+    }
+  }
+}

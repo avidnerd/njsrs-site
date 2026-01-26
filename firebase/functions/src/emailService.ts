@@ -1,0 +1,37 @@
+import * as sgMail from "@sendgrid/mail";
+
+// Initialize SendGrid
+const sendGridApiKey = process.env.SENDGRID_API_KEY;
+if (sendGridApiKey) {
+  sgMail.setApiKey(sendGridApiKey);
+}
+
+export interface EmailOptions {
+  to: string;
+  subject: string;
+  html: string;
+  from?: string;
+}
+
+export async function sendEmail(options: EmailOptions): Promise<void> {
+  if (!sendGridApiKey) {
+    console.warn("SENDGRID_API_KEY not set, email not sent:", options);
+    return;
+  }
+
+  try {
+    await sgMail.send({
+      to: options.to,
+      from: options.from || "noreply@njsrs.org",
+      subject: options.subject,
+      html: options.html,
+    });
+    console.log(`Email sent to ${options.to}`);
+  } catch (error: any) {
+    console.error("Error sending email:", error);
+    if (error.response) {
+      console.error("SendGrid error response:", error.response.body);
+    }
+    throw error;
+  }
+}
