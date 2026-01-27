@@ -1,8 +1,4 @@
 import Link from "next/link";
-import MicroscopeIllustration from "@/components/illustrations/MicroscopeIllustration";
-import EnvelopeIllustration from "@/components/illustrations/EnvelopeIllustration";
-import GiftBoxIllustration from "@/components/illustrations/GiftBoxIllustration";
-import ScienceIllustration from "@/components/illustrations/ScienceIllustration";
 
 export default function HomePage() {
   return (
@@ -53,7 +49,11 @@ export default function HomePage() {
             {/* The Competition */}
             <div className="bg-white rounded-lg shadow-md p-8">
               <div className="mb-4 flex justify-center">
-                <MicroscopeIllustration />
+                <img 
+                  src="/scientist.png" 
+                  alt="Scientist" 
+                  className="h-24 w-auto"
+                />
               </div>
               <h2 className="text-2xl font-bold text-primary-blue mb-4 text-center">
                 The Competition
@@ -66,7 +66,11 @@ export default function HomePage() {
             {/* How to Participate */}
             <div className="bg-white rounded-lg shadow-md p-8">
               <div className="mb-4 flex justify-center">
-                <EnvelopeIllustration />
+                <img 
+                  src="/Envelope_with_Letter_PNG_Clip_Art.png" 
+                  alt="Envelope with Letter" 
+                  className="h-24 w-auto"
+                />
               </div>
               <h2 className="text-2xl font-bold text-primary-blue mb-4 text-center">
                 How to Participate
@@ -79,7 +83,11 @@ export default function HomePage() {
             {/* Donate */}
             <div className="bg-white rounded-lg shadow-md p-8">
               <div className="mb-4 flex justify-center">
-                <GiftBoxIllustration />
+                <img 
+                  src="/donate.png" 
+                  alt="Donate" 
+                  className="h-24 w-auto"
+                />
               </div>
               <h2 className="text-2xl font-bold text-primary-blue mb-4 text-center">
                 Donate
