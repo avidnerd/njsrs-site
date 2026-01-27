@@ -9,9 +9,11 @@ import { onStudentRegistered } from "./triggers/studentRegistered";
 import { onSRARegistered } from "./triggers/sraRegistered";
 import { onJudgeRegistered } from "./triggers/judgeRegistered";
 import { onUserCreated } from "./triggers/sendVerificationEmail";
+import { onSRAApproved } from "./triggers/sraApproved";
+import { onJudgeApproved } from "./triggers/judgeApproved";
 
 // Export Cloud Functions
-export { onStudentRegistered, onSRARegistered, onJudgeRegistered, onUserCreated };
+export { onStudentRegistered, onSRARegistered, onJudgeRegistered, onUserCreated, onSRAApproved, onJudgeApproved };
 
 // HTTP function for SRA approval
 export const approveStudent = functions.https.onCall(async (data, context) => {

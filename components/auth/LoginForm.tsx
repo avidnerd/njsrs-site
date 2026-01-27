@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { loginUser } from "@/lib/firebase/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,21 +11,44 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { userProfile } = useAuth();
+  const { user, userProfile, loading: authLoading } = useAuth();
+
+  // Reset loading state when auth completes
+  useEffect(() => {
+    if (user && userProfile && loading) {
+      // Auth succeeded and profile loaded, redirect will happen
+      setLoading(false);
+    } else if (user && !userProfile && !authLoading && loading) {
+      // User exists but profile doesn't - likely missing Firestore document
+      setError("User profile not found in Firestore. Please ensure you've created the user document in the 'users' collection with your User UID from Authentication. See ADMIN_SETUP.md for instructions.");
+      setLoading(false);
+    }
+  }, [user, userProfile, authLoading, loading]);
+
+  // Clear any pending timeouts when component unmounts
+  useEffect(() => {
+    return () => {
+      // Cleanup handled by state updates
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
+    // Set a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      setError("Login is taking longer than expected. If you're an admin, please ensure your user document exists in Firestore. See ADMIN_SETUP.md for instructions.");
+      setLoading(false);
+    }, 5000);
+
     try {
       await loginUser(email, password);
-      // Wait a moment for auth state to update
-      setTimeout(() => {
-        // The redirect will be handled by the useEffect in the page component
-        // which checks userProfile after auth state changes
-      }, 500);
+      // Clear timeout if login succeeds - the redirect will be handled by useEffect
+      // The timeout will be cleared if userProfile loads successfully
     } catch (err: any) {
+      clearTimeout(timeoutId);
       setError(err.message || "Failed to log in");
       setLoading(false);
     }
