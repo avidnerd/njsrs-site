@@ -12,7 +12,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 leading-tight">
+              <h1 className="text-xl md:text-3xl lg:text-4xl font-bold mb-6 leading-tight">
                 The New Jersey Science Research Symposium (NJSRS) is a research competition that brings together high school scientists from across New Jersey to present original STEM research projects.
               </h1>
               <p className="text-lg md:text-xl mb-8 text-blue-100">
