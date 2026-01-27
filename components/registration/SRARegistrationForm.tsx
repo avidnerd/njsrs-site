@@ -84,7 +84,7 @@ export default function SRARegistrationForm() {
         });
       }
 
-      await registerSRA(formData.email, formData.password, {
+      const { verificationCode } = await registerSRA(formData.email, formData.password, {
         firstName: formData.firstName,
         lastName: formData.lastName,
         schoolId: schoolId!,
@@ -93,7 +93,9 @@ export default function SRARegistrationForm() {
         title: formData.title,
       });
 
-      router.push("/dashboard/sra");
+      // Store verification code in sessionStorage temporarily
+      sessionStorage.setItem("verificationCode", verificationCode);
+      router.push("/verify");
     } catch (err: any) {
       setError(err.message || "Registration failed");
     } finally {

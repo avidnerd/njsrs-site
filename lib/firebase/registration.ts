@@ -5,10 +5,10 @@ import type { SRA, Student, Judge, School } from "./database";
 export async function registerSRA(
   email: string,
   password: string,
-  sraData: Omit<SRA, "id" | "email" | "createdAt" | "approved">
-): Promise<void> {
+  sraData: Omit<SRA, "id" | "email" | "createdAt" | "approved" | "adminApproved">
+): Promise<{ verificationCode: string }> {
   // Create Firebase Auth account
-  const userCredential = await registerUser(email, password, "sra");
+  const { userCredential, verificationCode } = await registerUser(email, password, "sra");
 
   // Check if school exists, create if not
   let schoolId = sraData.schoolId;
@@ -25,13 +25,15 @@ export async function registerSRA(
     email,
     schoolId,
   });
+
+  return { verificationCode };
 }
 
 export async function registerStudent(
   email: string,
   password: string,
   studentData: Omit<Student, "id" | "email" | "createdAt" | "status" | "sraName">
-): Promise<void> {
+): Promise<{ verificationCode: string }> {
   // Verify SRA exists
   const sras = await getSRAsBySchool(studentData.schoolId);
   const selectedSRA = sras.find((sra) => sra.id === studentData.sraId);
@@ -41,7 +43,7 @@ export async function registerStudent(
   }
 
   // Create Firebase Auth account
-  const userCredential = await registerUser(email, password, "student");
+  const { userCredential, verificationCode } = await registerUser(email, password, "student");
 
   // Create student document
   await createStudent(userCredential.user.uid, {
@@ -49,19 +51,23 @@ export async function registerStudent(
     email,
     sraName: `${selectedSRA.firstName} ${selectedSRA.lastName}`,
   });
+
+  return { verificationCode };
 }
 
 export async function registerJudge(
   email: string,
   password: string,
-  judgeData: Omit<Judge, "id" | "email" | "createdAt">
-): Promise<void> {
+  judgeData: Omit<Judge, "id" | "email" | "createdAt" | "qualifications" | "affiliation" | "expertise" | "adminApproved">
+): Promise<{ verificationCode: string }> {
   // Create Firebase Auth account
-  const userCredential = await registerUser(email, password, "judge");
+  const { userCredential, verificationCode } = await registerUser(email, password, "judge");
 
-  // Create judge document
+  // Create judge document with all fields
   await createJudge(userCredential.user.uid, {
     ...judgeData,
     email,
   });
+
+  return { verificationCode };
 }

@@ -37,6 +37,7 @@ export interface SRA {
   title?: string;
   createdAt: Date | Timestamp;
   approved: boolean;
+  adminApproved?: boolean;
 }
 
 export interface Student {
@@ -65,10 +66,48 @@ export interface Judge {
   firstName: string;
   lastName: string;
   email: string;
+  // Contact Info
+  address?: string;
+  cellPhone?: string;
+  // Institution
+  institution?: string;
+  institutionYears?: string;
+  department?: string;
+  currentPosition?: string;
+  // Employment Status
+  employmentStatus?: "currently_working" | "retired";
+  // Education
+  highestDegree?: string;
+  degreeDate?: string;
+  degreeDiscipline?: string;
+  // Expertise
+  areaOfExpertise?: string;
+  // Publications & Patents
+  publications?: string;
+  patents?: string;
+  // Experience
+  experienceJudgingScienceFairs?: string;
+  canCommitToAllProjects?: boolean;
+  // Interview Approach
+  interviewApproach?: string;
+  // Handling Mistakes
+  handleMistakesApproach?: string;
+  // Conflicts of Interest
+  knowsStudents?: boolean;
+  knownStudents?: string;
+  mentoringStudents?: boolean;
+  mentoringDetails?: string;
+  // References
+  references?: string;
+  // Availability
+  availabilityApril18?: "in_person" | "remote_only" | "morning_only" | "full_day";
+  availabilityMarch?: boolean;
+  // Legacy fields
   qualifications?: string;
   affiliation?: string;
   expertise?: string[];
   createdAt: Date | Timestamp;
+  adminApproved?: boolean;
 }
 
 // School functions
@@ -107,12 +146,13 @@ export async function getAllSchools(): Promise<School[]> {
 }
 
 // SRA functions
-export async function createSRA(sraId: string, sra: Omit<SRA, "id" | "createdAt" | "approved">): Promise<void> {
+export async function createSRA(sraId: string, sra: Omit<SRA, "id" | "createdAt" | "approved" | "adminApproved">): Promise<void> {
   const dbInstance = ensureDb();
   await setDoc(doc(dbInstance, "sras", sraId), {
     ...sra,
     createdAt: Timestamp.now(),
-    approved: true, // SRAs are auto-approved
+    approved: true, // SRAs are auto-approved by system
+    adminApproved: false, // Requires admin approval
   });
 }
 
@@ -195,11 +235,12 @@ export async function updateStudentPaymentStatus(
 }
 
 // Judge functions
-export async function createJudge(judgeId: string, judge: Omit<Judge, "id" | "createdAt">): Promise<void> {
+export async function createJudge(judgeId: string, judge: Omit<Judge, "id" | "createdAt" | "adminApproved">): Promise<void> {
   const dbInstance = ensureDb();
   await setDoc(doc(dbInstance, "judges", judgeId), {
     ...judge,
     createdAt: Timestamp.now(),
+    adminApproved: false, // Requires admin approval
   });
 }
 
@@ -210,4 +251,40 @@ export async function getJudge(judgeId: string): Promise<Judge | null> {
     return null;
   }
   return { id: judgeDoc.id, ...judgeDoc.data() } as Judge;
+}
+
+// Admin functions
+export interface Admin {
+  id?: string;
+  email: string;
+  role: "fair_director" | "website_manager";
+  firstName?: string;
+  lastName?: string;
+  createdAt: Date | Timestamp;
+}
+
+export async function getAllSRAs(): Promise<SRA[]> {
+  const dbInstance = ensureDb();
+  const srasRef = collection(dbInstance, "sras");
+  const querySnapshot = await getDocs(srasRef);
+  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as SRA));
+}
+
+export async function getAllJudges(): Promise<Judge[]> {
+  const dbInstance = ensureDb();
+  const judgesRef = collection(dbInstance, "judges");
+  const querySnapshot = await getDocs(judgesRef);
+  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Judge));
+}
+
+export async function updateSRAApproval(sraId: string, approved: boolean): Promise<void> {
+  const dbInstance = ensureDb();
+  const sraRef = doc(dbInstance, "sras", sraId);
+  await updateDoc(sraRef, { adminApproved: approved });
+}
+
+export async function updateJudgeApproval(judgeId: string, approved: boolean): Promise<void> {
+  const dbInstance = ensureDb();
+  const judgeRef = doc(dbInstance, "judges", judgeId);
+  await updateDoc(judgeRef, { adminApproved: approved });
 }

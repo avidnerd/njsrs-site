@@ -6,9 +6,12 @@ admin.initializeApp();
 // Email service
 import { sendEmail } from "./emailService";
 import { onStudentRegistered } from "./triggers/studentRegistered";
+import { onSRARegistered } from "./triggers/sraRegistered";
+import { onJudgeRegistered } from "./triggers/judgeRegistered";
+import { onUserCreated } from "./triggers/sendVerificationEmail";
 
 // Export Cloud Functions
-export { onStudentRegistered };
+export { onStudentRegistered, onSRARegistered, onJudgeRegistered, onUserCreated };
 
 // HTTP function for SRA approval
 export const approveStudent = functions.https.onCall(async (data, context) => {

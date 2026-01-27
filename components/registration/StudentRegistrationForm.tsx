@@ -108,7 +108,7 @@ export default function StudentRegistrationForm() {
     try {
       const selectedSchool = schools.find((s) => s.id === formData.schoolId);
       
-      await registerStudent(formData.email, formData.password, {
+      const { verificationCode } = await registerStudent(formData.email, formData.password, {
         firstName: formData.firstName,
         lastName: formData.lastName,
         schoolId: formData.schoolId,
@@ -119,7 +119,9 @@ export default function StudentRegistrationForm() {
         projectDescription: formData.projectDescription,
       });
 
-      router.push("/register/student/pending");
+      // Store verification code in sessionStorage temporarily
+      sessionStorage.setItem("verificationCode", verificationCode);
+      router.push("/verify");
     } catch (err: any) {
       setError(err.message || "Registration failed");
     } finally {

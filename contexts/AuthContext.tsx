@@ -7,9 +7,12 @@ import { doc, getDoc } from "firebase/firestore";
 
 interface UserProfile {
   email: string;
-  role: "sra" | "student" | "judge";
+  role: "sra" | "student" | "judge" | "fair_director" | "website_manager";
   createdAt: Date;
   profileComplete: boolean;
+  emailVerified?: boolean;
+  verificationCode?: string;
+  verificationCodeExpiry?: Date;
 }
 
 interface AuthContextType {

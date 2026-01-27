@@ -12,7 +12,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 leading-tight">
                 The New Jersey Science Research Symposium (NJSRS) is a research competition that brings together high school scientists from across New Jersey to present original STEM research projects.
               </h1>
               <p className="text-lg md:text-xl mb-8 text-blue-100">
@@ -21,7 +21,7 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/register/student"
-                  className="bg-primary-green text-white px-6 py-3 rounded-md hover:bg-primary-darkGreen font-semibold text-center transition-colors"
+                  className="bg-primary-green text-white px-6 py-3 rounded-md hover:bg-primary-darkGreen font-semibold text-center transition-colors flex items-center justify-center"
                 >
                   COMPETE
                 </Link>
@@ -34,8 +34,12 @@ export default function HomePage() {
               </div>
             </div>
             <div className="hidden lg:block">
-              <div className="relative bg-gradient-to-br from-blue-100 via-blue-50 to-blue-200 rounded-lg p-8 h-96 flex items-center justify-center overflow-hidden">
-                <ScienceIllustration />
+              <div className="relative rounded-lg overflow-hidden h-96">
+                <img 
+                  src="/Laboratory-Equipment.jpg" 
+                  alt="Laboratory Equipment" 
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </div>

@@ -11,6 +11,12 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user && userProfile) {
+      // Check if email is verified
+      if (!userProfile.emailVerified) {
+        router.push("/verify");
+        return;
+      }
+
       // Redirect based on role
       switch (userProfile.role) {
         case "sra":
@@ -21,6 +27,10 @@ export default function LoginPage() {
           break;
         case "judge":
           router.push("/dashboard/judge");
+          break;
+        case "fair_director":
+        case "website_manager":
+          router.push("/dashboard/admin");
           break;
         default:
           router.push("/");

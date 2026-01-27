@@ -20,33 +20,24 @@ export default function LoginForm() {
 
     try {
       await loginUser(email, password);
-      // Redirect based on user role
-      if (userProfile) {
-        switch (userProfile.role) {
-          case "sra":
-            router.push("/dashboard/sra");
-            break;
-          case "student":
-            router.push("/dashboard/student");
-            break;
-          case "judge":
-            router.push("/dashboard/judge");
-            break;
-          default:
-            router.push("/");
-        }
-      } else {
-        router.push("/");
-      }
+      // Wait a moment for auth state to update
+      setTimeout(() => {
+        // The redirect will be handled by the useEffect in the page component
+        // which checks userProfile after auth state changes
+      }, 500);
     } catch (err: any) {
       setError(err.message || "Failed to log in");
-    } finally {
       setLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
+      <div className="mb-4">
+        <p className="text-sm text-gray-600 text-center">
+          Administrators: Use your admin email to log in
+        </p>
+      </div>
       <div>
         <label htmlFor="email" className="block text-sm font-medium mb-1">
           Email

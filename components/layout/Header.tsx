@@ -34,6 +34,9 @@ export default function Header() {
         return "/dashboard/student";
       case "judge":
         return "/dashboard/judge";
+      case "fair_director":
+      case "website_manager":
+        return "/dashboard/admin";
       default:
         return "/";
     }
@@ -44,18 +47,12 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-3 hover:opacity-90 transition-opacity">
+            <Link href="/" className="flex items-center hover:opacity-90 transition-opacity">
               <img 
                 src="/njsrs_logo.jpg" 
                 alt="NJSRS Logo" 
-                className="h-14 w-auto"
+                className="h-20 w-auto"
               />
-              <span className="text-sm font-medium text-gray-900 hidden sm:block">
-                New Jersey Science Research Symposium
-              </span>
-              <span className="text-sm font-medium text-gray-900 sm:hidden">
-                NJSRS
-              </span>
             </Link>
           </div>
 

@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles?: ("sra" | "student" | "judge")[];
+  allowedRoles?: ("sra" | "student" | "judge" | "fair_director" | "website_manager")[];
 }
 
 export default function ProtectedRoute({
@@ -34,6 +34,10 @@ export default function ProtectedRoute({
             break;
           case "judge":
             router.push("/dashboard/judge");
+            break;
+          case "fair_director":
+          case "website_manager":
+            router.push("/dashboard/admin");
             break;
           default:
             router.push("/");
