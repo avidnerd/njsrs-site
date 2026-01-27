@@ -44,10 +44,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (firebaseUser && db) {
         // Fetch user profile from Firestore
         try {
+          console.log("Fetching user profile for UID:", firebaseUser.uid);
           const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
           if (userDoc.exists()) {
+            console.log("User profile found:", userDoc.data());
             setUserProfile(userDoc.data() as UserProfile);
           } else {
+            console.error("User profile not found in Firestore. Looking for UID:", firebaseUser.uid);
+            console.error("Please ensure the document ID in Firestore matches this UID exactly.");
             setUserProfile(null);
           }
         } catch (error) {

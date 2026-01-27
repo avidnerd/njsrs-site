@@ -19,8 +19,9 @@ export default function LoginForm() {
       // Auth succeeded and profile loaded, redirect will happen
       setLoading(false);
     } else if (user && !userProfile && !authLoading && loading) {
-      // User exists but profile doesn't - likely missing Firestore document
-      setError("User profile not found in Firestore. Please ensure you've created the user document in the 'users' collection with your User UID from Authentication. See ADMIN_SETUP.md for instructions.");
+      // User exists but profile doesn't - likely missing Firestore document or UID mismatch
+      const uid = user.uid;
+      setError(`User profile not found in Firestore. Your User UID is: ${uid}. Please ensure the document ID in the 'users' collection matches this UID exactly. Check the browser console for more details.`);
       setLoading(false);
     }
   }, [user, userProfile, authLoading, loading]);
@@ -39,14 +40,15 @@ export default function LoginForm() {
 
     // Set a timeout to prevent infinite loading
     const timeoutId = setTimeout(() => {
-      setError("Login is taking longer than expected. If you're an admin, please ensure your user document exists in Firestore. See ADMIN_SETUP.md for instructions.");
+      setError("Login is taking longer than expected. Please check the browser console (F12) to see your User UID and verify it matches the Firestore document ID.");
       setLoading(false);
     }, 5000);
 
     try {
-      await loginUser(email, password);
-      // Clear timeout if login succeeds - the redirect will be handled by useEffect
-      // The timeout will be cleared if userProfile loads successfully
+      const result = await loginUser(email, password);
+      console.log("Login successful, user UID:", result.user.uid);
+      console.log("Please verify this UID matches your Firestore document ID exactly.");
+      // Don't clear timeout here - let it be cleared by useEffect when profile loads
     } catch (err: any) {
       clearTimeout(timeoutId);
       setError(err.message || "Failed to log in");

@@ -114,7 +114,9 @@ export async function loginUser(
   password: string
 ): Promise<UserCredential> {
   const authInstance = ensureAuth();
-  return signInWithEmailAndPassword(authInstance, email, password);
+  const result = await signInWithEmailAndPassword(authInstance, email, password);
+  console.log("Login successful, User UID:", result.user.uid);
+  return result;
 }
 
 export async function logoutUser(): Promise<void> {
