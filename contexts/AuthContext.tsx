@@ -34,28 +34,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!auth || !db) {
+      console.error("Firebase not initialized. Auth:", !!auth, "DB:", !!db);
       setLoading(false);
       return;
     }
 
+    console.log("Setting up auth state listener...");
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      console.log("Auth state changed. User:", firebaseUser ? firebaseUser.uid : "null");
       setUser(firebaseUser);
 
       if (firebaseUser && db) {
         // Fetch user profile from Firestore
         try {
           console.log("Fetching user profile for UID:", firebaseUser.uid);
-          const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+          const userDocRef = doc(db, "users", firebaseUser.uid);
+          console.log("Document reference path:", userDocRef.path);
+          
+          const userDoc = await getDoc(userDocRef);
+          console.log("Document exists:", userDoc.exists());
+          
           if (userDoc.exists()) {
-            console.log("User profile found:", userDoc.data());
-            setUserProfile(userDoc.data() as UserProfile);
+            const data = userDoc.data();
+            console.log("Raw user profile data:", data);
+            
+            // Convert Firestore Timestamp to Date if needed
+            const profileData: UserProfile = {
+              ...data,
+              createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
+              verificationCodeExpiry: data.verificationCodeExpiry?.toDate ? data.verificationCodeExpiry.toDate() : data.verificationCodeExpiry,
+            } as UserProfile;
+            
+            console.log("Processed user profile:", profileData);
+            setUserProfile(profileData);
           } else {
             console.error("User profile not found in Firestore. Looking for UID:", firebaseUser.uid);
+            console.error("Document path:", userDocRef.path);
             console.error("Please ensure the document ID in Firestore matches this UID exactly.");
             setUserProfile(null);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error("Error fetching user profile:", error);
+          console.error("Error code:", error?.code);
+          console.error("Error message:", error?.message);
+          
+          // Check if it's a permission error
+          if (error?.code === "permission-denied") {
+            console.error("PERMISSION DENIED: Check Firestore security rules!");
+            console.error("Make sure the rule allows: allow read: if isOwner(userId);");
+          }
+          
           setUserProfile(null);
         }
       } else {

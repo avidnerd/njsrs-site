@@ -16,7 +16,9 @@ service cloud.firestore {
     
     // Users collection
     match /users/{userId} {
+      // Allow users to read their own profile
       allow read: if isOwner(userId);
+      // Allow users to write their own profile (for updates)
       allow write: if isOwner(userId);
     }
     
