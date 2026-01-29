@@ -7,10 +7,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 xl:gap-28 items-center">
             <div className="pr-0 lg:pr-8">
-              <h1 className="text-xl md:text-3xl lg:text-4xl font-bold mb-6 leading-tight">
+              <h1 className="text-xl md:text-3xl lg:text-4xl font-bold mb-8 md:mb-10 leading-tight">
                 The New Jersey Science Research Symposium (NJSRS) is a research competition that brings together high school scientists from across New Jersey to present original STEM research projects.
               </h1>
-              <p className="text-lg md:text-xl mb-8 text-blue-100">
+              <p className="text-lg md:text-xl mb-10 md:mb-12 text-blue-100">
                 Hosted at Millburn High School, this invitational is designed to fill the gap left by suspended regional fairs and to give more students a platform to share, defend, and advance their research.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -45,7 +45,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white rounded-lg shadow-md p-8">
-              <div className="mb-4 flex justify-center">
+              <div className="mb-8 flex justify-center">
                 <img 
                   src="/scientist.png" 
                   alt="Scientist" 
@@ -61,7 +61,7 @@ export default function HomePage() {
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-8">
-              <div className="mb-4 flex justify-center">
+              <div className="mb-8 flex justify-center">
                 <img 
                   src="/Envelope_with_Letter_PNG_Clip_Art.png" 
                   alt="Envelope with Letter" 
@@ -77,7 +77,7 @@ export default function HomePage() {
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-8">
-              <div className="mb-4 flex justify-center">
+              <div className="mb-8 flex justify-center">
                 <img 
                   src="/donate.png" 
                   alt="Donate" 
