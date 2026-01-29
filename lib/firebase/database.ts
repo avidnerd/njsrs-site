@@ -237,11 +237,15 @@ export async function updateStudentPaymentStatus(
 // Judge functions
 export async function createJudge(judgeId: string, judge: Omit<Judge, "id" | "createdAt" | "adminApproved">): Promise<void> {
   const dbInstance = ensureDb();
-  await setDoc(doc(dbInstance, "judges", judgeId), {
+  const judgeData = {
     ...judge,
     createdAt: Timestamp.now(),
     adminApproved: false, // Requires admin approval
-  });
+  };
+  console.log("Creating judge document with ID:", judgeId);
+  console.log("Judge data:", judgeData);
+  await setDoc(doc(dbInstance, "judges", judgeId), judgeData);
+  console.log("Judge document created successfully");
 }
 
 export async function getJudge(judgeId: string): Promise<Judge | null> {

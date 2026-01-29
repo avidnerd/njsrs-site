@@ -51,9 +51,14 @@ service cloud.firestore {
     
     // Judges collection
     match /judges/{judgeId} {
+      // Allow authenticated users to read (for admin dashboard)
       allow read: if isAuthenticated();
+      // Allow judges to create their own document
       allow create: if isOwner(judgeId);
-      allow update: if isOwner(judgeId);
+      // Allow judges to update their own document, or admins to update (for approval)
+      allow update: if isOwner(judgeId) || 
+                        (isAuthenticated() && 
+                         (getUserRole() == 'fair_director' || getUserRole() == 'website_manager'));
     }
   }
 }
