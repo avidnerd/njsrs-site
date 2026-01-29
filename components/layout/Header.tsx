@@ -43,7 +43,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-white shadow-sm border-b border-gray-200 py-1">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
@@ -51,7 +51,7 @@ export default function Header() {
               <img 
                 src="/njsrs_logo.jpg" 
                 alt="NJSRS Logo" 
-                className="h-40 w-auto"
+                className="h-48 w-auto"
               />
             </Link>
           </div>
