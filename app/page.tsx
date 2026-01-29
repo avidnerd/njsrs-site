@@ -5,8 +5,8 @@ export default function HomePage() {
     <div>
       <section className="bg-primary-blue text-white py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
-            <div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 xl:gap-28 items-center">
+            <div className="pr-0 lg:pr-8">
               <h1 className="text-xl md:text-3xl lg:text-4xl font-bold mb-6 leading-tight">
                 The New Jersey Science Research Symposium (NJSRS) is a research competition that brings together high school scientists from across New Jersey to present original STEM research projects.
               </h1>
@@ -28,7 +28,7 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
-            <div className="hidden lg:block">
+            <div className="hidden lg:block pl-0 lg:pl-8">
               <div className="relative rounded-lg overflow-hidden h-96">
                 <img 
                   src="/Laboratory-Equipment.jpg" 
