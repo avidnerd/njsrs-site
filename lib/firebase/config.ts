@@ -18,7 +18,6 @@ let db: Firestore | undefined;
 let storage: FirebaseStorage | undefined;
 
 if (typeof window !== "undefined") {
-  // Initialize Firebase only on client side
   try {
     if (getApps().length === 0) {
       app = initializeApp(firebaseConfig);

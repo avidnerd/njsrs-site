@@ -26,7 +26,6 @@ export default function FileUpload({
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
-    // Validate file size
     if (selectedFile.size > maxSizeMB * 1024 * 1024) {
       setError(`File size must be less than ${maxSizeMB}MB`);
       return;
@@ -48,7 +47,6 @@ export default function FileUpload({
       await onUpload(file);
       setSuccess(true);
       setFile(null);
-      // Reset file input
       const input = document.getElementById(`file-${label}`) as HTMLInputElement;
       if (input) input.value = "";
     } catch (err: any) {

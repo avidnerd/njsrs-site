@@ -7,19 +7,15 @@ export async function registerSRA(
   password: string,
   sraData: Omit<SRA, "id" | "email" | "createdAt" | "approved" | "adminApproved">
 ): Promise<{ verificationCode: string }> {
-  // Create Firebase Auth account
   const { userCredential, verificationCode } = await registerUser(email, password, "sra");
 
-  // Check if school exists, create if not
   let schoolId = sraData.schoolId;
   if (!schoolId) {
-    // Create new school
     schoolId = await createSchool({
       name: sraData.schoolName,
     });
   }
 
-  // Create SRA document
   await createSRA(userCredential.user.uid, {
     ...sraData,
     email,
@@ -34,7 +30,6 @@ export async function registerStudent(
   password: string,
   studentData: Omit<Student, "id" | "email" | "createdAt" | "status" | "sraName">
 ): Promise<{ verificationCode: string }> {
-  // Verify SRA exists
   const sras = await getSRAsBySchool(studentData.schoolId);
   const selectedSRA = sras.find((sra) => sra.id === studentData.sraId);
   
@@ -42,10 +37,8 @@ export async function registerStudent(
     throw new Error("Selected SRA not found");
   }
 
-  // Create Firebase Auth account
   const { userCredential, verificationCode } = await registerUser(email, password, "student");
 
-  // Create student document
   await createStudent(userCredential.user.uid, {
     ...studentData,
     email,
@@ -60,10 +53,8 @@ export async function registerJudge(
   password: string,
   judgeData: Omit<Judge, "id" | "email" | "createdAt" | "qualifications" | "affiliation" | "expertise" | "adminApproved">
 ): Promise<{ verificationCode: string }> {
-  // Create Firebase Auth account
   const { userCredential, verificationCode } = await registerUser(email, password, "judge");
 
-  // Create judge document with all fields
   await createJudge(userCredential.user.uid, {
     ...judgeData,
     email,

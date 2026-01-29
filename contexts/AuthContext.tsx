@@ -45,7 +45,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(firebaseUser);
 
       if (firebaseUser && db) {
-        // Fetch user profile from Firestore
         try {
           console.log("Fetching user profile for UID:", firebaseUser.uid);
           const userDocRef = doc(db, "users", firebaseUser.uid);
@@ -58,7 +57,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const data = userDoc.data();
             console.log("Raw user profile data:", data);
             
-            // Convert Firestore Timestamp to Date if needed
             const profileData: UserProfile = {
               ...data,
               createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
@@ -78,7 +76,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.error("Error code:", error?.code);
           console.error("Error message:", error?.message);
           
-          // Check if it's a permission error
           if (error?.code === "permission-denied") {
             console.error("PERMISSION DENIED: Check Firestore security rules!");
             console.error("Make sure the rule allows: allow read: if isOwner(userId);");

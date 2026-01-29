@@ -18,7 +18,6 @@ function ensureDb() {
   return db;
 }
 
-// Type definitions
 export interface School {
   id?: string;
   name: string;
@@ -66,43 +65,30 @@ export interface Judge {
   firstName: string;
   lastName: string;
   email: string;
-  // Contact Info
   address?: string;
   cellPhone?: string;
-  // Institution
   institution?: string;
   institutionYears?: string;
   department?: string;
   currentPosition?: string;
-  // Employment Status
   employmentStatus?: "currently_working" | "retired";
-  // Education
   highestDegree?: string;
   degreeDate?: string;
   degreeDiscipline?: string;
-  // Expertise
   areaOfExpertise?: string;
-  // Publications & Patents
   publications?: string;
   patents?: string;
-  // Experience
   experienceJudgingScienceFairs?: string;
   canCommitToAllProjects?: boolean;
-  // Interview Approach
   interviewApproach?: string;
-  // Handling Mistakes
   handleMistakesApproach?: string;
-  // Conflicts of Interest
   knowsStudents?: boolean;
   knownStudents?: string;
   mentoringStudents?: boolean;
   mentoringDetails?: string;
-  // References
   references?: string;
-  // Availability
   availabilityApril18?: "in_person" | "remote_only" | "morning_only" | "full_day";
   availabilityMarch?: boolean;
-  // Legacy fields
   qualifications?: string;
   affiliation?: string;
   expertise?: string[];
@@ -110,7 +96,6 @@ export interface Judge {
   adminApproved?: boolean;
 }
 
-// School functions
 export async function createSchool(school: Omit<School, "id" | "createdAt">): Promise<string> {
   const dbInstance = ensureDb();
   const schoolRef = doc(collection(dbInstance, "schools"));
@@ -145,14 +130,13 @@ export async function getAllSchools(): Promise<School[]> {
   return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as School));
 }
 
-// SRA functions
 export async function createSRA(sraId: string, sra: Omit<SRA, "id" | "createdAt" | "approved" | "adminApproved">): Promise<void> {
   const dbInstance = ensureDb();
   await setDoc(doc(dbInstance, "sras", sraId), {
     ...sra,
     createdAt: Timestamp.now(),
-    approved: true, // SRAs are auto-approved by system
-    adminApproved: false, // Requires admin approval
+    approved: true,
+    adminApproved: false,
   });
 }
 
@@ -173,7 +157,6 @@ export async function getSRAsBySchool(schoolId: string): Promise<SRA[]> {
   return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as SRA));
 }
 
-// Student functions
 export async function createStudent(
   studentId: string,
   student: Omit<Student, "id" | "createdAt" | "status">
@@ -234,7 +217,6 @@ export async function updateStudentPaymentStatus(
   await updateDoc(studentRef, { paymentStatus });
 }
 
-// Judge functions
 export async function createJudge(judgeId: string, judge: Omit<Judge, "id" | "createdAt" | "adminApproved">): Promise<void> {
   const dbInstance = ensureDb();
   const judgeData = {
@@ -257,7 +239,6 @@ export async function getJudge(judgeId: string): Promise<Judge | null> {
   return { id: judgeDoc.id, ...judgeDoc.data() } as Judge;
 }
 
-// Admin functions
 export interface Admin {
   id?: string;
   email: string;

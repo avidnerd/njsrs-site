@@ -56,7 +56,6 @@ export default function SRARegistrationForm() {
     e.preventDefault();
     setError("");
 
-    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -77,7 +76,6 @@ export default function SRARegistrationForm() {
     try {
       let schoolId = formData.schoolId;
       
-      // Create new school if needed
       if (!schoolId && formData.schoolName) {
         schoolId = await createSchool({
           name: formData.schoolName,
@@ -93,7 +91,6 @@ export default function SRARegistrationForm() {
         title: formData.title,
       });
 
-      // Store verification code in sessionStorage temporarily
       sessionStorage.setItem("verificationCode", verificationCode);
       router.push("/verify");
     } catch (err: any) {
@@ -116,7 +113,7 @@ export default function SRARegistrationForm() {
             value={formData.firstName}
             onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
           />
         </div>
         <div>
@@ -129,7 +126,7 @@ export default function SRARegistrationForm() {
             value={formData.lastName}
             onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
           />
         </div>
       </div>
@@ -159,7 +156,7 @@ export default function SRARegistrationForm() {
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
           />
         </div>
         <div>
@@ -172,7 +169,7 @@ export default function SRARegistrationForm() {
             value={formData.confirmPassword}
             onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
           />
         </div>
       </div>
@@ -187,7 +184,7 @@ export default function SRARegistrationForm() {
             type="tel"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
           />
         </div>
         <div>
@@ -200,7 +197,7 @@ export default function SRARegistrationForm() {
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             placeholder="e.g., Science Teacher, Administrator"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
           />
         </div>
       </div>
@@ -251,7 +248,7 @@ export default function SRARegistrationForm() {
                 });
               }}
               required={!showNewSchool}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
             >
               <option value="">Select a school...</option>
               {schools.map((school) => (
@@ -278,7 +275,7 @@ export default function SRARegistrationForm() {
                 });
               }}
               required={showNewSchool}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
             />
           </div>
         )}

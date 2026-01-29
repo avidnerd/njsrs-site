@@ -8,46 +8,33 @@ export default function JudgeRegistrationForm() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    // Step 1: Basic Info & Account
     firstName: "",
     lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    // Step 2: Contact Info
     address: "",
     cellPhone: "",
-    // Step 3: Institution
     institution: "",
     institutionYears: "",
     department: "",
     currentPosition: "",
-    // Step 4: Employment Status
     employmentStatus: "" as "currently_working" | "retired" | "",
-    // Step 5: Education
     highestDegree: "",
     degreeDate: "",
     degreeDiscipline: "",
-    // Step 6: Expertise
     areaOfExpertise: "",
-    // Step 7: Publications & Patents
     publications: "",
     patents: "",
-    // Step 8: Experience
     experienceJudgingScienceFairs: "",
     canCommitToAllProjects: false,
-    // Step 9: Interview Approach
     interviewApproach: "",
-    // Step 10: Handling Mistakes
     handleMistakesApproach: "",
-    // Step 11: Conflicts of Interest
     knowsStudents: false,
     knownStudents: "",
     mentoringStudents: false,
     mentoringDetails: "",
-    // Step 12: References
     references: "",
-    // Step 13: Availability
     availabilityApril18: "" as "in_person" | "remote_only" | "morning_only" | "full_day" | "",
     availabilityMarch: false,
   });
@@ -85,7 +72,6 @@ export default function JudgeRegistrationForm() {
       case 10:
       case 11:
       case 12:
-        // These steps are mostly optional, but some key fields should be filled
         return true;
       case 13:
         if (!formData.availabilityApril18) {
@@ -173,7 +159,7 @@ export default function JudgeRegistrationForm() {
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
                 />
               </div>
               <div>
@@ -186,7 +172,7 @@ export default function JudgeRegistrationForm() {
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
                 />
               </div>
             </div>
@@ -200,7 +186,7 @@ export default function JudgeRegistrationForm() {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -214,7 +200,7 @@ export default function JudgeRegistrationForm() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
                 />
               </div>
               <div>
@@ -227,7 +213,7 @@ export default function JudgeRegistrationForm() {
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
                 />
               </div>
             </div>
@@ -247,7 +233,7 @@ export default function JudgeRegistrationForm() {
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
             <div>
@@ -259,7 +245,7 @@ export default function JudgeRegistrationForm() {
                 type="tel"
                 value={formData.cellPhone}
                 onChange={(e) => setFormData({ ...formData, cellPhone: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
           </div>
@@ -278,7 +264,7 @@ export default function JudgeRegistrationForm() {
                 type="text"
                 value={formData.institution}
                 onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
             <div>
@@ -290,7 +276,7 @@ export default function JudgeRegistrationForm() {
                 type="text"
                 value={formData.institutionYears}
                 onChange={(e) => setFormData({ ...formData, institutionYears: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
             <div>
@@ -302,7 +288,7 @@ export default function JudgeRegistrationForm() {
                 type="text"
                 value={formData.department}
                 onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
             <div>
@@ -314,7 +300,7 @@ export default function JudgeRegistrationForm() {
                 type="text"
                 value={formData.currentPosition}
                 onChange={(e) => setFormData({ ...formData, currentPosition: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
           </div>
@@ -368,7 +354,7 @@ export default function JudgeRegistrationForm() {
                 value={formData.highestDegree}
                 onChange={(e) => setFormData({ ...formData, highestDegree: e.target.value })}
                 placeholder="e.g., Ph.D., M.S., B.S."
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
             <div>
@@ -381,7 +367,7 @@ export default function JudgeRegistrationForm() {
                 value={formData.degreeDate}
                 onChange={(e) => setFormData({ ...formData, degreeDate: e.target.value })}
                 placeholder="e.g., 2010"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
             <div>
@@ -394,7 +380,7 @@ export default function JudgeRegistrationForm() {
                 value={formData.degreeDiscipline}
                 onChange={(e) => setFormData({ ...formData, degreeDiscipline: e.target.value })}
                 placeholder="e.g., Biology, Chemistry, Physics"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
           </div>
@@ -414,7 +400,7 @@ export default function JudgeRegistrationForm() {
                 onChange={(e) => setFormData({ ...formData, areaOfExpertise: e.target.value })}
                 rows={4}
                 placeholder="Describe your area of expertise..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
           </div>
@@ -434,7 +420,7 @@ export default function JudgeRegistrationForm() {
                 onChange={(e) => setFormData({ ...formData, publications: e.target.value })}
                 rows={4}
                 placeholder="List your publications (optional)"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
             <div>
@@ -447,7 +433,7 @@ export default function JudgeRegistrationForm() {
                 onChange={(e) => setFormData({ ...formData, patents: e.target.value })}
                 rows={4}
                 placeholder="List your patents (optional)"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
           </div>
@@ -467,7 +453,7 @@ export default function JudgeRegistrationForm() {
                 onChange={(e) => setFormData({ ...formData, experienceJudgingScienceFairs: e.target.value })}
                 rows={4}
                 placeholder="Describe your experience judging science fairs..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
             <div>
@@ -499,7 +485,7 @@ export default function JudgeRegistrationForm() {
                 onChange={(e) => setFormData({ ...formData, interviewApproach: e.target.value })}
                 rows={6}
                 placeholder="Describe your approach..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
           </div>
@@ -520,7 +506,7 @@ export default function JudgeRegistrationForm() {
                 onChange={(e) => setFormData({ ...formData, handleMistakesApproach: e.target.value })}
                 rows={6}
                 placeholder="Describe your approach..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
           </div>
@@ -550,7 +536,7 @@ export default function JudgeRegistrationForm() {
                     value={formData.knownStudents}
                     onChange={(e) => setFormData({ ...formData, knownStudents: e.target.value })}
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
                   />
                 </div>
               )}
@@ -575,7 +561,7 @@ export default function JudgeRegistrationForm() {
                     value={formData.mentoringDetails}
                     onChange={(e) => setFormData({ ...formData, mentoringDetails: e.target.value })}
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
                   />
                 </div>
               )}
@@ -597,7 +583,7 @@ export default function JudgeRegistrationForm() {
                 onChange={(e) => setFormData({ ...formData, references: e.target.value })}
                 rows={6}
                 placeholder="Please provide references with contact information..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
           </div>
@@ -679,7 +665,6 @@ export default function JudgeRegistrationForm() {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-      {/* Progress Bar */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-700">
@@ -697,19 +682,16 @@ export default function JudgeRegistrationForm() {
         </div>
       </div>
 
-      {/* Step Content */}
       <div className="bg-white rounded-lg shadow-md p-8 mb-6">
         {renderStep()}
       </div>
 
-      {/* Error Message */}
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
           {error}
         </div>
       )}
 
-      {/* Navigation Buttons */}
       <div className="flex justify-between">
         <button
           type="button"

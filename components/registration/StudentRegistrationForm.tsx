@@ -82,7 +82,6 @@ export default function StudentRegistrationForm() {
     e.preventDefault();
     setError("");
 
-    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -119,7 +118,6 @@ export default function StudentRegistrationForm() {
         projectDescription: formData.projectDescription,
       });
 
-      // Store verification code in sessionStorage temporarily
       sessionStorage.setItem("verificationCode", verificationCode);
       router.push("/verify");
     } catch (err: any) {
@@ -142,7 +140,7 @@ export default function StudentRegistrationForm() {
             value={formData.firstName}
             onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
           />
         </div>
         <div>
@@ -155,7 +153,7 @@ export default function StudentRegistrationForm() {
             value={formData.lastName}
             onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
           />
         </div>
       </div>
@@ -170,7 +168,7 @@ export default function StudentRegistrationForm() {
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
         />
       </div>
 
@@ -185,7 +183,7 @@ export default function StudentRegistrationForm() {
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
           />
         </div>
         <div>
@@ -198,7 +196,7 @@ export default function StudentRegistrationForm() {
             value={formData.confirmPassword}
             onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
           />
         </div>
       </div>
@@ -212,7 +210,7 @@ export default function StudentRegistrationForm() {
           value={formData.grade}
           onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
         >
           <option value="">Select grade...</option>
           <option value="9">9th Grade</option>
@@ -244,7 +242,7 @@ export default function StudentRegistrationForm() {
             });
           }}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
         >
           <option value="">Select a school...</option>
           {schools.map((school) => (
@@ -270,7 +268,7 @@ export default function StudentRegistrationForm() {
               value={formData.sraId}
               onChange={(e) => setFormData({ ...formData, sraId: e.target.value })}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
             >
               <option value="">Select your SRA...</option>
               {sras.map((sra) => (
@@ -292,7 +290,7 @@ export default function StudentRegistrationForm() {
           type="text"
           value={formData.projectTitle}
           onChange={(e) => setFormData({ ...formData, projectTitle: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
         />
       </div>
 
@@ -305,7 +303,7 @@ export default function StudentRegistrationForm() {
           value={formData.projectDescription}
           onChange={(e) => setFormData({ ...formData, projectDescription: e.target.value })}
           rows={4}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
         />
       </div>
 

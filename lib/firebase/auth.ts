@@ -33,7 +33,6 @@ function ensureDb() {
   return db;
 }
 
-// Generate verification code
 function generateVerificationCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
@@ -52,12 +51,10 @@ export async function registerUser(
     password
   );
 
-  // Generate verification code
   const verificationCode = generateVerificationCode();
   const verificationCodeExpiry = new Date();
-  verificationCodeExpiry.setHours(verificationCodeExpiry.getHours() + 24); // 24 hours expiry
+  verificationCodeExpiry.setHours(verificationCodeExpiry.getHours() + 24);
 
-  // Create user profile in Firestore
   await setDoc(doc(dbInstance, "users", userCredential.user.uid), {
     email,
     role,
@@ -68,7 +65,6 @@ export async function registerUser(
     verificationCodeExpiry,
   });
 
-  // Send email verification
   try {
     await sendEmailVerification(userCredential.user);
   } catch (error) {

@@ -51,7 +51,7 @@ export default function Header() {
               <img 
                 src="/njsrs_logo.jpg" 
                 alt="NJSRS Logo" 
-                className="h-20 w-auto"
+                className="h-40 w-auto"
               />
             </Link>
           </div>

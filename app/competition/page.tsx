@@ -4,57 +4,19 @@ export default function CompetitionPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 className="text-4xl font-bold text-primary-blue mb-8">Competition</h1>
 
-        {/* Timeline & Deadlines */}
         <section className="mb-12">
           <h2 className="text-2xl font-semibold text-primary-darkGreen mb-6">
             Timeline & Deadlines
           </h2>
-          <div className="relative">
-            <div className="flex items-center space-x-4 overflow-x-auto pb-4">
-              <div className="flex-shrink-0 text-center">
-                <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-sm font-semibold">01/01</span>
-                </div>
-                <p className="text-sm font-medium">01/01/2025</p>
-                <p className="text-sm text-gray-600">Registration Opens</p>
-              </div>
-              <div className="flex-shrink-0 w-24 h-1 bg-yellow-400"></div>
-              <div className="flex-shrink-0 text-center">
-                <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-sm font-semibold">TBD</span>
-                </div>
-                <p className="text-sm font-medium">TBD</p>
-                <p className="text-sm text-gray-600">SRC Project Submission</p>
-              </div>
-              <div className="flex-shrink-0 w-24 h-1 bg-yellow-400"></div>
-              <div className="flex-shrink-0 text-center">
-                <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-sm font-semibold">TBD</span>
-                </div>
-                <p className="text-sm font-medium">TBD</p>
-                <p className="text-sm text-gray-600">Registration Closes</p>
-              </div>
-              <div className="flex-shrink-0 w-24 h-1 bg-yellow-400"></div>
-              <div className="flex-shrink-0 text-center">
-                <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-sm font-semibold">TBD</span>
-                </div>
-                <p className="text-sm font-medium">TBD</p>
-                <p className="text-sm text-gray-600">Abstract Submission Deadline</p>
-              </div>
-              <div className="flex-shrink-0 w-24 h-1 bg-yellow-400"></div>
-              <div className="flex-shrink-0 text-center">
-                <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-sm font-semibold">04/16</span>
-                </div>
-                <p className="text-sm font-medium">04/16/2026</p>
-                <p className="text-sm text-gray-600">Fair Date</p>
-              </div>
-            </div>
+          <div className="w-full">
+            <img 
+              src="/fair_timeline.png" 
+              alt="Fair Timeline" 
+              className="w-full h-auto"
+            />
           </div>
         </section>
 
-        {/* Qualifying Projects */}
         <section className="mb-12">
           <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
             Qualifying Projects
@@ -72,7 +34,6 @@ export default function CompetitionPage() {
           </div>
         </section>
 
-        {/* Competition Format & Rules */}
         <section className="mb-12">
           <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
             Competition Format & Rules
@@ -118,7 +79,6 @@ export default function CompetitionPage() {
           </div>
         </section>
 
-        {/* Venue */}
         <section>
           <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
             Venue

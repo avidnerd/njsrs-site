@@ -24,12 +24,10 @@ export async function uploadResearchPlan(
   userId: string,
   file: File
 ): Promise<string> {
-  // Validate file type
   if (!file.type.includes("pdf") && !file.type.includes("doc") && !file.type.includes("docx")) {
     throw new Error("Research plan must be a PDF or Word document");
   }
 
-  // Validate file size (10MB max)
   if (file.size > 10 * 1024 * 1024) {
     throw new Error("File size must be less than 10MB");
   }
@@ -41,12 +39,10 @@ export async function uploadAbstract(
   userId: string,
   file: File
 ): Promise<string> {
-  // Validate file type
   if (!file.type.includes("pdf") && !file.type.includes("doc") && !file.type.includes("docx")) {
     throw new Error("Abstract must be a PDF or Word document");
   }
 
-  // Validate file size (5MB max)
   if (file.size > 5 * 1024 * 1024) {
     throw new Error("File size must be less than 5MB");
   }
@@ -58,7 +54,6 @@ export async function uploadPresentation(
   userId: string,
   file: File
 ): Promise<string> {
-  // Validate file type
   const validTypes = ["pdf", "ppt", "pptx", "key"];
   const fileExtension = file.name.split(".").pop()?.toLowerCase();
   
@@ -66,7 +61,6 @@ export async function uploadPresentation(
     throw new Error("Presentation must be a PDF, PowerPoint, or Keynote file");
   }
 
-  // Validate file size (20MB max)
   if (file.size > 20 * 1024 * 1024) {
     throw new Error("File size must be less than 20MB");
   }

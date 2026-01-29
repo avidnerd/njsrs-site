@@ -13,7 +13,6 @@ export default function DonatePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Payment processing would go here
     alert("Donation form submitted. In production, this would process the payment.");
   };
 
@@ -22,7 +21,6 @@ export default function DonatePage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 className="text-4xl font-bold text-primary-blue mb-8">Donate</h1>
 
-        {/* Our Mission */}
         <section className="mb-12">
           <h2 className="text-2xl font-semibold text-primary-blue mb-4">
             Our Mission
@@ -32,7 +30,6 @@ export default function DonatePage() {
           </p>
         </section>
 
-        {/* Our Sponsors */}
         <section className="mb-12">
           <h2 className="text-2xl font-semibold text-primary-blue mb-4">
             Our Sponsors
@@ -60,7 +57,6 @@ export default function DonatePage() {
           </p>
         </section>
 
-        {/* Donate Section */}
         <section className="mb-12">
           <h2 className="text-2xl font-semibold text-primary-blue mb-4">
             Donate
@@ -72,7 +68,6 @@ export default function DonatePage() {
             Use the form below to make a contribution, or contact us for information about institutional or larger gifts.
           </p>
 
-          {/* Donation Form */}
           <div className="bg-blue-50 border-2 border-primary-blue rounded-lg p-6">
             <h3 className="text-xl font-semibold text-primary-blue mb-6">Donation</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -86,7 +81,7 @@ export default function DonatePage() {
                     type="text"
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-blue focus:border-transparent text-gray-900"
                   />
                 </div>
                 <div>
@@ -98,7 +93,7 @@ export default function DonatePage() {
                     type="text"
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-blue focus:border-transparent text-gray-900"
                   />
                 </div>
               </div>
@@ -124,7 +119,7 @@ export default function DonatePage() {
                     type="text"
                     value={formData.cardNumber}
                     onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-blue focus:border-transparent text-gray-900"
                   />
                 </div>
                 <div className="flex items-end">
@@ -137,7 +132,7 @@ export default function DonatePage() {
                       type="text"
                       value={formData.cvv}
                       onChange={(e) => setFormData({ ...formData, cvv: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-blue focus:border-transparent text-gray-900"
                     />
                   </div>
                   <button

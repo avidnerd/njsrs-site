@@ -28,7 +28,6 @@ export default function EmailVerification() {
       const isValid = await verifyEmailCode(user.uid, code);
       if (isValid) {
         setVerified(true);
-        // Redirect based on role after a short delay
         setTimeout(() => {
           router.push("/dashboard");
         }, 2000);
@@ -65,7 +64,7 @@ export default function EmailVerification() {
           placeholder="Enter 6-digit code"
           required
           maxLength={6}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-center text-2xl tracking-widest"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-center text-2xl tracking-widest text-gray-900"
         />
         <p className="text-sm text-gray-600 mt-2">
           Check your email for the verification code we sent you.

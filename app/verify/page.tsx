@@ -11,10 +11,8 @@ export default function VerifyPage() {
 
   useEffect(() => {
     if (user && userProfile?.emailVerified) {
-      // Already verified, redirect to dashboard
       router.push("/dashboard");
     } else if (!user) {
-      // Not logged in, redirect to login
       router.push("/login");
     }
   }, [user, userProfile, router]);

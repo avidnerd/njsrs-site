@@ -13,23 +13,18 @@ export default function LoginForm() {
   const router = useRouter();
   const { user, userProfile, loading: authLoading } = useAuth();
 
-  // Reset loading state when auth completes
   useEffect(() => {
     if (user && userProfile && loading) {
-      // Auth succeeded and profile loaded, redirect will happen
       setLoading(false);
     } else if (user && !userProfile && !authLoading && loading) {
-      // User exists but profile doesn't - likely missing Firestore document or UID mismatch
       const uid = user.uid;
       setError(`User profile not found in Firestore. Your User UID is: ${uid}. Please ensure the document ID in the 'users' collection matches this UID exactly. Check the browser console for more details.`);
       setLoading(false);
     }
   }, [user, userProfile, authLoading, loading]);
 
-  // Clear any pending timeouts when component unmounts
   useEffect(() => {
     return () => {
-      // Cleanup handled by state updates
     };
   }, []);
 
@@ -38,7 +33,6 @@ export default function LoginForm() {
     setError("");
     setLoading(true);
 
-    // Set a timeout to prevent infinite loading
     const timeoutId = setTimeout(() => {
       setError("Login is taking longer than expected. Please check the browser console (F12) to see your User UID and verify it matches the Firestore document ID.");
       setLoading(false);
@@ -48,7 +42,6 @@ export default function LoginForm() {
       const result = await loginUser(email, password);
       console.log("Login successful, user UID:", result.user.uid);
       console.log("Please verify this UID matches your Firestore document ID exactly.");
-      // Don't clear timeout here - let it be cleared by useEffect when profile loads
     } catch (err: any) {
       clearTimeout(timeoutId);
       setError(err.message || "Failed to log in");
@@ -73,7 +66,7 @@ export default function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
         />
       </div>
       <div>
@@ -86,7 +79,7 @@ export default function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
         />
       </div>
       {error && (

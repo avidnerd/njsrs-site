@@ -11,22 +11,17 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      // If user exists but no profile, it might be loading or the document doesn't exist
       if (!userProfile && !loading) {
-        // User logged in but profile doesn't exist - show error
         console.error("User profile not found in Firestore. Please ensure the user document exists.");
         return;
       }
 
       if (userProfile) {
-        // Check if email is verified (skip for admins)
         if (userProfile.role !== "fair_director" && userProfile.role !== "website_manager" && !userProfile.emailVerified) {
           router.push("/verify");
           return;
         }
 
-        // Redirect based on role
-        // Note: SRA and Judge dashboards will check adminApproved status internally
         switch (userProfile.role) {
           case "sra":
             router.push("/dashboard/sra");

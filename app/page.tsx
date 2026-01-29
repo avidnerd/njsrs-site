@@ -3,7 +3,6 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <div>
-      {/* Hero Section */}
       <section className="bg-primary-blue text-white py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -42,11 +41,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Three Column Section */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* The Competition */}
             <div className="bg-white rounded-lg shadow-md p-8">
               <div className="mb-4 flex justify-center">
                 <img 
@@ -63,7 +60,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* How to Participate */}
             <div className="bg-white rounded-lg shadow-md p-8">
               <div className="mb-4 flex justify-center">
                 <img 
@@ -80,7 +76,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Donate */}
             <div className="bg-white rounded-lg shadow-md p-8">
               <div className="mb-4 flex justify-center">
                 <img 
