@@ -27,5 +27,9 @@ body {
 }
 
 input, textarea, select {
-  color: rgb(17, 24, 39);
+  color: rgb(17, 24, 39) !important;
+}
+
+input::placeholder, textarea::placeholder, select::placeholder {
+  color: rgb(156, 163, 175) !important;
 }

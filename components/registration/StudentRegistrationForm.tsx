@@ -229,7 +229,7 @@ export default function StudentRegistrationForm() {
           placeholder="Search for your school..."
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent mb-2"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent mb-2 text-gray-900"
         />
         <select
           id="school"
