@@ -26,6 +26,28 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+* {
+  --label-color: #111827;
+}
+
+label {
+  color: var(--label-color) !important;
+  color: #111827 !important;
+  color: rgb(17, 24, 39) !important;
+}
+
+label,
+label.block,
+label.text-sm,
+label.font-medium,
+form label,
+form label.block,
+div label,
+div label.block {
+  color: rgb(17, 24, 39) !important;
+  color: #111827 !important;
+}
+
 input,
 textarea,
 select {
@@ -54,6 +76,18 @@ select::placeholder {
 }
 
 @media (prefers-color-scheme: dark) {
+  label,
+  label.block,
+  label.text-sm,
+  label.font-medium,
+  form label,
+  form label.block,
+  div label,
+  div label.block {
+    color: rgb(17, 24, 39) !important;
+    color: #111827 !important;
+  }
+
   input,
   textarea,
   select {

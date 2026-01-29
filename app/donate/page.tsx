@@ -73,7 +73,7 @@ export default function DonatePage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium mb-1">
+                  <label htmlFor="firstName" className="block text-sm font-medium mb-1 text-gray-900">
                     First Name
                   </label>
                   <input
@@ -85,7 +85,7 @@ export default function DonatePage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium mb-1">
+                  <label htmlFor="lastName" className="block text-sm font-medium mb-1 text-gray-900">
                     Last Name
                   </label>
                   <input
@@ -98,7 +98,7 @@ export default function DonatePage() {
                 </div>
               </div>
               <div>
-                <label htmlFor="amount" className="block text-sm font-medium mb-1">
+                <label htmlFor="amount" className="block text-sm font-medium mb-1 text-gray-900">
                   Amount
                 </label>
                 <input
@@ -111,7 +111,7 @@ export default function DonatePage() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="cardNumber" className="block text-sm font-medium mb-1">
+                  <label htmlFor="cardNumber" className="block text-sm font-medium mb-1 text-gray-900">
                     Card Number/Other Payment Method
                   </label>
                   <input
@@ -124,7 +124,7 @@ export default function DonatePage() {
                 </div>
                 <div className="flex items-end">
                   <div className="flex-1">
-                    <label htmlFor="cvv" className="block text-sm font-medium mb-1">
+                    <label htmlFor="cvv" className="block text-sm font-medium mb-1 text-gray-900">
                       CVV
                     </label>
                     <input

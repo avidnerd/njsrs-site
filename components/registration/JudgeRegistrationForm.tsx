@@ -150,7 +150,7 @@ export default function JudgeRegistrationForm() {
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Basic Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="block text-sm font-medium mb-1">
+                <label htmlFor="firstName" className="block text-sm font-medium mb-1 text-gray-900">
                   First Name *
                 </label>
                 <input
@@ -163,7 +163,7 @@ export default function JudgeRegistrationForm() {
                 />
               </div>
               <div>
-                <label htmlFor="lastName" className="block text-sm font-medium mb-1">
+                <label htmlFor="lastName" className="block text-sm font-medium mb-1 text-gray-900">
                   Last Name *
                 </label>
                 <input
@@ -177,7 +177,7 @@ export default function JudgeRegistrationForm() {
               </div>
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1">
+              <label htmlFor="email" className="block text-sm font-medium mb-1 text-gray-900">
                 Email *
               </label>
               <input
@@ -191,7 +191,7 @@ export default function JudgeRegistrationForm() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="password" className="block text-sm font-medium mb-1">
+                <label htmlFor="password" className="block text-sm font-medium mb-1 text-gray-900">
                   Password *
                 </label>
                 <input
@@ -204,7 +204,7 @@ export default function JudgeRegistrationForm() {
                 />
               </div>
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1 text-gray-900">
                   Confirm Password *
                 </label>
                 <input
@@ -225,7 +225,7 @@ export default function JudgeRegistrationForm() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Contact Information</h2>
             <div>
-              <label htmlFor="address" className="block text-sm font-medium mb-1">
+              <label htmlFor="address" className="block text-sm font-medium mb-1 text-gray-900">
                 Address
               </label>
               <textarea
@@ -237,7 +237,7 @@ export default function JudgeRegistrationForm() {
               />
             </div>
             <div>
-              <label htmlFor="cellPhone" className="block text-sm font-medium mb-1">
+              <label htmlFor="cellPhone" className="block text-sm font-medium mb-1 text-gray-900">
                 Cell Phone Number
               </label>
               <input
@@ -256,7 +256,7 @@ export default function JudgeRegistrationForm() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Institution</h2>
             <div>
-              <label htmlFor="institution" className="block text-sm font-medium mb-1">
+              <label htmlFor="institution" className="block text-sm font-medium mb-1 text-gray-900">
                 Institution
               </label>
               <input
@@ -268,7 +268,7 @@ export default function JudgeRegistrationForm() {
               />
             </div>
             <div>
-              <label htmlFor="institutionYears" className="block text-sm font-medium mb-1">
+              <label htmlFor="institutionYears" className="block text-sm font-medium mb-1 text-gray-900">
                 Years at Institution
               </label>
               <input
@@ -280,7 +280,7 @@ export default function JudgeRegistrationForm() {
               />
             </div>
             <div>
-              <label htmlFor="department" className="block text-sm font-medium mb-1">
+              <label htmlFor="department" className="block text-sm font-medium mb-1 text-gray-900">
                 Department
               </label>
               <input
@@ -292,7 +292,7 @@ export default function JudgeRegistrationForm() {
               />
             </div>
             <div>
-              <label htmlFor="currentPosition" className="block text-sm font-medium mb-1">
+              <label htmlFor="currentPosition" className="block text-sm font-medium mb-1 text-gray-900">
                 Current Position
               </label>
               <input
@@ -345,7 +345,7 @@ export default function JudgeRegistrationForm() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Education</h2>
             <div>
-              <label htmlFor="highestDegree" className="block text-sm font-medium mb-1">
+              <label htmlFor="highestDegree" className="block text-sm font-medium mb-1 text-gray-900">
                 Highest Degree
               </label>
               <input
@@ -358,7 +358,7 @@ export default function JudgeRegistrationForm() {
               />
             </div>
             <div>
-              <label htmlFor="degreeDate" className="block text-sm font-medium mb-1">
+              <label htmlFor="degreeDate" className="block text-sm font-medium mb-1 text-gray-900">
                 Date of Degree
               </label>
               <input
@@ -371,7 +371,7 @@ export default function JudgeRegistrationForm() {
               />
             </div>
             <div>
-              <label htmlFor="degreeDiscipline" className="block text-sm font-medium mb-1">
+              <label htmlFor="degreeDiscipline" className="block text-sm font-medium mb-1 text-gray-900">
                 Discipline
               </label>
               <input
@@ -391,7 +391,7 @@ export default function JudgeRegistrationForm() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Area of Expertise</h2>
             <div>
-              <label htmlFor="areaOfExpertise" className="block text-sm font-medium mb-1">
+              <label htmlFor="areaOfExpertise" className="block text-sm font-medium mb-1 text-gray-900">
                 Primary Area of Expertise
               </label>
               <textarea
@@ -411,7 +411,7 @@ export default function JudgeRegistrationForm() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Publications & Patents</h2>
             <div>
-              <label htmlFor="publications" className="block text-sm font-medium mb-1">
+              <label htmlFor="publications" className="block text-sm font-medium mb-1 text-gray-900">
                 Publications
               </label>
               <textarea
@@ -424,7 +424,7 @@ export default function JudgeRegistrationForm() {
               />
             </div>
             <div>
-              <label htmlFor="patents" className="block text-sm font-medium mb-1">
+              <label htmlFor="patents" className="block text-sm font-medium mb-1 text-gray-900">
                 Patents
               </label>
               <textarea
@@ -444,7 +444,7 @@ export default function JudgeRegistrationForm() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Judging Experience</h2>
             <div>
-              <label htmlFor="experienceJudgingScienceFairs" className="block text-sm font-medium mb-1">
+              <label htmlFor="experienceJudgingScienceFairs" className="block text-sm font-medium mb-1 text-gray-900">
                 Experience Judging Science Fairs
               </label>
               <textarea
@@ -475,7 +475,7 @@ export default function JudgeRegistrationForm() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Interview Approach</h2>
             <div>
-              <label htmlFor="interviewApproach" className="block text-sm font-medium mb-1">
+              <label htmlFor="interviewApproach" className="block text-sm font-medium mb-1 text-gray-900">
                 What is your approach to interviewing a student?
               </label>
               <p className="text-sm text-gray-600 mb-2">(We're looking to see if you are a teacher or just a critic)</p>
@@ -496,7 +496,7 @@ export default function JudgeRegistrationForm() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Handling Mistakes</h2>
             <div>
-              <label htmlFor="handleMistakesApproach" className="block text-sm font-medium mb-1">
+              <label htmlFor="handleMistakesApproach" className="block text-sm font-medium mb-1 text-gray-900">
                 How do you handle a mistake in project methodology or conclusion?
               </label>
               <p className="text-sm text-gray-600 mb-2">(We're looking to see if you are a teacher or just a critic)</p>
@@ -528,7 +528,7 @@ export default function JudgeRegistrationForm() {
               </label>
               {formData.knowsStudents && (
                 <div className="ml-6 mb-4">
-                  <label htmlFor="knownStudents" className="block text-sm font-medium mb-1">
+                  <label htmlFor="knownStudents" className="block text-sm font-medium mb-1 text-gray-900">
                     If yes, who?
                   </label>
                   <textarea
@@ -553,7 +553,7 @@ export default function JudgeRegistrationForm() {
               </label>
               {formData.mentoringStudents && (
                 <div className="ml-6">
-                  <label htmlFor="mentoringDetails" className="block text-sm font-medium mb-1">
+                  <label htmlFor="mentoringDetails" className="block text-sm font-medium mb-1 text-gray-900">
                     Please provide details
                   </label>
                   <textarea
@@ -574,7 +574,7 @@ export default function JudgeRegistrationForm() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">References</h2>
             <div>
-              <label htmlFor="references" className="block text-sm font-medium mb-1">
+              <label htmlFor="references" className="block text-sm font-medium mb-1 text-gray-900">
                 References
               </label>
               <textarea

@@ -104,7 +104,7 @@ export default function SRARegistrationForm() {
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="firstName" className="block text-sm font-medium mb-1">
+          <label htmlFor="firstName" className="block text-sm font-medium mb-1 text-gray-900">
             First Name *
           </label>
           <input
@@ -117,7 +117,7 @@ export default function SRARegistrationForm() {
           />
         </div>
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium mb-1">
+          <label htmlFor="lastName" className="block text-sm font-medium mb-1 text-gray-900">
             Last Name *
           </label>
           <input
@@ -132,7 +132,7 @@ export default function SRARegistrationForm() {
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium mb-1">
+        <label htmlFor="email" className="block text-sm font-medium mb-1 text-gray-900">
           Email *
         </label>
         <input
@@ -147,7 +147,7 @@ export default function SRARegistrationForm() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="password" className="block text-sm font-medium mb-1">
+          <label htmlFor="password" className="block text-sm font-medium mb-1 text-gray-900">
             Password *
           </label>
           <input
@@ -160,7 +160,7 @@ export default function SRARegistrationForm() {
           />
         </div>
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
+          <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1 text-gray-900">
             Confirm Password *
           </label>
           <input
@@ -176,7 +176,7 @@ export default function SRARegistrationForm() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium mb-1">
+          <label htmlFor="phone" className="block text-sm font-medium mb-1 text-gray-900">
             Phone
           </label>
           <input
@@ -188,7 +188,7 @@ export default function SRARegistrationForm() {
           />
         </div>
         <div>
-          <label htmlFor="title" className="block text-sm font-medium mb-1">
+          <label htmlFor="title" className="block text-sm font-medium mb-1 text-gray-900">
             Title
           </label>
           <input
@@ -260,7 +260,7 @@ export default function SRARegistrationForm() {
           </div>
         ) : (
           <div>
-            <label htmlFor="newSchoolName" className="block text-sm font-medium mb-1">
+            <label htmlFor="newSchoolName" className="block text-sm font-medium mb-1 text-gray-900">
               School Name *
             </label>
             <input

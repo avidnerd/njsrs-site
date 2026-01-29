@@ -57,7 +57,7 @@ export default function LoginForm() {
         </p>
       </div>
       <div>
-        <label htmlFor="email" className="block text-sm font-medium mb-1">
+        <label htmlFor="email" className="block text-sm font-medium mb-1 text-gray-900">
           Email
         </label>
         <input
@@ -70,7 +70,7 @@ export default function LoginForm() {
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium mb-1">
+        <label htmlFor="password" className="block text-sm font-medium mb-1 text-gray-900">
           Password
         </label>
         <input

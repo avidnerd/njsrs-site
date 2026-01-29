@@ -131,7 +131,7 @@ export default function StudentRegistrationForm() {
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="firstName" className="block text-sm font-medium mb-1">
+          <label htmlFor="firstName" className="block text-sm font-medium mb-1 text-gray-900">
             First Name *
           </label>
           <input
@@ -144,7 +144,7 @@ export default function StudentRegistrationForm() {
           />
         </div>
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium mb-1">
+          <label htmlFor="lastName" className="block text-sm font-medium mb-1 text-gray-900">
             Last Name *
           </label>
           <input
@@ -159,7 +159,7 @@ export default function StudentRegistrationForm() {
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium mb-1">
+        <label htmlFor="email" className="block text-sm font-medium mb-1 text-gray-900">
           Email *
         </label>
         <input
@@ -174,7 +174,7 @@ export default function StudentRegistrationForm() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="password" className="block text-sm font-medium mb-1">
+          <label htmlFor="password" className="block text-sm font-medium mb-1 text-gray-900">
             Password *
           </label>
           <input
@@ -187,7 +187,7 @@ export default function StudentRegistrationForm() {
           />
         </div>
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
+          <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1 text-gray-900">
             Confirm Password *
           </label>
           <input
@@ -202,7 +202,7 @@ export default function StudentRegistrationForm() {
       </div>
 
       <div>
-        <label htmlFor="grade" className="block text-sm font-medium mb-1">
+        <label htmlFor="grade" className="block text-sm font-medium mb-1 text-gray-900">
           Grade *
         </label>
         <select
@@ -221,7 +221,7 @@ export default function StudentRegistrationForm() {
       </div>
 
       <div>
-        <label htmlFor="school" className="block text-sm font-medium mb-1">
+        <label htmlFor="school" className="block text-sm font-medium mb-1 text-gray-900">
           School *
         </label>
         <input
@@ -255,7 +255,7 @@ export default function StudentRegistrationForm() {
 
       {formData.schoolId && (
         <div>
-          <label htmlFor="sra" className="block text-sm font-medium mb-1">
+          <label htmlFor="sra" className="block text-sm font-medium mb-1 text-gray-900">
             Science Research Advisor *
           </label>
           {sras.length === 0 ? (
@@ -282,7 +282,7 @@ export default function StudentRegistrationForm() {
       )}
 
       <div>
-        <label htmlFor="projectTitle" className="block text-sm font-medium mb-1">
+        <label htmlFor="projectTitle" className="block text-sm font-medium mb-1 text-gray-900">
           Project Title
         </label>
         <input
@@ -295,7 +295,7 @@ export default function StudentRegistrationForm() {
       </div>
 
       <div>
-        <label htmlFor="projectDescription" className="block text-sm font-medium mb-1">
+        <label htmlFor="projectDescription" className="block text-sm font-medium mb-1 text-gray-900">
           Project Description
         </label>
         <textarea

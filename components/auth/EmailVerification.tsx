@@ -53,7 +53,7 @@ export default function EmailVerification() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="code" className="block text-sm font-medium mb-1">
+        <label htmlFor="code" className="block text-sm font-medium mb-1 text-gray-900">
           Verification Code
         </label>
         <input
