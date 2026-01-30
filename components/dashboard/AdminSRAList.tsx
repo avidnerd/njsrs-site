@@ -143,7 +143,7 @@ export default function AdminSRAList() {
       {/* SRA Detail Modal */}
       {selectedSRA && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 text-gray-900">
             <div className="flex justify-between items-start mb-4">
               <h2 className="text-2xl font-bold text-primary-blue">
                 SRA Application Details
@@ -158,14 +158,14 @@ export default function AdminSRAList() {
             <div className="space-y-4 text-gray-900">
               <div>
                 <h3 className="font-semibold text-gray-900">Contact Information</h3>
-                <p className="text-gray-900"><strong>Name:</strong> {selectedSRA.firstName} {selectedSRA.lastName}</p>
-                <p className="text-gray-900"><strong>Email:</strong> {selectedSRA.email}</p>
-                {selectedSRA.phone && <p className="text-gray-900"><strong>Phone:</strong> {selectedSRA.phone}</p>}
+                <p className="text-gray-900"><strong className="text-gray-900">Name:</strong> {selectedSRA.firstName} {selectedSRA.lastName}</p>
+                <p className="text-gray-900"><strong className="text-gray-900">Email:</strong> {selectedSRA.email}</p>
+                {selectedSRA.phone && <p className="text-gray-900"><strong className="text-gray-900">Phone:</strong> {selectedSRA.phone}</p>}
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900">School Information</h3>
-                <p className="text-gray-900"><strong>School:</strong> {selectedSRA.schoolName}</p>
-                {selectedSRA.title && <p className="text-gray-900"><strong>Title:</strong> {selectedSRA.title}</p>}
+                <p className="text-gray-900"><strong className="text-gray-900">School:</strong> {selectedSRA.schoolName}</p>
+                {selectedSRA.title && <p className="text-gray-900"><strong className="text-gray-900">Title:</strong> {selectedSRA.title}</p>}
               </div>
             </div>
             <div className="mt-6 flex gap-4">
