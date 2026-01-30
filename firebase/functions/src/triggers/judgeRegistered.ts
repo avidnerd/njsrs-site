@@ -4,7 +4,8 @@ import { sendEmail } from "../emailService";
 
 export const onJudgeRegistered = functions.firestore
   .document("judges/{judgeId}")
-  .onCreate(async (snap, context) => {
+  // eslint-disable-next-line no-unused-vars
+  .onCreate(async (snap, _context) => {
     const judgeData = snap.data();
 
     try {

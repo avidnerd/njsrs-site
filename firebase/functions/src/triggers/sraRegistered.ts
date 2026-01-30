@@ -4,7 +4,8 @@ import { sendEmail } from "../emailService";
 
 export const onSRARegistered = functions.firestore
   .document("sras/{sraId}")
-  .onCreate(async (snap, context) => {
+  // eslint-disable-next-line no-unused-vars
+  .onCreate(async (snap, _context) => {
     const sraData = snap.data();
 
     try {

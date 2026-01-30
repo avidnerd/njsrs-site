@@ -1,10 +1,10 @@
 import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
 import { sendEmail } from "../emailService";
 
 export const onJudgeApproved = functions.firestore
   .document("judges/{judgeId}")
-  .onUpdate(async (change, context) => {
+  // eslint-disable-next-line no-unused-vars
+  .onUpdate(async (change, _context) => {
     const before = change.before.data();
     const after = change.after.data();
 
