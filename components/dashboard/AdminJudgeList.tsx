@@ -185,24 +185,10 @@ export default function AdminJudgeList() {
                   <p className="text-gray-900">{selectedJudge.areaOfExpertise}</p>
                 </div>
               )}
-              {selectedJudge.experienceJudgingScienceFairs && (
-                <div>
-                  <h3 className="font-semibold text-gray-900">Judging Experience</h3>
-                  <p className="text-gray-900">{selectedJudge.experienceJudgingScienceFairs}</p>
-                </div>
-              )}
-              {selectedJudge.interviewApproach && (
-                <div>
-                  <h3 className="font-semibold text-gray-900">Interview Approach</h3>
-                  <p className="text-gray-900">{selectedJudge.interviewApproach}</p>
-                </div>
-              )}
-              {selectedJudge.handleMistakesApproach && (
-                <div>
-                  <h3 className="font-semibold text-gray-900">Handling Mistakes</h3>
-                  <p className="text-gray-900">{selectedJudge.handleMistakesApproach}</p>
-                </div>
-              )}
+              <div>
+                <h3 className="font-semibold text-gray-900">Judging Experience</h3>
+                <p className="text-gray-900"><strong>Has Experience Judging Science Fairs:</strong> {selectedJudge.experienceJudgingScienceFairs === "Yes" ? "Yes" : "No"}</p>
+              </div>
               {selectedJudge.knowsStudents && (
                 <div>
                   <h3 className="font-semibold text-gray-900">Conflicts of Interest</h3>
@@ -215,16 +201,9 @@ export default function AdminJudgeList() {
               <div>
                 <h3 className="font-semibold text-gray-900">Availability</h3>
                 {selectedJudge.availabilityApril18 && (
-                  <p className="text-gray-900"><strong>April 18:</strong> {selectedJudge.availabilityApril18.replace(/_/g, " ").toUpperCase()}</p>
+                  <p className="text-gray-900"><strong>April 18:</strong> {selectedJudge.availabilityApril18.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}</p>
                 )}
-                <p className="text-gray-900"><strong>March Availability:</strong> {selectedJudge.availabilityMarch ? "Yes" : "No"}</p>
               </div>
-              {selectedJudge.references && (
-                <div>
-                  <h3 className="font-semibold text-gray-900">References</h3>
-                  <p className="whitespace-pre-wrap text-gray-900">{selectedJudge.references}</p>
-                </div>
-              )}
             </div>
             <div className="mt-6 flex gap-4">
               {!selectedJudge.adminApproved && (
