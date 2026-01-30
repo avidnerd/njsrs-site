@@ -6,12 +6,29 @@ import { verifyEmailCode } from "@/lib/firebase/auth";
 import { useRouter } from "next/navigation";
 
 export default function EmailVerification() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const router = useRouter();
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState(false);
+
+  const getDashboardPath = () => {
+    if (!userProfile) return "/";
+    switch (userProfile.role) {
+      case "sra":
+        return "/dashboard/sra";
+      case "student":
+        return "/dashboard/student";
+      case "judge":
+        return "/dashboard/judge";
+      case "fair_director":
+      case "website_manager":
+        return "/dashboard/admin";
+      default:
+        return "/";
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +46,7 @@ export default function EmailVerification() {
       if (isValid) {
         setVerified(true);
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push(getDashboardPath());
         }, 2000);
       } else {
         setError("Invalid or expired verification code. Please check your email and try again.");

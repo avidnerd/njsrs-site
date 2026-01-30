@@ -163,71 +163,71 @@ export default function AdminJudgeList() {
                 ×
               </button>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-4 text-gray-900">
               <div>
-                <h3 className="font-semibold">Contact Information</h3>
-                <p><strong>Name:</strong> {selectedJudge.firstName} {selectedJudge.lastName}</p>
-                <p><strong>Email:</strong> {selectedJudge.email}</p>
-                {selectedJudge.cellPhone && <p><strong>Phone:</strong> {selectedJudge.cellPhone}</p>}
-                {selectedJudge.address && <p><strong>Address:</strong> {selectedJudge.address}</p>}
+                <h3 className="font-semibold text-gray-900">Contact Information</h3>
+                <p className="text-gray-900"><strong>Name:</strong> {selectedJudge.firstName} {selectedJudge.lastName}</p>
+                <p className="text-gray-900"><strong>Email:</strong> {selectedJudge.email}</p>
+                {selectedJudge.cellPhone && <p className="text-gray-900"><strong>Phone:</strong> {selectedJudge.cellPhone}</p>}
+                {selectedJudge.address && <p className="text-gray-900"><strong>Address:</strong> {selectedJudge.address}</p>}
               </div>
               <div>
-                <h3 className="font-semibold">Institution</h3>
-                {selectedJudge.institution && <p><strong>Institution:</strong> {selectedJudge.institution}</p>}
-                {selectedJudge.department && <p><strong>Department:</strong> {selectedJudge.department}</p>}
-                {selectedJudge.currentPosition && <p><strong>Position:</strong> {selectedJudge.currentPosition}</p>}
-                {selectedJudge.institutionYears && <p><strong>Years:</strong> {selectedJudge.institutionYears}</p>}
+                <h3 className="font-semibold text-gray-900">Institution</h3>
+                {selectedJudge.institution && <p className="text-gray-900"><strong>Institution:</strong> {selectedJudge.institution}</p>}
+                {selectedJudge.department && <p className="text-gray-900"><strong>Department:</strong> {selectedJudge.department}</p>}
+                {selectedJudge.currentPosition && <p className="text-gray-900"><strong>Position:</strong> {selectedJudge.currentPosition}</p>}
+                {selectedJudge.institutionYears && <p className="text-gray-900"><strong>Years:</strong> {selectedJudge.institutionYears}</p>}
               </div>
               <div>
-                <h3 className="font-semibold">Education</h3>
-                {selectedJudge.highestDegree && <p><strong>Degree:</strong> {selectedJudge.highestDegree}</p>}
-                {selectedJudge.degreeDate && <p><strong>Date:</strong> {selectedJudge.degreeDate}</p>}
-                {selectedJudge.degreeDiscipline && <p><strong>Discipline:</strong> {selectedJudge.degreeDiscipline}</p>}
+                <h3 className="font-semibold text-gray-900">Education</h3>
+                {selectedJudge.highestDegree && <p className="text-gray-900"><strong>Degree:</strong> {selectedJudge.highestDegree}</p>}
+                {selectedJudge.degreeDate && <p className="text-gray-900"><strong>Date:</strong> {selectedJudge.degreeDate}</p>}
+                {selectedJudge.degreeDiscipline && <p className="text-gray-900"><strong>Discipline:</strong> {selectedJudge.degreeDiscipline}</p>}
               </div>
               {selectedJudge.areaOfExpertise && (
                 <div>
-                  <h3 className="font-semibold">Area of Expertise</h3>
-                  <p>{selectedJudge.areaOfExpertise}</p>
+                  <h3 className="font-semibold text-gray-900">Area of Expertise</h3>
+                  <p className="text-gray-900">{selectedJudge.areaOfExpertise}</p>
                 </div>
               )}
               {selectedJudge.experienceJudgingScienceFairs && (
                 <div>
-                  <h3 className="font-semibold">Judging Experience</h3>
-                  <p>{selectedJudge.experienceJudgingScienceFairs}</p>
+                  <h3 className="font-semibold text-gray-900">Judging Experience</h3>
+                  <p className="text-gray-900">{selectedJudge.experienceJudgingScienceFairs}</p>
                 </div>
               )}
               {selectedJudge.interviewApproach && (
                 <div>
-                  <h3 className="font-semibold">Interview Approach</h3>
-                  <p>{selectedJudge.interviewApproach}</p>
+                  <h3 className="font-semibold text-gray-900">Interview Approach</h3>
+                  <p className="text-gray-900">{selectedJudge.interviewApproach}</p>
                 </div>
               )}
               {selectedJudge.handleMistakesApproach && (
                 <div>
-                  <h3 className="font-semibold">Handling Mistakes</h3>
-                  <p>{selectedJudge.handleMistakesApproach}</p>
+                  <h3 className="font-semibold text-gray-900">Handling Mistakes</h3>
+                  <p className="text-gray-900">{selectedJudge.handleMistakesApproach}</p>
                 </div>
               )}
               {selectedJudge.knowsStudents && (
                 <div>
-                  <h3 className="font-semibold">Conflicts of Interest</h3>
-                  <p><strong>Knows Students:</strong> {selectedJudge.knowsStudents ? "Yes" : "No"}</p>
-                  {selectedJudge.knownStudents && <p><strong>Known Students:</strong> {selectedJudge.knownStudents}</p>}
-                  <p><strong>Mentoring Students:</strong> {selectedJudge.mentoringStudents ? "Yes" : "No"}</p>
-                  {selectedJudge.mentoringDetails && <p><strong>Details:</strong> {selectedJudge.mentoringDetails}</p>}
+                  <h3 className="font-semibold text-gray-900">Conflicts of Interest</h3>
+                  <p className="text-gray-900"><strong>Knows Students:</strong> {selectedJudge.knowsStudents ? "Yes" : "No"}</p>
+                  {selectedJudge.knownStudents && <p className="text-gray-900"><strong>Known Students:</strong> {selectedJudge.knownStudents}</p>}
+                  <p className="text-gray-900"><strong>Mentoring Students:</strong> {selectedJudge.mentoringStudents ? "Yes" : "No"}</p>
+                  {selectedJudge.mentoringDetails && <p className="text-gray-900"><strong>Details:</strong> {selectedJudge.mentoringDetails}</p>}
                 </div>
               )}
               <div>
-                <h3 className="font-semibold">Availability</h3>
+                <h3 className="font-semibold text-gray-900">Availability</h3>
                 {selectedJudge.availabilityApril18 && (
-                  <p><strong>April 18:</strong> {selectedJudge.availabilityApril18.replace(/_/g, " ").toUpperCase()}</p>
+                  <p className="text-gray-900"><strong>April 18:</strong> {selectedJudge.availabilityApril18.replace(/_/g, " ").toUpperCase()}</p>
                 )}
-                <p><strong>March Availability:</strong> {selectedJudge.availabilityMarch ? "Yes" : "No"}</p>
+                <p className="text-gray-900"><strong>March Availability:</strong> {selectedJudge.availabilityMarch ? "Yes" : "No"}</p>
               </div>
               {selectedJudge.references && (
                 <div>
-                  <h3 className="font-semibold">References</h3>
-                  <p className="whitespace-pre-wrap">{selectedJudge.references}</p>
+                  <h3 className="font-semibold text-gray-900">References</h3>
+                  <p className="whitespace-pre-wrap text-gray-900">{selectedJudge.references}</p>
                 </div>
               )}
             </div>

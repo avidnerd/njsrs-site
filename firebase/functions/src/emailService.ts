@@ -1,9 +1,12 @@
 import * as sgMail from "@sendgrid/mail";
+import * as functions from "firebase-functions";
 
-// Initialize SendGrid
-const sendGridApiKey = process.env.SENDGRID_API_KEY;
+// Initialize SendGrid - try config first (v1), then environment variable (v2)
+const sendGridApiKey = functions.config().sendgrid?.api_key || process.env.SENDGRID_API_KEY;
 if (sendGridApiKey) {
   sgMail.setApiKey(sendGridApiKey);
+} else {
+  console.warn("SendGrid API key not found in config or environment variables");
 }
 
 export interface EmailOptions {

@@ -11,7 +11,13 @@ service cloud.firestore {
     }
     
     function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+      return userDoc != null && userDoc.data != null ? userDoc.data.role : null;
+    }
+    
+    function isAdmin() {
+      let role = getUserRole();
+      return role == 'fair_director' || role == 'website_manager';
     }
     
     // Users collection
@@ -33,7 +39,7 @@ service cloud.firestore {
     match /sras/{sraId} {
       allow read: if isAuthenticated();
       allow create: if isOwner(sraId);
-      allow update: if isOwner(sraId);
+      allow update: if isOwner(sraId) || isAdmin();
     }
     
     // Students collection
@@ -56,9 +62,7 @@ service cloud.firestore {
       // Allow judges to create their own document
       allow create: if isOwner(judgeId);
       // Allow judges to update their own document, or admins to update (for approval)
-      allow update: if isOwner(judgeId) || 
-                        (isAuthenticated() && 
-                         (getUserRole() == 'fair_director' || getUserRole() == 'website_manager'));
+      allow update: if isOwner(judgeId) || isAdmin();
     }
   }
 }
