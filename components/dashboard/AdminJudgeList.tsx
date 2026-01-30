@@ -16,14 +16,9 @@ export default function AdminJudgeList() {
 
   const loadJudges = async () => {
     try {
-      console.log("Loading judges for admin dashboard...");
       const judgeList = await getAllJudges();
-      console.log("Judges loaded:", judgeList.length, judgeList);
       setJudges(judgeList);
     } catch (error: any) {
-      console.error("Error loading judges:", error);
-      console.error("Error code:", error?.code);
-      console.error("Error message:", error?.message);
       alert(`Error loading judges: ${error?.message || "Unknown error"}`);
     } finally {
       setLoading(false);

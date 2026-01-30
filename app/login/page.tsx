@@ -12,7 +12,6 @@ export default function LoginPage() {
   useEffect(() => {
     if (user) {
       if (!userProfile && !loading) {
-        console.error("User profile not found in Firestore. Please ensure the user document exists.");
         return;
       }
 

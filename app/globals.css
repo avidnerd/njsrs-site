@@ -75,6 +75,13 @@ select::placeholder {
   opacity: 1 !important;
 }
 
+div.bg-white p,
+div.bg-white h3,
+div.bg-white strong,
+div.bg-white span {
+  color: rgb(17, 24, 39) !important;
+}
+
 @media (prefers-color-scheme: dark) {
   label,
   label.block,
@@ -106,5 +113,12 @@ select::placeholder {
   select {
     color: rgb(17, 24, 39) !important;
     background-color: white !important;
+  }
+
+  div.bg-white p,
+  div.bg-white h3,
+  div.bg-white strong,
+  div.bg-white span {
+    color: rgb(17, 24, 39) !important;
   }
 }

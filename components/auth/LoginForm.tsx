@@ -39,9 +39,7 @@ export default function LoginForm() {
     }, 5000);
 
     try {
-      const result = await loginUser(email, password);
-      console.log("Login successful, user UID:", result.user.uid);
-      console.log("Please verify this UID matches your Firestore document ID exactly.");
+      await loginUser(email, password);
     } catch (err: any) {
       clearTimeout(timeoutId);
       setError(err.message || "Failed to log in");
