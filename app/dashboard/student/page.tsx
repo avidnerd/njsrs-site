@@ -7,7 +7,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { logoutUser } from "@/lib/firebase/auth";
 import { getStudent } from "@/lib/firebase/database";
 import StudentStatus from "@/components/dashboard/StudentStatus";
-import ProjectUpload from "@/components/dashboard/ProjectUpload";
+import StudentMaterials from "@/components/dashboard/StudentMaterials";
 import type { Student } from "@/lib/firebase/database";
 
 export default function StudentDashboardPage() {
@@ -78,7 +78,7 @@ export default function StudentDashboardPage() {
           ) : student ? (
             <div className="space-y-6">
               <StudentStatus student={student} />
-              <ProjectUpload />
+              <StudentMaterials />
             </div>
           ) : (
             <div className="text-center py-12">

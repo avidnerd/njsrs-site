@@ -67,3 +67,35 @@ export async function uploadPresentation(
 
   return uploadFile(userId, file, `presentation.${fileExtension}`);
 }
+
+export async function uploadResearchReport(
+  userId: string,
+  file: File
+): Promise<string> {
+  if (!file.type.includes("pdf")) {
+    throw new Error("Research report must be a PDF file");
+  }
+
+  if (file.size > 15 * 1024 * 1024) {
+    throw new Error("File size must be less than 15MB");
+  }
+
+  return uploadFile(userId, file, "research-report.pdf");
+}
+
+export async function uploadSlideshow(
+  userId: string,
+  file: File
+): Promise<string> {
+  const fileExtension = file.name.split(".").pop()?.toLowerCase();
+  
+  if (fileExtension !== "pptx") {
+    throw new Error("Slideshow must be in .pptx format only");
+  }
+
+  if (file.size > 25 * 1024 * 1024) {
+    throw new Error("File size must be less than 25MB");
+  }
+
+  return uploadFile(userId, file, "slideshow.pptx");
+}

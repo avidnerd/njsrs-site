@@ -37,7 +37,7 @@ export default function JudgeRegistrationForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const totalSteps = 9;
+  const totalSteps = 10;
 
   const validateStep = (step: number): boolean => {
     setError("");
@@ -64,8 +64,9 @@ export default function JudgeRegistrationForm() {
       case 6:
       case 7:
       case 8:
-        return true;
       case 9:
+        return true;
+      case 10:
         if (!formData.availabilityApril18) {
           setError("Please select your availability for April 18th");
           return false;
@@ -513,7 +514,7 @@ export default function JudgeRegistrationForm() {
           </div>
         );
 
-      case 9:
+      case 10:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Availability</h2>

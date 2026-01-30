@@ -58,6 +58,66 @@ export interface Student {
   abstractUrl?: string;
   presentationUrl?: string;
   paymentStatus?: "not_received" | "received";
+  // Materials submission fields
+  researchReportUrl?: string;
+  slideshowUrl?: string;
+  // SRC fields
+  srcQuestions?: SRCQuestions;
+  srcApprovalRequested?: boolean;
+  srcApprovalRequestedAt?: Date | Timestamp | null;
+  srcApproved?: boolean;
+  srcApprovedAt?: Date | Timestamp | null;
+  srcApprovedBy?: string;
+  srcNotes?: string;
+  // Ethics questionnaire
+  ethicsQuestionnaire?: EthicsQuestionnaire;
+}
+
+export interface SRCQuestions {
+  // Human Participants
+  involvesHumanParticipants?: boolean;
+  humanParticipantsDetails?: string;
+  irbApprovalObtained?: boolean;
+  irbApprovalDetails?: string;
+  informedConsentObtained?: boolean;
+  // Vertebrate Animals
+  involvesVertebrateAnimals?: boolean;
+  vertebrateAnimalsDetails?: string;
+  animalCareProtocol?: string;
+  veterinaryOversight?: boolean;
+  // Potentially Hazardous Biological Agents (PHBA)
+  involvesPHBA?: boolean;
+  phbaDetails?: string;
+  biosafetyLevel?: string;
+  phbaLocation?: string;
+  // Hazardous Chemicals/Devices
+  involvesHazardousMaterials?: boolean;
+  hazardousMaterialsDetails?: string;
+  safetyProtocols?: string;
+  // Continuation Project
+  isContinuationProject?: boolean;
+  continuationProjectDetails?: string;
+  previousYearAbstract?: string;
+}
+
+export interface EthicsQuestionnaire {
+  // Research Ownership
+  studentOwnership?: string; // Description of work done by student
+  mentorAssistance?: string; // Description of mentor assistance
+  labTechnicianAssistance?: string; // Description of lab tech assistance
+  externalData?: boolean; // Whether external data was used
+  externalDataDetails?: string;
+  // Attribution
+  properAttribution?: boolean;
+  literatureReviewCompleted?: boolean;
+  // Research Integrity
+  allProceduresReported?: boolean;
+  modificationsDisclosed?: boolean;
+  dataCollectionTransparent?: boolean;
+  // AI Usage
+  aiToolsUsed?: boolean;
+  aiUsageDetails?: string;
+  aiDisclosed?: boolean;
 }
 
 export interface Judge {
@@ -211,6 +271,48 @@ export async function updateStudentPaymentStatus(
   const dbInstance = ensureDb();
   const studentRef = doc(dbInstance, "students", studentId);
   await updateDoc(studentRef, { paymentStatus });
+}
+
+export async function updateStudentMaterials(
+  studentId: string,
+  updates: Partial<Pick<Student, "researchReportUrl" | "slideshowUrl" | "srcQuestions" | "ethicsQuestionnaire" | "srcApprovalRequested" | "srcApprovalRequestedAt">>
+): Promise<void> {
+  const dbInstance = ensureDb();
+  const studentRef = doc(dbInstance, "students", studentId);
+  await updateDoc(studentRef, updates);
+}
+
+export async function requestSRCApproval(studentId: string): Promise<void> {
+  const dbInstance = ensureDb();
+  const studentRef = doc(dbInstance, "students", studentId);
+  await updateDoc(studentRef, {
+    srcApprovalRequested: true,
+    srcApprovalRequestedAt: Timestamp.now(),
+  });
+}
+
+export async function updateSRCApproval(
+  studentId: string,
+  approved: boolean,
+  approvedBy: string,
+  notes?: string
+): Promise<void> {
+  const dbInstance = ensureDb();
+  const studentRef = doc(dbInstance, "students", studentId);
+  await updateDoc(studentRef, {
+    srcApproved: approved,
+    srcApprovedAt: approved ? Timestamp.now() : null,
+    srcApprovedBy: approved ? approvedBy : null,
+    srcNotes: notes || null,
+  });
+}
+
+export async function getStudentsWithSRCRequests(): Promise<Student[]> {
+  const dbInstance = ensureDb();
+  const studentsRef = collection(dbInstance, "students");
+  const q = query(studentsRef, where("srcApprovalRequested", "==", true));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Student));
 }
 
 export async function createJudge(judgeId: string, judge: Omit<Judge, "id" | "createdAt" | "adminApproved">): Promise<void> {

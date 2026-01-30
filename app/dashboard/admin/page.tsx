@@ -7,11 +7,12 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { logoutUser } from "@/lib/firebase/auth";
 import AdminSRAList from "@/components/dashboard/AdminSRAList";
 import AdminJudgeList from "@/components/dashboard/AdminJudgeList";
+import AdminSRCApproval from "@/components/dashboard/AdminSRCApproval";
 
 export default function AdminDashboardPage() {
   const { user, userProfile } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"sras" | "judges">("sras");
+  const [activeTab, setActiveTab] = useState<"sras" | "judges" | "src">("sras");
 
   const handleLogout = async () => {
     try {
@@ -72,6 +73,16 @@ export default function AdminDashboardPage() {
               >
                 Judges
               </button>
+              <button
+                onClick={() => setActiveTab("src")}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === "src"
+                    ? "border-primary-blue text-primary-blue"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                SRC Approval
+              </button>
             </nav>
           </div>
 
@@ -88,7 +99,7 @@ export default function AdminDashboardPage() {
               </div>
               <AdminSRAList />
             </div>
-          ) : (
+          ) : activeTab === "judges" ? (
             <div>
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
@@ -99,6 +110,18 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
               <AdminJudgeList />
+            </div>
+          ) : (
+            <div>
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  SRC Approval Requests
+                </h2>
+                <p className="text-gray-600">
+                  Review and approve Scientific Review Committee requests from students.
+                </p>
+              </div>
+              <AdminSRCApproval />
             </div>
           )}
         </div>
