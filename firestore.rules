@@ -47,12 +47,14 @@ service cloud.firestore {
       allow read: if isOwner(studentId) || 
                      (isAuthenticated() && 
                       getUserRole() == 'sra' && 
-                      get(/databases/$(database)/documents/students/$(studentId)).data.sraId == request.auth.uid);
+                      get(/databases/$(database)/documents/students/$(studentId)).data.sraId == request.auth.uid) ||
+                     isAdmin();
       allow create: if isOwner(studentId);
       allow update: if isOwner(studentId) || 
                         (isAuthenticated() && 
                          getUserRole() == 'sra' && 
-                         get(/databases/$(database)/documents/students/$(studentId)).data.sraId == request.auth.uid);
+                         get(/databases/$(database)/documents/students/$(studentId)).data.sraId == request.auth.uid) ||
+                        isAdmin();
     }
     
     // Judges collection
