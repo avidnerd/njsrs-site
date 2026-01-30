@@ -24,8 +24,10 @@ service cloud.firestore {
     match /users/{userId} {
       // Allow users to read their own profile
       allow read: if isOwner(userId);
-      // Allow users to write their own profile (for updates)
-      allow write: if isOwner(userId);
+      // Allow users to create their own profile during registration
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      // Allow users to update their own profile
+      allow update: if isOwner(userId);
     }
     
     // Schools collection
