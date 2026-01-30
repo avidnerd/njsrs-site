@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { registerSRA } from "@/lib/firebase/registration";
-import { getAllSchools, searchSchools, createSchool } from "@/lib/firebase/database";
+import { createSchool } from "@/lib/firebase/database";
 import { useRouter } from "next/navigation";
-import type { School } from "@/lib/firebase/database";
+import { loadAllSchools, searchSchools as searchSchoolsCSV, type SchoolData } from "@/lib/schools";
 
 export default function SRARegistrationForm() {
   const router = useRouter();
@@ -18,12 +18,15 @@ export default function SRARegistrationForm() {
     title: "",
     schoolName: "",
     schoolId: "",
+    selectedSchool: null as SchoolData | null,
   });
-  const [schools, setSchools] = useState<School[]>([]);
+  const [allSchools, setAllSchools] = useState<SchoolData[]>([]);
+  const [filteredSchools, setFilteredSchools] = useState<SchoolData[]>([]);
   const [showNewSchool, setShowNewSchool] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingSchools, setLoadingSchools] = useState(true);
 
   useEffect(() => {
     loadSchools();
@@ -31,24 +34,24 @@ export default function SRARegistrationForm() {
 
   const loadSchools = async () => {
     try {
-      const allSchools = await getAllSchools();
-      setSchools(allSchools);
+      setLoadingSchools(true);
+      const schools = await loadAllSchools();
+      setAllSchools(schools);
+      setFilteredSchools([]);
     } catch (err) {
       console.error("Error loading schools:", err);
+    } finally {
+      setLoadingSchools(false);
     }
   };
 
-  const handleSearch = async (term: string) => {
+  const handleSearch = (term: string) => {
     setSearchTerm(term);
-    if (term.length > 0) {
-      try {
-        const results = await searchSchools(term);
-        setSchools(results);
-      } catch (err) {
-        console.error("Error searching schools:", err);
-      }
+    if (term.length > 2) {
+      const results = searchSchoolsCSV(allSchools, term);
+      setFilteredSchools(results);
     } else {
-      loadSchools();
+      setFilteredSchools([]);
     }
   };
 
@@ -66,7 +69,7 @@ export default function SRARegistrationForm() {
       return;
     }
 
-    if (!formData.schoolId && !formData.schoolName) {
+    if (!formData.selectedSchool && !formData.schoolName) {
       setError("Please select or create a school");
       return;
     }
@@ -75,18 +78,27 @@ export default function SRARegistrationForm() {
 
     try {
       let schoolId = formData.schoolId;
+      let schoolName = formData.schoolName;
       
-      if (!schoolId && formData.schoolName) {
+      if (formData.selectedSchool) {
+        schoolName = formData.selectedSchool.name;
+        // Check if school exists in Firestore, if not create it
+        schoolId = await createSchool({
+          name: formData.selectedSchool.name,
+          address: formData.selectedSchool.address || `${formData.selectedSchool.city}, ${formData.selectedSchool.state} ${formData.selectedSchool.zip}`,
+        });
+      } else if (formData.schoolName) {
         schoolId = await createSchool({
           name: formData.schoolName,
         });
+        schoolName = formData.schoolName;
       }
 
       const { verificationCode } = await registerSRA(formData.email, formData.password, {
         firstName: formData.firstName,
         lastName: formData.lastName,
         schoolId: schoolId!,
-        schoolName: formData.schoolName || schools.find(s => s.id === schoolId)?.name || "",
+        schoolName: schoolName,
         phone: formData.phone,
         title: formData.title,
       });
@@ -230,33 +242,66 @@ export default function SRARegistrationForm() {
 
         {!showNewSchool ? (
           <div>
+            <label htmlFor="schoolSearch" className="block text-sm font-medium mb-1 text-gray-900">
+              Search for your school *
+            </label>
             <input
+              id="schoolSearch"
               type="text"
-              placeholder="Search for your school..."
+              placeholder="Type to search for your school..."
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent mb-2"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 mb-2"
             />
-            <select
-              value={formData.schoolId}
-              onChange={(e) => {
-                const selected = schools.find((s) => s.id === e.target.value);
-                setFormData({
-                  ...formData,
-                  schoolId: e.target.value,
-                  schoolName: selected?.name || "",
-                });
-              }}
-              required={!showNewSchool}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
-            >
-              <option value="">Select a school...</option>
-              {schools.map((school) => (
-                <option key={school.id} value={school.id}>
-                  {school.name}
-                </option>
-              ))}
-            </select>
+            {loadingSchools && (
+              <p className="text-sm text-gray-500 mb-2">Loading schools...</p>
+            )}
+            {filteredSchools.length > 0 && (
+              <div className="border border-gray-300 rounded-md max-h-60 overflow-y-auto">
+                {filteredSchools.map((school, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      setFormData({
+                        ...formData,
+                        selectedSchool: school,
+                        schoolName: school.name,
+                        schoolId: "",
+                      });
+                      setSearchTerm(school.name);
+                      setFilteredSchools([]);
+                    }}
+                    className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
+                      formData.selectedSchool?.name === school.name ? "bg-primary-green bg-opacity-10" : ""
+                    }`}
+                  >
+                    <div className="font-medium text-gray-900">{school.name}</div>
+                    <div className="text-sm text-gray-600">
+                      {school.city}, {school.state} {school.zip}
+                      {school.district && ` • ${school.district}`}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {formData.selectedSchool && (
+              <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
+                <div className="font-medium text-gray-900">Selected: {formData.selectedSchool.name}</div>
+                <div className="text-sm text-gray-600">
+                  {formData.selectedSchool.city}, {formData.selectedSchool.state} {formData.selectedSchool.zip}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData({ ...formData, selectedSchool: null, schoolName: "", schoolId: "" });
+                    setSearchTerm("");
+                  }}
+                  className="mt-2 text-sm text-red-600 hover:text-red-800"
+                >
+                  Clear selection
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div>

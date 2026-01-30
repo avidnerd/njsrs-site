@@ -10,6 +10,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'New Jersey Science Research Symposium',
   description: 'A research competition that brings together high school scientists from across New Jersey',
+  icons: {
+    icon: '/njsrs-icon-only.png',
+  },
 }
 
 export default function RootLayout({

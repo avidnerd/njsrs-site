@@ -36,7 +36,7 @@ export default function StudentRegistrationForm() {
     } else {
       setSRAs([]);
       setFormData({ ...formData, sraId: "" });
-      setError(""); // Clear error when school is deselected
+      setError(""); 
     }
   }, [formData.schoolId]);
 
@@ -56,7 +56,7 @@ export default function StudentRegistrationForm() {
       if (schoolSRAs.length === 0) {
         setError("No Science Research Advisors found for this school. Please contact your school to register an SRA first.");
       } else {
-        setError(""); // Clear error when SRAs are successfully loaded
+        setError(""); 
       }
     } catch (err) {
       console.error("Error loading SRAs:", err);
@@ -203,7 +203,7 @@ export default function StudentRegistrationForm() {
 
       <div>
         <label htmlFor="grade" className="block text-sm font-medium mb-1 text-gray-900">
-          Grade *
+          Grade - 9-12 only *
         </label>
         <select
           id="grade"
@@ -238,7 +238,7 @@ export default function StudentRegistrationForm() {
             setFormData({
               ...formData,
               schoolId: e.target.value,
-              sraId: "", // Reset SRA when school changes
+              sraId: "", 
             });
           }}
           required
@@ -296,7 +296,7 @@ export default function StudentRegistrationForm() {
 
       <div>
         <label htmlFor="projectDescription" className="block text-sm font-medium mb-1 text-gray-900">
-          Project Description
+          Please enter a brief description of your project (150 words max).
         </label>
         <textarea
           id="projectDescription"

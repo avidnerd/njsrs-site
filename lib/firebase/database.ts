@@ -80,15 +80,11 @@ export interface Judge {
   patents?: string;
   experienceJudgingScienceFairs?: string;
   canCommitToAllProjects?: boolean;
-  interviewApproach?: string;
-  handleMistakesApproach?: string;
   knowsStudents?: boolean;
   knownStudents?: string;
   mentoringStudents?: boolean;
   mentoringDetails?: string;
-  references?: string;
-  availabilityApril18?: "in_person" | "remote_only" | "morning_only" | "full_day";
-  availabilityMarch?: boolean;
+  availabilityApril18?: "remote_morning_only" | "in_person_full_day" | "in_person_morning_only";
   qualifications?: string;
   affiliation?: string;
   expertise?: string[];

@@ -26,22 +26,18 @@ export default function JudgeRegistrationForm() {
     areaOfExpertise: "",
     publications: "",
     patents: "",
-    experienceJudgingScienceFairs: "",
+    experienceJudgingScienceFairs: false,
     canCommitToAllProjects: false,
-    interviewApproach: "",
-    handleMistakesApproach: "",
     knowsStudents: false,
     knownStudents: "",
     mentoringStudents: false,
     mentoringDetails: "",
-    references: "",
-    availabilityApril18: "" as "in_person" | "remote_only" | "morning_only" | "full_day" | "",
-    availabilityMarch: false,
+    availabilityApril18: "" as "remote_morning_only" | "in_person_full_day" | "in_person_morning_only" | "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const totalSteps = 13;
+  const totalSteps = 9;
 
   const validateStep = (step: number): boolean => {
     setError("");
@@ -68,12 +64,8 @@ export default function JudgeRegistrationForm() {
       case 6:
       case 7:
       case 8:
-      case 9:
-      case 10:
-      case 11:
-      case 12:
         return true;
-      case 13:
+      case 9:
         if (!formData.availabilityApril18) {
           setError("Please select your availability for April 18th");
           return false;
@@ -119,17 +111,13 @@ export default function JudgeRegistrationForm() {
         areaOfExpertise: formData.areaOfExpertise,
         publications: formData.publications,
         patents: formData.patents,
-        experienceJudgingScienceFairs: formData.experienceJudgingScienceFairs,
+        experienceJudgingScienceFairs: formData.experienceJudgingScienceFairs ? "Yes" : "No",
         canCommitToAllProjects: formData.canCommitToAllProjects,
-        interviewApproach: formData.interviewApproach,
-        handleMistakesApproach: formData.handleMistakesApproach,
         knowsStudents: formData.knowsStudents,
         knownStudents: formData.knownStudents,
         mentoringStudents: formData.mentoringStudents,
         mentoringDetails: formData.mentoringDetails,
-        references: formData.references,
         availabilityApril18: formData.availabilityApril18 || undefined,
-        availabilityMarch: formData.availabilityMarch,
       });
 
       // Store verification code in sessionStorage temporarily
@@ -444,17 +432,15 @@ export default function JudgeRegistrationForm() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Judging Experience</h2>
             <div>
-              <label htmlFor="experienceJudgingScienceFairs" className="block text-sm font-medium mb-1 text-gray-900">
-                Experience Judging Science Fairs
+              <label className="flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  checked={formData.experienceJudgingScienceFairs}
+                  onChange={(e) => setFormData({ ...formData, experienceJudgingScienceFairs: e.target.checked })}
+                  className="mr-2"
+                />
+                Have you had experience judging science fairs?
               </label>
-              <textarea
-                id="experienceJudgingScienceFairs"
-                value={formData.experienceJudgingScienceFairs}
-                onChange={(e) => setFormData({ ...formData, experienceJudgingScienceFairs: e.target.value })}
-                rows={4}
-                placeholder="Describe your experience judging science fairs..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
-              />
             </div>
             <div>
               <label className="flex items-center">
@@ -471,48 +457,6 @@ export default function JudgeRegistrationForm() {
         );
 
       case 9:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-primary-blue mb-4">Interview Approach</h2>
-            <div>
-              <label htmlFor="interviewApproach" className="block text-sm font-medium mb-1 text-gray-900">
-                What is your approach to interviewing a student?
-              </label>
-              <p className="text-sm text-gray-600 mb-2">(We're looking to see if you are a teacher or just a critic)</p>
-              <textarea
-                id="interviewApproach"
-                value={formData.interviewApproach}
-                onChange={(e) => setFormData({ ...formData, interviewApproach: e.target.value })}
-                rows={6}
-                placeholder="Describe your approach..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
-              />
-            </div>
-          </div>
-        );
-
-      case 10:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-primary-blue mb-4">Handling Mistakes</h2>
-            <div>
-              <label htmlFor="handleMistakesApproach" className="block text-sm font-medium mb-1 text-gray-900">
-                How do you handle a mistake in project methodology or conclusion?
-              </label>
-              <p className="text-sm text-gray-600 mb-2">(We're looking to see if you are a teacher or just a critic)</p>
-              <textarea
-                id="handleMistakesApproach"
-                value={formData.handleMistakesApproach}
-                onChange={(e) => setFormData({ ...formData, handleMistakesApproach: e.target.value })}
-                rows={6}
-                placeholder="Describe your approach..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
-              />
-            </div>
-          </div>
-        );
-
-      case 11:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Conflicts of Interest</h2>
@@ -569,91 +513,49 @@ export default function JudgeRegistrationForm() {
           </div>
         );
 
-      case 12:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-primary-blue mb-4">References</h2>
-            <div>
-              <label htmlFor="references" className="block text-sm font-medium mb-1 text-gray-900">
-                References
-              </label>
-              <textarea
-                id="references"
-                value={formData.references}
-                onChange={(e) => setFormData({ ...formData, references: e.target.value })}
-                rows={6}
-                placeholder="Please provide references with contact information..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
-              />
-            </div>
-          </div>
-        );
-
-      case 13:
+      case 9:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Availability</h2>
             <div>
-              <label htmlFor="availabilityApril18" className="block text-sm font-medium mb-3">
+              <label htmlFor="availabilityApril18" className="block text-sm font-medium mb-3 text-gray-900">
                 Availability on April 18th *
               </label>
               <div className="space-y-2">
-                <label className="flex items-center">
+                <label className="flex items-center text-gray-900">
                   <input
                     type="radio"
                     name="availabilityApril18"
-                    value="in_person"
-                    checked={formData.availabilityApril18 === "in_person"}
+                    value="remote_morning_only"
+                    checked={formData.availabilityApril18 === "remote_morning_only"}
                     onChange={(e) => setFormData({ ...formData, availabilityApril18: e.target.value as any })}
                     className="mr-2"
                   />
-                  In-Person (Full Day)
+                  Remote (Morning Only, 8:30 AM - 12:00 PM)
                 </label>
-                <label className="flex items-center">
+                <label className="flex items-center text-gray-900">
                   <input
                     type="radio"
                     name="availabilityApril18"
-                    value="remote_only"
-                    checked={formData.availabilityApril18 === "remote_only"}
+                    value="in_person_full_day"
+                    checked={formData.availabilityApril18 === "in_person_full_day"}
                     onChange={(e) => setFormData({ ...formData, availabilityApril18: e.target.value as any })}
                     className="mr-2"
                   />
-                  Remote Only
+                  In Person (Full Day, 8:30 AM - 3:30 PM)
                 </label>
-                <label className="flex items-center">
+                <label className="flex items-center text-gray-900">
                   <input
                     type="radio"
                     name="availabilityApril18"
-                    value="morning_only"
-                    checked={formData.availabilityApril18 === "morning_only"}
+                    value="in_person_morning_only"
+                    checked={formData.availabilityApril18 === "in_person_morning_only"}
                     onChange={(e) => setFormData({ ...formData, availabilityApril18: e.target.value as any })}
                     className="mr-2"
                   />
-                  Morning Only (8:30 AM - 12:00 PM)
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="availabilityApril18"
-                    value="full_day"
-                    checked={formData.availabilityApril18 === "full_day"}
-                    onChange={(e) => setFormData({ ...formData, availabilityApril18: e.target.value as any })}
-                    className="mr-2"
-                  />
-                  Full Day (Morning + Afternoon, 8:30 AM - 3:30 PM)
+                  In Person (Morning Only, 8:30 AM - 12:00 PM)
                 </label>
               </div>
-            </div>
-            <div>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.availabilityMarch}
-                  onChange={(e) => setFormData({ ...formData, availabilityMarch: e.target.checked })}
-                  className="mr-2"
-                />
-                Available in March (virtually) for preliminary judging to choose top-10 in each category. This will involve choosing the top 10 project submissions by reviewing their research papers.
-              </label>
             </div>
           </div>
         );

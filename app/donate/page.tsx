@@ -34,15 +34,16 @@ export default function DonatePage() {
           <h2 className="text-2xl font-semibold text-primary-blue mb-4">
             Our Sponsors
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-gray-200 h-32 rounded flex items-center justify-center">
-              <span className="text-gray-500">Sponsor 1</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="bg-white h-32 rounded border border-gray-200 flex items-center justify-center p-4">
+              <img 
+                src="/mef_logo.png" 
+                alt="Millburn Education Foundation" 
+                className="max-h-full max-w-full object-contain"
+              />
             </div>
             <div className="bg-gray-200 h-32 rounded flex items-center justify-center">
-              <span className="text-gray-500">Sponsor 2</span>
-            </div>
-            <div className="bg-gray-200 h-32 rounded flex items-center justify-center">
-              <span className="text-gray-500">Sponsor 3</span>
+              <span className="text-gray-500">Coming Soon</span>
             </div>
           </div>
           <p className="text-gray-700 mb-4">
