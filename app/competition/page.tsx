@@ -5,28 +5,6 @@ export default function CompetitionPage() {
         <h1 className="text-4xl font-bold text-primary-blue mb-8">Competition</h1>
 
         <section className="mb-12">
-          <div className="bg-primary-blue rounded-lg shadow-lg p-6 text-white hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold mb-2">Competition Rules</h2>
-                <p className="text-blue-100">
-                  Download the complete competition rules, guidelines, and policies document
-                </p>
-              </div>
-              <a
-                href="/2025-2026%20New%20Jersey%20Science%20Research%20Symposium%20Core%20Rules%20260131.5%20%281%29.pdf"
-                download="NJSRS_Competition_Rules.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white text-primary-blue px-6 py-3 rounded-md hover:bg-gray-100 font-semibold transition-colors whitespace-nowrap"
-              >
-                View Competition Rules
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-12">
           <h2 className="text-2xl font-semibold text-primary-darkGreen mb-6">
             Timeline & Deadlines
           </h2>
@@ -36,6 +14,28 @@ export default function CompetitionPage() {
               alt="Fair Timeline" 
               className="w-full h-auto"
             />
+          </div>
+        </section>
+
+        <section className="mb-12">
+          <div className="bg-primary-blue rounded-lg shadow-lg p-6 text-white hover:shadow-xl transition-shadow">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Competition Rules</h2>
+                <p className="text-white">
+                  Download the complete competition rules, guidelines, and policies document
+                </p>
+              </div>
+              <a
+                href="/2025-2026 New Jersey Science Research Symposium Core Rules 20260131.5 (1).pdf"
+                download="NJSRS_Competition_Rules.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white text-primary-blue px-6 py-3 rounded-md hover:bg-gray-100 font-semibold transition-colors whitespace-nowrap"
+              >
+                View Competition Rules
+              </a>
+            </div>
           </div>
         </section>
 
@@ -167,9 +167,23 @@ export default function CompetitionPage() {
             Venue
           </h2>
           <p className="text-gray-700 mb-4">
-            The New Jersey Science Research Symposium is hosted at Millburn High School in Millburn, New Jersey. The event uses two main spaces:
+            The New Jersey Science Research Symposium is hosted at Millburn High School in Millburn, New Jersey.
           </p>
-          
+          <div className="w-full h-96 rounded-lg overflow-hidden shadow-md mb-4">
+            <iframe
+              src="https://www.google.com/maps?q=462+Millburn+Ave,+Millburn,+NJ+07041&output=embed"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Millburn High School Location - 462 Millburn Ave, Millburn, NJ 07041"
+            />
+          </div>
+          <p className="text-gray-700">
+            <strong>Address:</strong> 462 Millburn Ave., Millburn, NJ 07041
+          </p>
         </section>
       </div>
     </div>
