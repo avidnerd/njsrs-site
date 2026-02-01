@@ -260,7 +260,7 @@ export default function StudentRegistrationForm() {
           School *
         </label>
         <p className="text-sm text-gray-500 mb-2">
-          Note: if you do not see your school, it means that there is no Science Research Advisor currently registered at your school. Any member of your school&apos;s administration or faculty can register as a science research advisor, but they must be able to be present at the competition to chaperone your school&apos;s team.
+          Note: if you do not see your school, it means that there is no Science Research Advisor currently registered at your school. Any member of your school&apos;s administration or faculty can register as a science research advisor, but they must be able to be present at the competition to chaperone your school&apos;s team. If there is an SRA registered at your school, make sure you contact them prior to registering so that they know to approve your registration.
         </p>
         <select
           id="school"
