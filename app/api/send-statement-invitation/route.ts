@@ -26,12 +26,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use production URL if set, otherwise fall back to VERCEL_URL (for preview deployments)
+    // Use production URL - prioritize NEXT_PUBLIC_APP_URL, then check if we're in production
     // In production, NEXT_PUBLIC_APP_URL should be set to https://njsrs.org
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+    let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+    
+    if (!baseUrl) {
+      // If NEXT_PUBLIC_APP_URL is not set, check environment
+      if (process.env.VERCEL_ENV === 'production') {
+        // In production, default to njsrs.org
+        baseUrl = 'https://njsrs.org';
+      } else if (process.env.VERCEL_URL) {
+        // For preview deployments, use the preview URL
+        baseUrl = `https://${process.env.VERCEL_URL}`;
+      } else {
+        // Local development
+        baseUrl = 'http://localhost:3000';
+      }
+    }
 
-    const signerType = type === "teacher" ? "Teacher" : type === "mentor" ? "Mentor" : "Parent";
+    const signerType = type === "teacher" ? "Science Research Advisor" : type === "mentor" ? "Mentor" : "Parent";
     const invitationLink = `${baseUrl}/statement-sign/${token}`;
 
     const emailSubject = `NJSRS Statement of Outside Assistance - ${signerType} Signature Required`;

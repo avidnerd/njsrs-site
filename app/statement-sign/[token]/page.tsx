@@ -24,6 +24,7 @@ export default function StatementSignPage() {
   const [signature, setSignature] = useState("");
   const [comments, setComments] = useState("");
   const [safetyStatement, setSafetyStatement] = useState("");
+  const [isCompleted, setIsCompleted] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -47,20 +48,30 @@ export default function StatementSignPage() {
       setFormData(data.formData);
       setSignerType(data.signerType);
       
-      // Pre-fill signature fields if already completed
-      if (data.signerType === "teacher" && data.formData.teacherSignature) {
-        setSignature(data.formData.teacherSignature);
-      } else if (data.signerType === "mentor" && data.formData.mentorSignature) {
-        setSignature(data.formData.mentorSignature);
-      } else if (data.signerType === "parent" && data.formData.parentSignature) {
-        setSignature(data.formData.parentSignature);
+      // Check if form is already completed for this signer
+      let alreadyCompleted = false;
+      if (data.signerType === "teacher" && data.formData.teacherCompleted) {
+        alreadyCompleted = true;
+        setSignature(data.formData.teacherSignature || "");
+      } else if (data.signerType === "mentor" && data.formData.mentorCompleted) {
+        alreadyCompleted = true;
+        setSignature(data.formData.mentorSignature || "");
+      } else if (data.signerType === "parent" && data.formData.parentCompleted) {
+        alreadyCompleted = true;
+        setSignature(data.formData.parentSignature || "");
       }
-
-      if (data.formData.teacherMentorComments) {
-        setComments(data.formData.teacherMentorComments);
-      }
-      if (data.formData.teacherMentorSafetyStatement) {
-        setSafetyStatement(data.formData.teacherMentorSafetyStatement);
+      
+      if (alreadyCompleted) {
+        setIsCompleted(true);
+        setSuccess("Form submitted successfully! Thank you for completing your section.");
+      } else {
+        // Pre-fill fields if they exist but form isn't completed
+        if (data.formData.teacherMentorComments) {
+          setComments(data.formData.teacherMentorComments);
+        }
+        if (data.formData.teacherMentorSafetyStatement) {
+          setSafetyStatement(data.formData.teacherMentorSafetyStatement);
+        }
       }
     } catch (error: any) {
       setError(error.message || "Failed to load form");
@@ -142,10 +153,8 @@ export default function StatementSignPage() {
         throw new Error(errorData.error || "Failed to submit form");
       }
 
+      setIsCompleted(true);
       setSuccess("Form submitted successfully! Thank you for completing your section.");
-      setTimeout(() => {
-        setSuccess("");
-      }, 5000);
     } catch (error: any) {
       setError(error.message || "Failed to submit form");
     } finally {
@@ -174,7 +183,7 @@ export default function StatementSignPage() {
     );
   }
 
-  const signerLabel = signerType === "teacher" ? "Teacher" : signerType === "mentor" ? "Mentor" : "Parent";
+  const signerLabel = signerType === "teacher" ? "Science Research Advisor" : signerType === "mentor" ? "Mentor" : "Parent";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -213,11 +222,29 @@ export default function StatementSignPage() {
 
             {success && (
               <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                {success}
+                <div className="flex items-center">
+                  <svg className="h-5 w-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <p className="font-semibold">{success}</p>
+                </div>
+                <p className="mt-2 text-sm">This form has been submitted and cannot be edited.</p>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            {isCompleted ? (
+              <div className="text-center py-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+                  <svg className="w-8 h-8 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Form Successfully Submitted</h3>
+                <p className="text-gray-600">Thank you for completing your section of the Statement of Outside Assistance form.</p>
+                <p className="text-gray-600 mt-2">You can safely close this page.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
             {/* Teacher/Mentor Comments Section */}
             {(signerType === "teacher" || signerType === "mentor") && (
               <div className="border rounded-lg p-4 space-y-4">
@@ -259,13 +286,13 @@ export default function StatementSignPage() {
               </div>
             )}
 
-            {/* Additional Fields for Teacher */}
+            {/* Additional Fields for Science Research Advisor */}
             {signerType === "teacher" && (
               <div className="border rounded-lg p-4 space-y-4">
-                <h3 className="font-semibold text-gray-900">Teacher Information</h3>
+                <h3 className="font-semibold text-gray-900">Science Research Advisor Information</h3>
                 <div>
                   <label className="block text-sm font-medium mb-1 text-gray-900">
-                    Teacher&apos;s High School *
+                    Science Research Advisor&apos;s High School *
                   </label>
                   <input
                     type="text"
@@ -410,6 +437,7 @@ export default function StatementSignPage() {
               </button>
             </div>
           </form>
+            )}
           </div>
         </div>
       </div>

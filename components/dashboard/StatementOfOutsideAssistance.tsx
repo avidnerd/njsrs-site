@@ -291,13 +291,13 @@ export default function StatementOfOutsideAssistance() {
         </div>
       </div>
 
-      {/* Teacher Information */}
+      {/* Science Research Advisor Information */}
       <div className="border rounded-lg p-4 space-y-4">
-        <h4 className="font-semibold text-gray-900">Teacher Information</h4>
+        <h4 className="font-semibold text-gray-900">Science Research Advisor Information</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-900">
-              Teacher First Name *
+              Science Research Advisor First Name *
             </label>
             <input
               type="text"
@@ -309,7 +309,7 @@ export default function StatementOfOutsideAssistance() {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-900">
-              Teacher Last Name *
+              Science Research Advisor Last Name *
             </label>
             <input
               type="text"
@@ -321,14 +321,14 @@ export default function StatementOfOutsideAssistance() {
           </div>
           <div className="md:col-span-2">
             <label className="block text-sm font-medium mb-1 text-gray-900">
-              Teacher Email (for signature invitation) *
+              Science Research Advisor Email (for signature invitation) *
             </label>
             <div className="flex gap-2">
               <input
                 type="email"
                 value={formData.teacherEmail || ""}
                 onChange={(e) => updateField("teacherEmail", e.target.value)}
-                placeholder="teacher@school.edu"
+                placeholder="advisor@school.edu"
                 required
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
@@ -483,17 +483,25 @@ export default function StatementOfOutsideAssistance() {
         </button>
         {formData.studentCompleted && formData.studentSignatureDate && (
           <p className="text-sm text-gray-600">
-            Signed on: {formData.studentSignatureDate instanceof Date 
-              ? formData.studentSignatureDate.toLocaleDateString()
-              : new Date((formData.studentSignatureDate as any).toDate()).toLocaleDateString()}
+            Signed on: {(() => {
+              const date = formData.studentSignatureDate;
+              if (date instanceof Date) {
+                return date.toLocaleDateString();
+              } else if (date && typeof date === 'object' && 'toDate' in date && typeof (date as any).toDate === 'function') {
+                return (date as any).toDate().toLocaleDateString();
+              } else if (date && typeof date === 'object' && 'seconds' in date) {
+                return new Date((date as any).seconds * 1000).toLocaleDateString();
+              }
+              return 'Unknown date';
+            })()}
           </p>
         )}
       </div>
 
-      {/* Parent Invitation (if no teacher/mentor) */}
+      {/* Parent Invitation (if no Science Research Advisor/mentor) */}
       {(!formData.teacherFirstName || !formData.mentorFirstName) && (
         <div className="border rounded-lg p-4 space-y-4">
-          <h4 className="font-semibold text-gray-900">Parent Information (Required if no Teacher or Mentor)</h4>
+          <h4 className="font-semibold text-gray-900">Parent Information (Required if no Science Research Advisor or Mentor)</h4>
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-900">
               Parent Email (for signature invitation) *
