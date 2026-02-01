@@ -223,7 +223,7 @@ export default function StudentRegistrationForm() {
           required
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
         >
-          <option value="">Select a school...</option>
+          <option value="">Select a school. Note: if you do not see your school, it means that there is no Science Research Advisor currently registered at your school. Any member of your school's administration or faculty can register as a science research advisor, but they must be able to be present at the competition to chaperone your school's team.</option>
           {schools.map((school) => (
             <option key={school.id} value={school.id}>
               {school.name}
@@ -232,7 +232,7 @@ export default function StudentRegistrationForm() {
         </select>
         {schools.length === 0 && !loading && (
           <p className="mt-2 text-sm text-gray-600">
-            No schools with Science Research Advisors found. Please contact your school to register an SRA first.
+            No schools with Science Research Advisors found. Please contact your school to register an advisor first.
           </p>
         )}
       </div>
