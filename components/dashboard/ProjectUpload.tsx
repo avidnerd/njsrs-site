@@ -55,12 +55,12 @@ export default function ProjectUpload() {
   };
 
   const confirmResearchPlanChange = async () => {
-    if (pendingResearchPlan) {
-      await updateStudentProject(user.uid, { researchPlanUrl: pendingResearchPlan }, true);
-      await loadStudent();
-      setShowWarning(false);
-      setPendingResearchPlan(null);
-    }
+    if (!user || !pendingResearchPlan) return;
+    
+    await updateStudentProject(user.uid, { researchPlanUrl: pendingResearchPlan }, true);
+    await loadStudent();
+    setShowWarning(false);
+    setPendingResearchPlan(null);
   };
 
   const cancelResearchPlanChange = () => {
