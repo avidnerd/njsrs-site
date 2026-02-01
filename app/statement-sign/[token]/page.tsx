@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { Timestamp } from "firebase/firestore";
 import type { StatementOfOutsideAssistance } from "@/lib/firebase/database";
 
 interface StudentInfo {

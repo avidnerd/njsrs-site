@@ -39,3 +39,6 @@ next-env.d.ts
 .firebase/
 firebase-debug.log
 firestore-debug.log
+firebase-service-account.json
+*-firebase-adminsdk-*.json
+service-account-oneline.json

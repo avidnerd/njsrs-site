@@ -176,9 +176,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Convert Timestamp objects (they come as {seconds, nanoseconds} from JSON.stringify)
+    const convertTimestamps = (obj: any): any => {
+      if (obj === null || obj === undefined) return obj;
+      if (Array.isArray(obj)) {
+        return obj.map(convertTimestamps);
+      }
+      if (typeof obj === 'object' && obj.seconds !== undefined && obj.nanoseconds !== undefined && !(obj instanceof Timestamp)) {
+        // This is a Timestamp-like object from JSON (has seconds and nanoseconds but isn't a Timestamp instance)
+        return new Timestamp(obj.seconds, obj.nanoseconds);
+      }
+      if (typeof obj === 'object' && !(obj instanceof Date) && !(obj instanceof Timestamp)) {
+        const converted: any = {};
+        for (const key in obj) {
+          converted[key] = convertTimestamps(obj[key]);
+        }
+        return converted;
+      }
+      return obj;
+    };
+
+    const convertedFormData = convertTimestamps(formData);
+
     // Update the student document with the new form data
     await db.collection("students").doc(studentId).update({
-      statementOfOutsideAssistance: formData,
+      statementOfOutsideAssistance: convertedFormData,
     });
 
     return NextResponse.json({ success: true });
