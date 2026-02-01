@@ -21,8 +21,8 @@ export default function CompetitionPage() {
           <div className="bg-primary-blue rounded-lg shadow-lg p-6 text-white hover:shadow-xl transition-shadow">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold mb-2">Competition Rules</h2>
-                <p className="text-white">
+                <h2 className="text-2xl font-bold mb-2 text-white">Competition Rules</h2>
+                <p className="!text-white">
                   Download the complete competition rules, guidelines, and policies document
                 </p>
               </div>

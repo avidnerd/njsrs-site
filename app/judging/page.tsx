@@ -14,7 +14,7 @@ export default function JudgingPage() {
             REGISTER TO JUDGE OUR SCIENCE FAIR!
           </Link>
           <p className="text-sm text-gray-600">
-            <strong>Registration opens January 1st</strong>
+            <strong>Registration opens February 1st</strong>
           </p>
         </div>
 

@@ -154,6 +154,18 @@ export interface Judge {
 
 export async function createSchool(school: Omit<School, "id" | "createdAt">): Promise<string> {
   const dbInstance = ensureDb();
+  
+  // First, check if a school with this name already exists
+  const schoolsRef = collection(dbInstance, "schools");
+  const q = query(schoolsRef, where("name", "==", school.name));
+  const querySnapshot = await getDocs(q);
+  
+  if (!querySnapshot.empty) {
+    // School already exists, return its ID
+    return querySnapshot.docs[0].id;
+  }
+  
+  // School doesn't exist, create a new one
   const schoolRef = doc(collection(dbInstance, "schools"));
   await setDoc(schoolRef, {
     ...school,
