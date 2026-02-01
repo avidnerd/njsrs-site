@@ -17,29 +17,59 @@ export const onUserCreated = functions.firestore
       return null;
     }
 
+    // Validate email address
+    if (!userData.email || typeof userData.email !== "string") {
+      console.error(`Invalid email address for user ${userId}: ${userData.email}`);
+      return null;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userData.email)) {
+      console.error(`Invalid email format for user ${userId}: ${userData.email}`);
+      return null;
+    }
+
     try {
       // Get user details from their role-specific collection
+      // Use a retry mechanism in case the document doesn't exist yet
       let userName = "";
       let userDetails: any = null;
+      let attempts = 0;
+      const maxAttempts = 3;
+      const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-      if (userData.role === "sra") {
-        const sraDoc = await admin.firestore().collection("sras").doc(userId).get();
-        if (sraDoc.exists) {
-          userDetails = sraDoc.data();
-          userName = `${userDetails?.firstName || ""} ${userDetails?.lastName || ""}`.trim();
+      while (attempts < maxAttempts) {
+        if (userData.role === "sra") {
+          const sraDoc = await admin.firestore().collection("sras").doc(userId).get();
+          if (sraDoc.exists) {
+            userDetails = sraDoc.data();
+            userName = `${userDetails?.firstName || ""} ${userDetails?.lastName || ""}`.trim();
+            break;
+          }
+        } else if (userData.role === "student") {
+          const studentDoc = await admin.firestore().collection("students").doc(userId).get();
+          if (studentDoc.exists) {
+            userDetails = studentDoc.data();
+            userName = `${userDetails?.firstName || ""} ${userDetails?.lastName || ""}`.trim();
+            break;
+          }
+        } else if (userData.role === "judge") {
+          const judgeDoc = await admin.firestore().collection("judges").doc(userId).get();
+          if (judgeDoc.exists) {
+            userDetails = judgeDoc.data();
+            userName = `${userDetails?.firstName || ""} ${userDetails?.lastName || ""}`.trim();
+            break;
+          }
         }
-      } else if (userData.role === "student") {
-        const studentDoc = await admin.firestore().collection("students").doc(userId).get();
-        if (studentDoc.exists) {
-          userDetails = studentDoc.data();
-          userName = `${userDetails?.firstName || ""} ${userDetails?.lastName || ""}`.trim();
+
+        attempts++;
+        if (attempts < maxAttempts) {
+          await delay(1000 * attempts); // Wait 1s, 2s, 3s between attempts
         }
-      } else if (userData.role === "judge") {
-        const judgeDoc = await admin.firestore().collection("judges").doc(userId).get();
-        if (judgeDoc.exists) {
-          userDetails = judgeDoc.data();
-          userName = `${userDetails?.firstName || ""} ${userDetails?.lastName || ""}`.trim();
-        }
+      }
+
+      if (attempts === maxAttempts && !userName) {
+        console.warn(`Role-specific document not found for user ${userId} after ${maxAttempts} attempts, proceeding with generic name`);
       }
 
       // Send verification email
@@ -58,10 +88,35 @@ export const onUserCreated = functions.firestore
         `,
       });
 
-      console.log(`Verification email sent to ${userData.email}`);
+      console.log(`✓ Verification email sent successfully to ${userData.email} for user ${userId}`);
       return null;
     } catch (error: any) {
-      console.error("Error sending verification email:", error);
+      // Enhanced error logging
+      console.error(`✗ Error sending verification email to ${userData.email} for user ${userId}:`, error);
+      
+      if (error.response) {
+        console.error("SendGrid API error response:", JSON.stringify(error.response.body, null, 2));
+        
+        // Log specific SendGrid error codes
+        if (error.response.body && Array.isArray(error.response.body.errors)) {
+          error.response.body.errors.forEach((err: any) => {
+            console.error(`SendGrid error: ${err.message} (field: ${err.field}, help: ${err.help || 'N/A'})`);
+          });
+        }
+      } else if (error.message) {
+        console.error("Error message:", error.message);
+      }
+
+      // Store error in user document for debugging (optional)
+      try {
+        await admin.firestore().collection("users").doc(userId).update({
+          emailError: error.message || "Unknown error",
+          emailErrorAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      } catch (updateError) {
+        console.error("Failed to update user document with error:", updateError);
+      }
+
       return null;
     }
   });

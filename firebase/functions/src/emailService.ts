@@ -18,23 +18,54 @@ export interface EmailOptions {
 
 export async function sendEmail(options: EmailOptions): Promise<void> {
   if (!sendGridApiKey) {
-    console.warn("SENDGRID_API_KEY not set, email not sent:", options);
-    return;
+    const errorMsg = "SENDGRID_API_KEY not set, email not sent";
+    console.error(errorMsg, { to: options.to, subject: options.subject });
+    throw new Error(errorMsg);
+  }
+
+  // Validate email address
+  if (!options.to || typeof options.to !== "string") {
+    throw new Error(`Invalid recipient email: ${options.to}`);
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(options.to)) {
+    throw new Error(`Invalid email format: ${options.to}`);
   }
 
   try {
-    await sgMail.send({
+    const result = await sgMail.send({
       to: options.to,
       from: options.from || "faircommittee@njsrs.org",
       subject: options.subject,
       html: options.html,
     });
-    console.log(`Email sent to ${options.to}`);
+    
+    console.log(`✓ Email sent successfully to ${options.to}`, {
+      statusCode: result[0]?.statusCode,
+      headers: result[0]?.headers,
+    });
   } catch (error: any) {
-    console.error("Error sending email:", error);
+    console.error(`✗ Error sending email to ${options.to}:`, error);
+    
     if (error.response) {
-      console.error("SendGrid error response:", error.response.body);
+      const errorBody = error.response.body;
+      console.error("SendGrid API error response:", JSON.stringify(errorBody, null, 2));
+      
+      // Log specific error details
+      if (errorBody && Array.isArray(errorBody.errors)) {
+        errorBody.errors.forEach((err: any) => {
+          console.error(`SendGrid error detail:`, {
+            message: err.message,
+            field: err.field,
+            help: err.help,
+          });
+        });
+      }
+    } else if (error.message) {
+      console.error("Error message:", error.message);
     }
+    
     throw error;
   }
 }

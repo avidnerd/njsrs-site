@@ -2,7 +2,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  sendEmailVerification,
   User,
   UserCredential,
 } from "firebase/auth";
@@ -65,11 +64,8 @@ export async function registerUser(
     verificationCodeExpiry: Timestamp.fromDate(verificationCodeExpiry),
   });
 
-  try {
-    await sendEmailVerification(userCredential.user);
-  } catch (error) {
-    console.error("Error sending email verification:", error);
-  }
+  // Note: Verification email is sent via Firebase Cloud Function (sendVerificationEmail trigger)
+  // We don't use Firebase Auth's default sendEmailVerification to avoid sending duplicate emails
 
   return { userCredential, verificationCode };
 }
