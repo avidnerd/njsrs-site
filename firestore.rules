@@ -49,16 +49,22 @@ service cloud.firestore {
     
     // Students collection
     match /students/{studentId} {
-      allow read: if isOwner(studentId) || 
-                     (isAuthenticated() && 
-                      getUserRole() == 'sra' && 
-                      get(/databases/$(database)/documents/students/$(studentId)).data.sraId == request.auth.uid) ||
-                     isAdmin();
+      // Helper function to check if user is SRA and owns this student
+      function isSRAOwner() {
+        return isAuthenticated() && 
+               getUserRole() == 'sra' && 
+               get(/databases/$(database)/documents/students/$(studentId)).data.sraId == request.auth.uid;
+      }
+      
+      // Allow read if owner, SRA owner, or admin
+      allow read: if isOwner(studentId) || isSRAOwner() || isAdmin();
+      // Allow create if owner
       allow create: if isOwner(studentId);
+      // Allow update if owner, SRA owner, or admin
       allow update: if isOwner(studentId) || 
                         (isAuthenticated() && 
                          getUserRole() == 'sra' && 
-                         get(/databases/$(database)/documents/students/$(studentId)).data.sraId == request.auth.uid) ||
+                         resource.data.sraId == request.auth.uid) ||
                         isAdmin();
     }
     

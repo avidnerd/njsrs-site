@@ -272,7 +272,13 @@ export async function getStudentsBySRA(sraId: string): Promise<Student[]> {
   const studentsRef = collection(dbInstance, "students");
   const q = query(studentsRef, where("sraId", "==", sraId));
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Student));
+  const students = querySnapshot.docs.map((doc) => {
+    const data = doc.data();
+    console.log(`Student ${doc.id}: sraId=${data.sraId}, status=${data.status}`);
+    return { id: doc.id, ...data } as Student;
+  });
+  console.log(`Query for sraId=${sraId} returned ${students.length} students`);
+  return students;
 }
 
 export async function updateStudentStatus(

@@ -22,10 +22,13 @@ export default function SRAStudentList() {
     if (!user) return;
     
     try {
+      console.log("Loading students for SRA:", user.uid);
       const studentList = await getStudentsBySRA(user.uid);
+      console.log("Found students:", studentList.length, studentList);
       setStudents(studentList);
     } catch (error) {
       console.error("Error loading students:", error);
+      alert(`Error loading students: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setLoading(false);
     }
