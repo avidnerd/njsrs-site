@@ -26,6 +26,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Use production URL if set, otherwise fall back to VERCEL_URL (for preview deployments)
+    // In production, NEXT_PUBLIC_APP_URL should be set to https://njsrs.org
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
