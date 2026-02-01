@@ -148,6 +148,9 @@ export default function StudentRegistrationForm() {
         <label htmlFor="email" className="block text-sm font-medium mb-1 text-gray-900">
           Email *
         </label>
+        <p className="text-sm text-gray-500 mb-2">
+          Note: We recommend using a personal email address for this registration, as a school email address may block verification emails from us.
+        </p>
         <input
           id="email"
           type="email"

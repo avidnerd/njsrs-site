@@ -20,6 +20,19 @@ service cloud.firestore {
       return role == 'fair_director' || role == 'website_manager';
     }
     
+    // Helper function to check if user is SRA (by checking if SRA document exists)
+    function isSRA() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/sras/$(request.auth.uid)).data != null;
+    }
+    
+    // Helper function to check if user is SRA and owns this student
+    function isSRAOwner(studentId) {
+      return isSRA() && 
+             get(/databases/$(database)/documents/students/$(studentId)).data != null &&
+             get(/databases/$(database)/documents/students/$(studentId)).data.sraId == request.auth.uid;
+    }
+    
     // Users collection
     match /users/{userId} {
       // Allow users to read their own profile
@@ -49,22 +62,14 @@ service cloud.firestore {
     
     // Students collection
     match /students/{studentId} {
-      // Helper function to check if user is SRA and owns this student
-      function isSRAOwner() {
-        return isAuthenticated() && 
-               getUserRole() == 'sra' && 
-               get(/databases/$(database)/documents/students/$(studentId)).data.sraId == request.auth.uid;
-      }
-      
       // Allow read if owner, SRA owner, or admin
-      allow read: if isOwner(studentId) || isSRAOwner() || isAdmin();
+      // For queries, Firestore will evaluate this for each matching document
+      allow read: if isOwner(studentId) || isSRAOwner(studentId) || isAdmin();
       // Allow create if owner
       allow create: if isOwner(studentId);
       // Allow update if owner, SRA owner, or admin
       allow update: if isOwner(studentId) || 
-                        (isAuthenticated() && 
-                         getUserRole() == 'sra' && 
-                         resource.data.sraId == request.auth.uid) ||
+                        (isSRA() && resource.data.sraId == request.auth.uid) ||
                         isAdmin();
     }
     
