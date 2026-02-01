@@ -106,7 +106,13 @@ export default function SRARegistrationForm() {
       sessionStorage.setItem("verificationCode", verificationCode);
       router.push("/verify");
     } catch (err: any) {
-      setError(err.message || "Registration failed");
+      console.error("SRA Registration Error:", err);
+      const errorMessage = err.message || "Registration failed";
+      if (errorMessage.includes("permission") || errorMessage.includes("Permission")) {
+        setError("Registration failed due to permissions. Please ensure you are logged in and try again. If the problem persists, please contact support.");
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }

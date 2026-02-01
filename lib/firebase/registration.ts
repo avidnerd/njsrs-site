@@ -7,22 +7,37 @@ export async function registerSRA(
   password: string,
   sraData: Omit<SRA, "id" | "email" | "createdAt" | "approved" | "adminApproved">
 ): Promise<{ verificationCode: string }> {
-  const { userCredential, verificationCode } = await registerUser(email, password, "sra");
+  try {
+    const { userCredential, verificationCode } = await registerUser(email, password, "sra");
 
-  let schoolId = sraData.schoolId;
-  if (!schoolId) {
-    schoolId = await createSchool({
-      name: sraData.schoolName,
-    });
+    let schoolId = sraData.schoolId;
+    if (!schoolId) {
+      try {
+        schoolId = await createSchool({
+          name: sraData.schoolName,
+        });
+      } catch (schoolError: any) {
+        console.error("Error creating school:", schoolError);
+        throw new Error(`Failed to create school: ${schoolError.message || "Unknown error"}`);
+      }
+    }
+
+    try {
+      await createSRA(userCredential.user.uid, {
+        ...sraData,
+        email,
+        schoolId,
+      });
+    } catch (sraError: any) {
+      console.error("Error creating SRA:", sraError);
+      throw new Error(`Failed to create SRA profile: ${sraError.message || "Unknown error"}`);
+    }
+
+    return { verificationCode };
+  } catch (error: any) {
+    console.error("SRA Registration Error:", error);
+    throw error;
   }
-
-  await createSRA(userCredential.user.uid, {
-    ...sraData,
-    email,
-    schoolId,
-  });
-
-  return { verificationCode };
 }
 
 export async function registerStudent(
