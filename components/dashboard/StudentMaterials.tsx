@@ -9,7 +9,11 @@ import StatementOfOutsideAssistance from "./StatementOfOutsideAssistance";
 import type { Student } from "@/lib/firebase/database";
 import Link from "next/link";
 
-export default function StudentMaterials() {
+interface StudentMaterialsProps {
+  onFormUpdate?: () => void;
+}
+
+export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps) {
   const { user } = useAuth();
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,6 +44,9 @@ export default function StudentMaterials() {
     const url = await uploadResearchReport(user.uid, file);
     await updateStudentMaterials(user.uid, { researchReportUrl: url });
     await loadStudent();
+    if (onFormUpdate) {
+      onFormUpdate();
+    }
   };
 
   const handleSlideshowUpload = async (file: File) => {
@@ -47,6 +54,9 @@ export default function StudentMaterials() {
     const url = await uploadSlideshow(user.uid, file);
     await updateStudentMaterials(user.uid, { slideshowUrl: url });
     await loadStudent();
+    if (onFormUpdate) {
+      onFormUpdate();
+    }
   };
 
   const handleAbstractUpload = async (file: File) => {
@@ -54,6 +64,9 @@ export default function StudentMaterials() {
     const url = await uploadAbstract(user.uid, file);
     await updateStudentMaterials(user.uid, { abstractUrl: url });
     await loadStudent();
+    if (onFormUpdate) {
+      onFormUpdate();
+    }
   };
 
   if (loading) {
@@ -194,7 +207,7 @@ export default function StudentMaterials() {
 
       {/* Statement of Outside Assistance Section */}
       {activeSection === "statement" && (
-        <StatementOfOutsideAssistance />
+        <StatementOfOutsideAssistance onFormUpdate={onFormUpdate} />
       )}
     </div>
   );

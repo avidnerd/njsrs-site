@@ -6,7 +6,11 @@ import { updateStudentMaterials, getStudent } from "@/lib/firebase/database";
 import type { Student, StatementOfOutsideAssistance } from "@/lib/firebase/database";
 import { Timestamp } from "firebase/firestore";
 
-export default function StatementOfOutsideAssistance() {
+interface StatementOfOutsideAssistanceProps {
+  onFormUpdate?: () => void;
+}
+
+export default function StatementOfOutsideAssistance({ onFormUpdate }: StatementOfOutsideAssistanceProps) {
   const { user } = useAuth();
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
@@ -60,6 +64,9 @@ export default function StatementOfOutsideAssistance() {
       });
       setSuccess("Form saved successfully!");
       setTimeout(() => setSuccess(""), 3000);
+      if (onFormUpdate) {
+        onFormUpdate();
+      }
     } catch (error) {
       setError("Failed to save form");
     } finally {
@@ -128,6 +135,9 @@ export default function StatementOfOutsideAssistance() {
       setFormData(updatedFormData);
       setSuccess(`Invitation sent to ${email} successfully!`);
       setTimeout(() => setSuccess(""), 3000);
+      if (onFormUpdate) {
+        onFormUpdate();
+      }
     } catch (error: any) {
       setError(error.message || "Failed to send invitation");
     } finally {
@@ -161,6 +171,9 @@ export default function StatementOfOutsideAssistance() {
       setFormData(updatedFormData);
       setSuccess("Signature saved successfully!");
       setTimeout(() => setSuccess(""), 3000);
+      if (onFormUpdate) {
+        onFormUpdate();
+      }
     } catch (error) {
       setError("Failed to save signature");
     } finally {
