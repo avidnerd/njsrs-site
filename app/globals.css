@@ -86,7 +86,10 @@ div.bg-white span {
 .bg-primary-blue h2,
 .bg-primary-blue h3,
 .bg-primary-blue span,
-.bg-primary-blue div {
+.bg-primary-blue div,
+.bg-primary-blue p.text-white,
+section.bg-primary-blue p,
+section.bg-primary-blue div p {
   color: white !important;
 }
 
