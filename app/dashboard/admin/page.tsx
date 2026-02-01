@@ -8,11 +8,12 @@ import { logoutUser } from "@/lib/firebase/auth";
 import AdminSRAList from "@/components/dashboard/AdminSRAList";
 import AdminJudgeList from "@/components/dashboard/AdminJudgeList";
 import AdminSRCApproval from "@/components/dashboard/AdminSRCApproval";
+import AdminStudentList from "@/components/dashboard/AdminStudentList";
 
 export default function AdminDashboardPage() {
   const { user, userProfile } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"sras" | "judges" | "src">("sras");
+  const [activeTab, setActiveTab] = useState<"sras" | "judges" | "src" | "students">("sras");
 
   const handleLogout = async () => {
     try {
@@ -83,6 +84,16 @@ export default function AdminDashboardPage() {
               >
                 SRC Approval
               </button>
+              <button
+                onClick={() => setActiveTab("students")}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === "students"
+                    ? "border-primary-blue text-primary-blue"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                All Students
+              </button>
             </nav>
           </div>
 
@@ -111,7 +122,7 @@ export default function AdminDashboardPage() {
               </div>
               <AdminJudgeList />
             </div>
-          ) : (
+          ) : activeTab === "src" ? (
             <div>
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
@@ -122,6 +133,18 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
               <AdminSRCApproval />
+            </div>
+          ) : (
+            <div>
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  All Students
+                </h2>
+                <p className="text-gray-600">
+                  View all registered students and their submitted materials, forms, and information.
+                </p>
+              </div>
+              <AdminStudentList />
             </div>
           )}
         </div>

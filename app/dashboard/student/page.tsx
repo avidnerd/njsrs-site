@@ -77,7 +77,7 @@ export default function StudentDashboardPage() {
             </div>
           ) : student ? (
             <div className="space-y-6">
-              <StudentStatus student={student} />
+              <StudentStatus student={student} onUpdate={loadStudent} />
               <StudentMaterials />
             </div>
           ) : (

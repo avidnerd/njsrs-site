@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface FileUploadProps {
   label: string;
@@ -21,6 +21,19 @@ export default function FileUpload({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const previousFileRef = useRef<string | undefined>(currentFile);
+
+  // Track when currentFile changes to show success
+  useEffect(() => {
+    if (currentFile && currentFile !== previousFileRef.current && uploading === false) {
+      // File was just uploaded
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 5000);
+    }
+    previousFileRef.current = currentFile;
+  }, [currentFile, uploading]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -45,10 +58,10 @@ export default function FileUpload({
 
     try {
       await onUpload(file);
-      setSuccess(true);
       setFile(null);
       const input = document.getElementById(`file-${label}`) as HTMLInputElement;
       if (input) input.value = "";
+      // Success will be shown when currentFile updates via useEffect
     } catch (err: any) {
       setError(err.message || "Upload failed");
     } finally {

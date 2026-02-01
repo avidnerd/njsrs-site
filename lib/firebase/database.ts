@@ -366,10 +366,40 @@ export async function updateStudentStatus(
 
 export async function updateStudentProject(
   studentId: string,
-  updates: Partial<Pick<Student, "projectTitle" | "projectDescription" | "researchPlanUrl" | "abstractUrl" | "presentationUrl">>
+  updates: Partial<Pick<Student, "projectTitle" | "projectDescription" | "researchPlanUrl" | "abstractUrl" | "presentationUrl">>,
+  resetSignatures?: boolean
 ): Promise<void> {
   const dbInstance = ensureDb();
   const studentRef = doc(dbInstance, "students", studentId);
+  
+  if (resetSignatures && updates.researchPlanUrl) {
+    // Get current student data
+    const studentDoc = await getDoc(studentRef);
+    if (studentDoc.exists()) {
+      const currentData = studentDoc.data();
+      const currentSOA = currentData.statementOfOutsideAssistance || {};
+      
+      // Reset all signatures
+      const resetSOA = {
+        ...currentSOA,
+        studentCompleted: false,
+        studentSignature: null,
+        teacherCompleted: false,
+        mentorCompleted: false,
+        parentCompleted: false,
+        teacherInviteSent: false,
+        mentorInviteSent: false,
+        parentInviteSent: false,
+      };
+      
+      await updateDoc(studentRef, {
+        ...updates,
+        statementOfOutsideAssistance: resetSOA,
+      });
+      return;
+    }
+  }
+  
   await updateDoc(studentRef, updates);
 }
 
@@ -422,6 +452,16 @@ export async function getStudentsWithSRCRequests(): Promise<Student[]> {
   const q = query(studentsRef, where("srcApprovalRequested", "==", true));
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Student));
+}
+
+export async function getAllStudents(): Promise<Student[]> {
+  const dbInstance = ensureDb();
+  const studentsRef = collection(dbInstance, "students");
+  const querySnapshot = await getDocs(studentsRef);
+  return querySnapshot.docs.map((doc) => {
+    const data = doc.data();
+    return { id: doc.id, ...data } as Student;
+  });
 }
 
 export async function createJudge(judgeId: string, judge: Omit<Judge, "id" | "createdAt" | "adminApproved">): Promise<void> {

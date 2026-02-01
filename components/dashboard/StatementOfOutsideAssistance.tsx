@@ -87,7 +87,25 @@ export default function StatementOfOutsideAssistance() {
       // Generate a unique token for this invitation
       const token = `${user.uid}_${type}_${Date.now()}_${Math.random().toString(36).substring(7)}`;
       
-      // Update form data with invitation info
+      // Send invitation email via API route FIRST
+      const response = await fetch("/api/send-statement-invitation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studentId: user.uid,
+          studentName: `${student?.firstName} ${student?.lastName}`,
+          type,
+          email,
+          token,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to send invitation email");
+      }
+
+      // Only update form data AFTER email is successfully sent
       const updatedFormData = { ...formData };
       if (type === "teacher") {
         updatedFormData.teacherEmail = email;
@@ -106,23 +124,6 @@ export default function StatementOfOutsideAssistance() {
       await updateStudentMaterials(user.uid, {
         statementOfOutsideAssistance: updatedFormData,
       });
-
-      // Send invitation email via API route
-      const response = await fetch("/api/send-statement-invitation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          studentId: user.uid,
-          studentName: `${student?.firstName} ${student?.lastName}`,
-          type,
-          email,
-          token,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send invitation email");
-      }
 
       setFormData(updatedFormData);
       setSuccess(`Invitation sent to ${email} successfully!`);
@@ -168,7 +169,21 @@ export default function StatementOfOutsideAssistance() {
   };
 
   const updateField = (field: keyof StatementOfOutsideAssistance, value: any) => {
-    setFormData({ ...formData, [field]: value });
+    const updated = { ...formData, [field]: value };
+    
+    // Clear invitation sent status if email is changed
+    if (field === "teacherEmail" && value !== formData.teacherEmail) {
+      updated.teacherInviteSent = false;
+      updated.teacherInviteToken = undefined;
+    } else if (field === "mentorEmail" && value !== formData.mentorEmail) {
+      updated.mentorInviteSent = false;
+      updated.mentorInviteToken = undefined;
+    } else if (field === "parentEmail" && value !== formData.parentEmail) {
+      updated.parentInviteSent = false;
+      updated.parentInviteToken = undefined;
+    }
+    
+    setFormData(updated);
   };
 
   if (loading) {
@@ -320,10 +335,10 @@ export default function StatementOfOutsideAssistance() {
               <button
                 type="button"
                 onClick={() => sendInvitation("teacher", formData.teacherEmail || "")}
-                disabled={saving || formData.teacherInviteSent}
+                disabled={saving}
                 className="px-4 py-2 bg-primary-green text-white rounded-md hover:bg-primary-darkGreen disabled:opacity-50"
               >
-                {formData.teacherInviteSent ? "Invitation Sent" : "Send Invitation"}
+                {saving ? "Sending..." : formData.teacherInviteSent ? "Resend Invitation" : "Send Invitation"}
               </button>
             </div>
             {formData.teacherInviteSent && (
@@ -386,10 +401,10 @@ export default function StatementOfOutsideAssistance() {
                 <button
                   type="button"
                   onClick={() => sendInvitation("mentor", formData.mentorEmail || "")}
-                  disabled={saving || formData.mentorInviteSent}
+                  disabled={saving}
                   className="px-4 py-2 bg-primary-green text-white rounded-md hover:bg-primary-darkGreen disabled:opacity-50"
                 >
-                  {formData.mentorInviteSent ? "Invitation Sent" : "Send Invitation"}
+                  {saving ? "Sending..." : formData.mentorInviteSent ? "Resend Invitation" : "Send Invitation"}
                 </button>
               </div>
               {formData.mentorInviteSent && (
@@ -495,10 +510,10 @@ export default function StatementOfOutsideAssistance() {
               <button
                 type="button"
                 onClick={() => sendInvitation("parent", formData.parentEmail || "")}
-                disabled={saving || formData.parentInviteSent}
+                disabled={saving}
                 className="px-4 py-2 bg-primary-green text-white rounded-md hover:bg-primary-darkGreen disabled:opacity-50"
               >
-                {formData.parentInviteSent ? "Invitation Sent" : "Send Invitation"}
+                {saving ? "Sending..." : formData.parentInviteSent ? "Resend Invitation" : "Send Invitation"}
               </button>
             </div>
             {formData.parentInviteSent && (
