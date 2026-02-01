@@ -7,37 +7,51 @@ export async function registerSRA(
   password: string,
   sraData: Omit<SRA, "id" | "email" | "createdAt" | "approved" | "adminApproved">
 ): Promise<{ verificationCode: string }> {
+  let userCredential;
+  let verificationCode;
   try {
-    const { userCredential, verificationCode } = await registerUser(email, password, "sra");
-
-    let schoolId = sraData.schoolId;
-    if (!schoolId) {
-      try {
-        schoolId = await createSchool({
-          name: sraData.schoolName,
-        });
-      } catch (schoolError: any) {
-        console.error("Error creating school:", schoolError);
-        throw new Error(`Failed to create school: ${schoolError.message || "Unknown error"}`);
-      }
-    }
-
-    try {
-      await createSRA(userCredential.user.uid, {
-        ...sraData,
-        email,
-        schoolId,
-      });
-    } catch (sraError: any) {
-      console.error("Error creating SRA:", sraError);
-      throw new Error(`Failed to create SRA profile: ${sraError.message || "Unknown error"}`);
-    }
-
-    return { verificationCode };
+    console.log("Step 1: Creating user account...");
+    const result = await registerUser(email, password, "sra");
+    userCredential = result.userCredential;
+    verificationCode = result.verificationCode;
+    console.log("Step 1: User account created, UID:", userCredential.user.uid);
   } catch (error: any) {
-    console.error("SRA Registration Error:", error);
-    throw error;
+    console.error("Error in registerUser:", error);
+    throw new Error(`Failed to create user account: ${error.message || "Unknown error"}`);
   }
+
+  let schoolId = sraData.schoolId;
+  if (!schoolId) {
+    try {
+      console.log("Step 2: Creating school...");
+      schoolId = await createSchool({
+        name: sraData.schoolName,
+      });
+      console.log("Step 2: School created, ID:", schoolId);
+    } catch (schoolError: any) {
+      console.error("Error creating school:", schoolError);
+      throw new Error(`Failed to create school: ${schoolError.message || "Unknown error"}`);
+    }
+  } else {
+    console.log("Step 2: Using existing school ID:", schoolId);
+  }
+
+  try {
+    console.log("Step 3: Creating SRA document with UID:", userCredential.user.uid);
+    await createSRA(userCredential.user.uid, {
+      ...sraData,
+      email,
+      schoolId,
+    });
+    console.log("Step 3: SRA document created successfully");
+  } catch (sraError: any) {
+    console.error("Error creating SRA document:", sraError);
+    console.error("SRA Error Code:", sraError.code);
+    console.error("SRA Error Details:", sraError);
+    throw new Error(`Failed to create SRA profile: ${sraError.message || "Unknown error"}`);
+  }
+
+  return { verificationCode };
 }
 
 export async function registerStudent(

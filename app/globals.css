@@ -82,6 +82,14 @@ div.bg-white span {
   color: rgb(17, 24, 39) !important;
 }
 
+.bg-primary-blue p,
+.bg-primary-blue h2,
+.bg-primary-blue h3,
+.bg-primary-blue span,
+.bg-primary-blue div {
+  color: white !important;
+}
+
 @media (prefers-color-scheme: dark) {
   label,
   label.block,

@@ -22,7 +22,7 @@ export default function CompetitionPage() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-bold mb-2 text-white">Competition Rules</h2>
-                <p className="!text-white">
+                <p className="text-white" style={{ color: 'white' }}>
                   Download the complete competition rules, guidelines, and policies document
                 </p>
               </div>
@@ -36,57 +36,6 @@ export default function CompetitionPage() {
                 View Competition Rules
               </a>
             </div>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
-            Qualifying Projects
-          </h2>
-          <div className="prose max-w-none">
-            <p className="text-gray-700 mb-4">
-              Qualifying projects include <strong>experimental research projects started after April of 2025.</strong>
-            </p>
-            <p className="text-gray-700 mb-4">
-              An &apos;experimental research project&apos; is the implementation of the scientific method to answer a question or solve a problem. This involves doing background research on the question/problem, forming a hypothesis or proposed solution, designing and performing experiments to test the hypothesis/solution, analyzing the experimental data, and using the results to draw conclusions about the question or problem being investigated. In <strong>NJSRS</strong>, the research can be in any area of Science, Technology, Engineering, or Mathematics (STEM).
-            </p>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
-            Competition Format & Rules
-          </h2>
-          <p className="text-gray-700 mb-6">
-            In NJSRS, every project is presented through a long-form oral presentation with slides and is judged in front of a panel of STEM professionals and an audience. The competition uses a two-stage format: morning category judging in classrooms and afternoon final round presentations for category winners. In addition, there will be an afternoon poster session for all entrants, offering them the opportunity to win special awards.
-          </p>
-
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">
-              Judged Oral Presentations (Category Round and Final Round)
-            </h3>
-            <p className="text-gray-700 mb-4">
-              Students present in assigned categories (e.g., Biology, Chemistry, Mathematics & Computer Science), with each category in its own classroom. Every student gives a 10-minute presentation using slides, followed by a judge Q&A session and a brief audience Q&A session. Evaluation is based on clarity of explanation, quality of experimental design and analysis, understanding of the science, and ability to respond to questions.
-              First place category winners deliver a second 10-minute slide presentation in the Millburn High School auditorium. These finalists will be eligible to win the Grand Prizes of NJSRS.
-            </p>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">
-              Final Round Presentations
-            </h3>
-            <p className="text-gray-700 mb-4">
-              First place category winners deliver a second 10-minute slide presentation in the Millburn High School auditorium. In the final round, there is no judge Q&A and no audience Q&A; judges score solely on the quality of the presentation and the underlying research. These finalists will be eligible to win the Grand Prizes of NJSRS.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">
-              Rules, Safety & Ethics
-            </h3>
-            <p className="text-gray-700 mb-4">
-              All projects must follow ISEF safety rules and NJSRS&apos;s own rules on research integrity, attribution, and safe use of materials and equipment. For projects involving human participants, vertebrate animals, or potentially hazardous biological agents (PHBAs), please refer to the Core Rules of the Competition for more details. Students must accurately represent their own work, maintain proper citations, and may not fabricate or misreport data; serious violations lead to disqualification.
-            </p>
           </div>
         </section>
 
@@ -159,6 +108,57 @@ export default function CompetitionPage() {
                 <li>Mail the payment to: <strong>462 Millburn Ave., Millburn, NJ</strong></li>
               </ul>
             </div>
+          </div>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
+            Qualifying Projects
+          </h2>
+          <div className="prose max-w-none">
+            <p className="text-gray-700 mb-4">
+              Qualifying projects include <strong>experimental research projects started after April of 2025.</strong>
+            </p>
+            <p className="text-gray-700 mb-4">
+              An &apos;experimental research project&apos; is the implementation of the scientific method to answer a question or solve a problem. This involves doing background research on the question/problem, forming a hypothesis or proposed solution, designing and performing experiments to test the hypothesis/solution, analyzing the experimental data, and using the results to draw conclusions about the question or problem being investigated. In <strong>NJSRS</strong>, the research can be in any area of Science, Technology, Engineering, or Mathematics (STEM).
+            </p>
+          </div>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
+            Competition Format & Rules
+          </h2>
+          <p className="text-gray-700 mb-6">
+            In NJSRS, every project is presented through a long-form oral presentation with slides and is judged in front of a panel of STEM professionals and an audience. The competition uses a two-stage format: morning category judging in classrooms and afternoon final round presentations for category winners. In addition, there will be an afternoon poster session for all entrants, offering them the opportunity to win special awards.
+          </p>
+
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              Judged Oral Presentations (Category Round and Final Round)
+            </h3>
+            <p className="text-gray-700 mb-4">
+              Students present in assigned categories (e.g., Biology, Chemistry, Mathematics & Computer Science), with each category in its own classroom. Every student gives a 10-minute presentation using slides, followed by a judge Q&A session and a brief audience Q&A session. Evaluation is based on clarity of explanation, quality of experimental design and analysis, understanding of the science, and ability to respond to questions.
+              First place category winners deliver a second 10-minute slide presentation in the Millburn High School auditorium. These finalists will be eligible to win the Grand Prizes of NJSRS.
+            </p>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              Final Round Presentations
+            </h3>
+            <p className="text-gray-700 mb-4">
+              First place category winners deliver a second 10-minute slide presentation in the Millburn High School auditorium. In the final round, there is no judge Q&A and no audience Q&A; judges score solely on the quality of the presentation and the underlying research. These finalists will be eligible to win the Grand Prizes of NJSRS.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              Rules, Safety & Ethics
+            </h3>
+            <p className="text-gray-700 mb-4">
+              All projects must follow ISEF safety rules and NJSRS&apos;s own rules on research integrity, attribution, and safe use of materials and equipment. For projects involving human participants, vertebrate animals, or potentially hazardous biological agents (PHBAs), please refer to the Core Rules of the Competition for more details. Students must accurately represent their own work, maintain proper citations, and may not fabricate or misreport data; serious violations lead to disqualification.
+            </p>
           </div>
         </section>
 

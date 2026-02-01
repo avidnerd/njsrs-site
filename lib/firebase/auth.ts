@@ -7,7 +7,7 @@ import {
   UserCredential,
 } from "firebase/auth";
 import { auth, db } from "./config";
-import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
 
 export interface UserProfile {
   email: string;
@@ -58,11 +58,11 @@ export async function registerUser(
   await setDoc(doc(dbInstance, "users", userCredential.user.uid), {
     email,
     role,
-    createdAt: new Date(),
+    createdAt: Timestamp.now(),
     profileComplete: false,
     emailVerified: false,
     verificationCode,
-    verificationCodeExpiry,
+    verificationCodeExpiry: Timestamp.fromDate(verificationCodeExpiry),
   });
 
   try {
