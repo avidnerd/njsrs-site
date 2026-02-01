@@ -8,6 +8,7 @@ interface FileUploadProps {
   onUpload: (file: File) => Promise<void>;
   currentFile?: string;
   maxSizeMB?: number;
+  disabled?: boolean;
 }
 
 export default function FileUpload({
@@ -16,6 +17,7 @@ export default function FileUpload({
   onUpload,
   currentFile,
   maxSizeMB = 10,
+  disabled = false,
 }: FileUploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -78,9 +80,10 @@ export default function FileUpload({
           type="file"
           accept={accept}
           onChange={handleFileChange}
-          className="block text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-green file:text-white hover:file:bg-primary-darkGreen"
+          disabled={disabled}
+          className="block text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-green file:text-white hover:file:bg-primary-darkGreen disabled:opacity-50 disabled:cursor-not-allowed"
         />
-        {file && (
+        {file && !disabled && (
           <button
             type="button"
             onClick={handleUpload}

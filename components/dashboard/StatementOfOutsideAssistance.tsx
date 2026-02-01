@@ -8,9 +8,10 @@ import { Timestamp } from "firebase/firestore";
 
 interface StatementOfOutsideAssistanceProps {
   onFormUpdate?: () => void;
+  disabled?: boolean;
 }
 
-export default function StatementOfOutsideAssistance({ onFormUpdate }: StatementOfOutsideAssistanceProps) {
+export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = false }: StatementOfOutsideAssistanceProps) {
   const { user } = useAuth();
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
@@ -215,6 +216,23 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
         </p>
       </div>
 
+      {disabled && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                <strong>Editing Disabled:</strong> The deadline for editing materials was March 23, 2026. You can still view your form, but editing is no longer available.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           {error}
@@ -240,7 +258,8 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
               value={formData.studentFirstName || ""}
               onChange={(e) => updateField("studentFirstName", e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              disabled={disabled}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           <div>
@@ -252,7 +271,8 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
               value={formData.studentLastName || ""}
               onChange={(e) => updateField("studentLastName", e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              disabled={disabled}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           <div>
@@ -263,7 +283,8 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
               type="text"
               value={formData.partnerFirstName || ""}
               onChange={(e) => updateField("partnerFirstName", e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              disabled={disabled}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           <div>
@@ -274,7 +295,8 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
               type="text"
               value={formData.partnerLastName || ""}
               onChange={(e) => updateField("partnerLastName", e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              disabled={disabled}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           <div className="md:col-span-2">
@@ -286,7 +308,8 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
               value={formData.researchReportTitle || ""}
               onChange={(e) => updateField("researchReportTitle", e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              disabled={disabled}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           <div>
@@ -298,7 +321,8 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
               value={formData.school || ""}
               onChange={(e) => updateField("school", e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              disabled={disabled}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
         </div>
@@ -317,7 +341,8 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
               value={formData.teacherFirstName || ""}
               onChange={(e) => updateField("teacherFirstName", e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              disabled={disabled}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           <div>
@@ -329,7 +354,8 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
               value={formData.teacherLastName || ""}
               onChange={(e) => updateField("teacherLastName", e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              disabled={disabled}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           <div className="md:col-span-2">
@@ -343,12 +369,13 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
                 onChange={(e) => updateField("teacherEmail", e.target.value)}
                 placeholder="advisor@school.edu"
                 required
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+                disabled={disabled}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <button
                 type="button"
                 onClick={() => sendInvitation("teacher", formData.teacherEmail || "")}
-                disabled={saving}
+                disabled={saving || disabled}
                 className="px-4 py-2 bg-primary-green text-white rounded-md hover:bg-primary-darkGreen disabled:opacity-50"
               >
                 {saving ? "Sending..." : formData.teacherInviteSent ? "Resend Invitation" : "Send Invitation"}
@@ -373,7 +400,8 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
               type="text"
               value={formData.mentorFirstName || ""}
               onChange={(e) => updateField("mentorFirstName", e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              disabled={disabled}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           <div>
@@ -384,7 +412,8 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
               type="text"
               value={formData.mentorLastName || ""}
               onChange={(e) => updateField("mentorLastName", e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              disabled={disabled}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           <div className="md:col-span-2">
@@ -395,7 +424,8 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
               type="text"
               value={formData.mentorInstitution || ""}
               onChange={(e) => updateField("mentorInstitution", e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              disabled={disabled}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           <div className="md:col-span-2">
@@ -411,12 +441,13 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
                 value={formData.mentorEmail || ""}
                 onChange={(e) => updateField("mentorEmail", e.target.value)}
                 placeholder={formData.mentorFirstName ? "mentor@institution.edu" : "advisor@school.edu or mentor@institution.edu"}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+                disabled={disabled}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <button
                 type="button"
                 onClick={() => sendInvitation("mentor", formData.mentorEmail || "")}
-                disabled={saving || !formData.mentorEmail}
+                disabled={saving || !formData.mentorEmail || disabled}
                 className="px-4 py-2 bg-primary-green text-white rounded-md hover:bg-primary-darkGreen disabled:opacity-50"
               >
                 {saving ? "Sending..." : formData.mentorInviteSent ? "Resend Invitation" : "Send Invitation"}
@@ -478,7 +509,8 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
                 onChange={(e) => updateField(fieldName, e.target.value)}
                 rows={4}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+                disabled={disabled}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="Type 'N/A' if this question does not apply to your research project."
               />
             </div>
@@ -498,13 +530,14 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
             value={signature}
             onChange={(e) => setSignature(e.target.value)}
             placeholder="Your full name"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+            disabled={disabled}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
           />
         </div>
         <button
           type="button"
           onClick={handleStudentSignature}
-          disabled={saving || !signature.trim() || formData.studentCompleted}
+          disabled={saving || !signature.trim() || formData.studentCompleted || disabled}
           className="px-4 py-2 bg-primary-green text-white rounded-md hover:bg-primary-darkGreen disabled:opacity-50"
         >
           {formData.studentCompleted ? "✓ Signed" : "Sign Form"}
@@ -541,12 +574,13 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
                 onChange={(e) => updateField("parentEmail", e.target.value)}
                 placeholder="parent@email.com"
                 required
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+                disabled={disabled}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <button
                 type="button"
                 onClick={() => sendInvitation("parent", formData.parentEmail || "")}
-                disabled={saving}
+                disabled={saving || disabled}
                 className="px-4 py-2 bg-primary-green text-white rounded-md hover:bg-primary-darkGreen disabled:opacity-50"
               >
                 {saving ? "Sending..." : formData.parentInviteSent ? "Resend Invitation" : "Send Invitation"}
@@ -564,7 +598,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
         <button
           type="button"
           onClick={saveForm}
-          disabled={saving}
+          disabled={saving || disabled}
           className="px-6 py-2 bg-primary-blue text-white rounded-md hover:bg-primary-darkGreen disabled:opacity-50"
         >
           {saving ? "Saving..." : "Save Progress"}

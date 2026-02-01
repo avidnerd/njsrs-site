@@ -13,12 +13,18 @@ interface StudentMaterialsProps {
   onFormUpdate?: () => void;
 }
 
+// Deadline: March 23, 2026 at 11:59 PM
+const EDITING_DEADLINE = new Date("2026-03-24T00:00:00");
+
 export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps) {
   const { user } = useAuth();
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<"research" | "slideshow" | "statement">("research");
+  
+  // Check if editing is disabled (after deadline)
+  const isEditingDisabled = new Date() >= EDITING_DEADLINE;
 
   useEffect(() => {
     if (user) {
@@ -87,6 +93,23 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-2xl font-bold text-primary-blue mb-6">Submit Competition Materials</h2>
       
+      {isEditingDisabled && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                <strong>Editing Deadline Passed:</strong> The deadline for editing materials was March 23, 2026. You can still view your submitted materials, but editing is no longer available.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Section Navigation */}
       <div className="mb-6 flex flex-wrap gap-2 border-b pb-4">
         <button
@@ -138,6 +161,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
               onUpload={handleResearchReportUpload}
               currentFile={student.researchReportUrl}
               maxSizeMB={15}
+              disabled={isEditingDisabled}
             />
           </div>
 
@@ -150,21 +174,6 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
                     <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <div className="ml-3">
-                  <p className="text-sm font-semibold text-yellow-800">
-                    Important: Please double-check your abstract before uploading
-                  </p>
-                  <p className="mt-2 text-sm text-yellow-700">
-                    The abstract you upload will be published in the official program for the fair and <strong>cannot be changed once uploaded</strong>. 
-                    Please carefully review your abstract for:
-                  </p>
-                  <ul className="mt-2 text-sm text-yellow-700 list-disc list-inside">
-                    <li>Correct spelling and grammar</li>
-                    <li>Accurate scientific terminology</li>
-                    <li>Proper formatting</li>
-                    <li>Complete and accurate information</li>
-                  </ul>
-                </div>
               </div>
             </div>
             <p className="text-gray-600 mb-4">
@@ -176,6 +185,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
               onUpload={handleAbstractUpload}
               currentFile={student.abstractUrl}
               maxSizeMB={5}
+              disabled={isEditingDisabled}
             />
           </div>
         </div>
@@ -200,6 +210,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
               onUpload={handleSlideshowUpload}
               currentFile={student.slideshowUrl}
               maxSizeMB={25}
+              disabled={isEditingDisabled}
             />
           </div>
         </div>
@@ -207,7 +218,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
 
       {/* Statement of Outside Assistance Section */}
       {activeSection === "statement" && (
-        <StatementOfOutsideAssistance onFormUpdate={onFormUpdate} />
+        <StatementOfOutsideAssistance onFormUpdate={onFormUpdate} disabled={isEditingDisabled} />
       )}
     </div>
   );
