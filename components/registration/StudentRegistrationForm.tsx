@@ -208,7 +208,7 @@ export default function StudentRegistrationForm() {
 
       <div>
         <label htmlFor="school" className="block text-sm font-medium mb-1 text-gray-900">
-          School *
+          School* Note: if you do not see your school, it means that there is no Science Research Advisor currently registered at your school. Any member of your school's administration or faculty can register as a science research advisor, but they must be able to be present at the competition to chaperone your school's team.
         </label>
         <select
           id="school"
@@ -223,7 +223,7 @@ export default function StudentRegistrationForm() {
           required
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
         >
-          <option value="">Select a school. Note: if you do not see your school, it means that there is no Science Research Advisor currently registered at your school. Any member of your school's administration or faculty can register as a science research advisor, but they must be able to be present at the competition to chaperone your school's team.</option>
+          <option value="">Select a school...</option>
           {schools.map((school) => (
             <option key={school.id} value={school.id}>
               {school.name}
