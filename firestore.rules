@@ -41,7 +41,8 @@ service cloud.firestore {
     
     // SRAs collection
     match /sras/{sraId} {
-      allow read: if isAuthenticated();
+      // Allow anyone to read SRAs (needed for student registration to select SRA)
+      allow read: if true;
       allow create: if isOwner(sraId);
       allow update: if isOwner(sraId) || isAdmin();
     }

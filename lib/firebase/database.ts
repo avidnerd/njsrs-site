@@ -190,6 +190,34 @@ export async function getAllSchools(): Promise<School[]> {
   return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as School));
 }
 
+export async function getSchoolsWithSRAs(): Promise<School[]> {
+  const dbInstance = ensureDb();
+  // Get all SRAs
+  const srasRef = collection(dbInstance, "sras");
+  const srasSnapshot = await getDocs(srasRef);
+  
+  // Get unique school IDs from SRAs
+  const schoolIds = new Set<string>();
+  srasSnapshot.docs.forEach((doc) => {
+    const sra = doc.data() as SRA;
+    if (sra.schoolId) {
+      schoolIds.add(sra.schoolId);
+    }
+  });
+  
+  // Fetch school documents for each unique school ID
+  const schools: School[] = [];
+  for (const schoolId of schoolIds) {
+    const school = await getSchool(schoolId);
+    if (school) {
+      schools.push(school);
+    }
+  }
+  
+  // Sort by name
+  return schools.sort((a, b) => a.name.localeCompare(b.name));
+}
+
 export async function createSRA(sraId: string, sra: Omit<SRA, "id" | "createdAt" | "approved" | "adminApproved">): Promise<void> {
   const dbInstance = ensureDb();
   await setDoc(doc(dbInstance, "sras", sraId), {

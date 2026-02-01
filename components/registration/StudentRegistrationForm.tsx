@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { registerStudent } from "@/lib/firebase/registration";
-import { getAllSchools, searchSchools, getSRAsBySchool } from "@/lib/firebase/database";
+import { getSchoolsWithSRAs, getSRAsBySchool } from "@/lib/firebase/database";
 import { useRouter } from "next/navigation";
 import type { School, SRA } from "@/lib/firebase/database";
 
@@ -22,7 +22,6 @@ export default function StudentRegistrationForm() {
   });
   const [schools, setSchools] = useState<School[]>([]);
   const [sras, setSRAs] = useState<SRA[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -42,10 +41,11 @@ export default function StudentRegistrationForm() {
 
   const loadSchools = async () => {
     try {
-      const allSchools = await getAllSchools();
-      setSchools(allSchools);
+      const schoolsWithSRAs = await getSchoolsWithSRAs();
+      setSchools(schoolsWithSRAs);
     } catch (err) {
       console.error("Error loading schools:", err);
+      setError("Error loading schools. Please try again.");
     }
   };
 
@@ -61,20 +61,6 @@ export default function StudentRegistrationForm() {
     } catch (err) {
       console.error("Error loading SRAs:", err);
       setError("Error loading SRAs for this school");
-    }
-  };
-
-  const handleSearch = async (term: string) => {
-    setSearchTerm(term);
-    if (term.length > 0) {
-      try {
-        const results = await searchSchools(term);
-        setSchools(results);
-      } catch (err) {
-        console.error("Error searching schools:", err);
-      }
-    } else {
-      loadSchools();
     }
   };
 
@@ -224,13 +210,6 @@ export default function StudentRegistrationForm() {
         <label htmlFor="school" className="block text-sm font-medium mb-1 text-gray-900">
           School *
         </label>
-        <input
-          type="text"
-          placeholder="Search for your school..."
-          value={searchTerm}
-          onChange={(e) => handleSearch(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent mb-2 text-gray-900"
-        />
         <select
           id="school"
           value={formData.schoolId}
@@ -251,6 +230,11 @@ export default function StudentRegistrationForm() {
             </option>
           ))}
         </select>
+        {schools.length === 0 && !loading && (
+          <p className="mt-2 text-sm text-gray-600">
+            No schools with Science Research Advisors found. Please contact your school to register an SRA first.
+          </p>
+        )}
       </div>
 
       {formData.schoolId && (
