@@ -8,6 +8,7 @@ import { logoutUser } from "@/lib/firebase/auth";
 import { getStudent } from "@/lib/firebase/database";
 import StudentStatus from "@/components/dashboard/StudentStatus";
 import StudentMaterials from "@/components/dashboard/StudentMaterials";
+import PhotoRelease from "@/components/dashboard/PhotoRelease";
 import type { Student } from "@/lib/firebase/database";
 
 export default function StudentDashboardPage() {
@@ -78,7 +79,8 @@ export default function StudentDashboardPage() {
           ) : student ? (
             <div className="space-y-6">
               <StudentStatus student={student} onUpdate={loadStudent} />
-              <StudentMaterials />
+              <StudentMaterials onFormUpdate={loadStudent} />
+              <PhotoRelease onFormUpdate={loadStudent} />
             </div>
           ) : (
             <div className="text-center py-12">

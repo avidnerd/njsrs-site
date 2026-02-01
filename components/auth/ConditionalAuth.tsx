@@ -12,8 +12,8 @@ export default function ConditionalAuth({
 }) {
   const pathname = usePathname();
   
-  // Skip AuthProvider and Header for statement-sign pages (they don't need authentication)
-  if (pathname?.startsWith('/statement-sign')) {
+  // Skip AuthProvider and Header for statement-sign and photo-release-sign pages (they don't need authentication)
+  if (pathname?.startsWith('/statement-sign') || pathname?.startsWith('/photo-release-sign')) {
     return (
       <>
         <main className="flex-grow">{children}</main>

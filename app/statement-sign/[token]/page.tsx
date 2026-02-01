@@ -245,45 +245,81 @@ export default function StatementSignPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Teacher/Mentor Comments Section */}
-            {(signerType === "teacher" || signerType === "mentor") && (
-              <div className="border rounded-lg p-4 space-y-4">
-                <h3 className="font-semibold text-gray-900">
-                  Comments on Student&apos;s Individual Contributions
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Please be specific about what the student did versus what others did.
-                </p>
-                <textarea
-                  value={comments}
-                  onChange={(e) => setComments(e.target.value)}
-                  rows={6}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
-                  placeholder="Describe the student's individual contributions to the research..."
-                />
-              </div>
+            {/* Science Research Advisor Form - Simplified */}
+            {signerType === "teacher" && (
+              <>
+                <div className="border rounded-lg p-4 space-y-4">
+                  <h3 className="font-semibold text-gray-900">
+                    Did the student conduct this project on their own?
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Please confirm whether the student conducted this research project independently, or describe any assistance they received.
+                  </p>
+                  <textarea
+                    value={comments}
+                    onChange={(e) => setComments(e.target.value)}
+                    rows={4}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+                    placeholder="Please describe whether the student conducted this project independently or with assistance..."
+                  />
+                </div>
+                <div className="border rounded-lg p-4 space-y-4">
+                  <h3 className="font-semibold text-gray-900">
+                    Safety and Ethics Confirmation
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Please confirm that the student conducted the research properly in accordance with all applicable safety and ethics standards.
+                  </p>
+                  <textarea
+                    value={safetyStatement}
+                    onChange={(e) => setSafetyStatement(e.target.value)}
+                    rows={3}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+                    placeholder="I confirm that the student conducted the research properly in accordance with all applicable standards..."
+                  />
+                </div>
+              </>
             )}
 
-            {/* Safety Statement Section */}
-            {(signerType === "teacher" || signerType === "mentor") && (
-              <div className="border rounded-lg p-4 space-y-4">
-                <h3 className="font-semibold text-gray-900">
-                  Safety and Ethics Statement
-                </h3>
-                <p className="text-sm text-gray-600">
-                  For projects involving human participants, vertebrates, or potentially hazardous materials, 
-                  please confirm that the student conducted the research properly in accordance with all applicable standards.
-                </p>
-                <textarea
-                  value={safetyStatement}
-                  onChange={(e) => setSafetyStatement(e.target.value)}
-                  rows={4}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
-                  placeholder="I confirm that the student conducted the research properly..."
-                />
-              </div>
+            {/* Mentor Form - Detailed */}
+            {signerType === "mentor" && (
+              <>
+                <div className="border rounded-lg p-4 space-y-4">
+                  <h3 className="font-semibold text-gray-900">
+                    Comments on Student&apos;s Individual Contributions
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Please be specific about what the student did versus what others did.
+                  </p>
+                  <textarea
+                    value={comments}
+                    onChange={(e) => setComments(e.target.value)}
+                    rows={6}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+                    placeholder="Describe the student's individual contributions to the research..."
+                  />
+                </div>
+                <div className="border rounded-lg p-4 space-y-4">
+                  <h3 className="font-semibold text-gray-900">
+                    Safety and Ethics Statement
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    For projects involving human participants, vertebrates, or potentially hazardous materials, 
+                    please confirm that the student conducted the research properly in accordance with all applicable standards.
+                  </p>
+                  <textarea
+                    value={safetyStatement}
+                    onChange={(e) => setSafetyStatement(e.target.value)}
+                    rows={4}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+                    placeholder="I confirm that the student conducted the research properly..."
+                  />
+                </div>
+              </>
             )}
 
             {/* Additional Fields for Science Research Advisor */}

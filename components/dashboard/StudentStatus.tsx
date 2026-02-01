@@ -100,10 +100,15 @@ export default function StudentStatus({ student, onUpdate }: StudentStatusProps)
       label: "Parent Signature (SOA)",
       completed: !!student.statementOfOutsideAssistance?.parentCompleted,
     },
+    {
+      label: "Photo Release Form",
+      completed: !!student.photoRelease?.completed,
+    },
   ];
 
   const allMaterialsComplete = checklistItems.slice(0, 3).every(item => item.completed);
-  const allSignaturesComplete = checklistItems.slice(3).every(item => item.completed);
+  const allSignaturesComplete = checklistItems.slice(3, 7).every(item => item.completed);
+  const photoReleaseComplete = checklistItems[7]?.completed || false;
 
   return (
     <div className="space-y-6">
@@ -208,6 +213,32 @@ export default function StudentStatus({ student, onUpdate }: StudentStatusProps)
             </div>
             {allSignaturesComplete && (
               <p className="text-sm text-green-600 mt-2">✓ All signatures received</p>
+            )}
+          </div>
+
+          {/* Photo Release Section */}
+          <div className="border-t pt-4 mt-4">
+            <h3 className="font-semibold text-gray-900 mb-3">Photo Release Form</h3>
+            <div className="space-y-2">
+              {checklistItems.slice(7).map((item, index) => (
+                <div key={index} className="flex items-center">
+                  {item.completed ? (
+                    <svg className="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                  <span className={item.completed ? "text-gray-900" : "text-gray-500"}>
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {photoReleaseComplete && (
+              <p className="text-sm text-green-600 mt-2">✓ Photo release form completed</p>
             )}
           </div>
         </div>

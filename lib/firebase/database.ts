@@ -73,6 +73,8 @@ export interface Student {
   ethicsQuestionnaire?: EthicsQuestionnaire;
   // Statement of Outside Assistance
   statementOfOutsideAssistance?: StatementOfOutsideAssistance;
+  // Photo Release Form
+  photoRelease?: PhotoRelease;
 }
 
 export interface SRCQuestions {
@@ -189,6 +191,17 @@ export interface StatementOfOutsideAssistance {
   mentorCompleted?: boolean;
   parentCompleted?: boolean;
   formCompleted?: boolean;
+}
+
+export interface PhotoRelease {
+  parentEmail?: string;
+  parentInviteSent?: boolean;
+  parentInviteToken?: string;
+  parentName?: string;
+  parentSignature?: string;
+  parentSignatureDate?: Date | Timestamp;
+  parentPhone?: string;
+  completed?: boolean;
 }
 
 export interface Judge {
