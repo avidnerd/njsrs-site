@@ -97,12 +97,14 @@ export default function JudgeRegistrationForm() {
           setError("Current position is required");
           return false;
         }
+        return true;
+      case 4:
         if (!formData.employmentStatus) {
           setError("Employment status is required");
           return false;
         }
         return true;
-      case 4:
+      case 5:
         if (!formData.highestDegree.trim()) {
           setError("Highest degree is required");
           return false;
@@ -116,16 +118,14 @@ export default function JudgeRegistrationForm() {
           return false;
         }
         return true;
-      case 5:
+      case 6:
         if (!formData.areaOfExpertise.trim()) {
           setError("Area of expertise is required");
           return false;
         }
         return true;
-      case 6:
-        return true; // Publications and patents are optional
       case 7:
-        return true; // Experience is a checkbox
+        return true; // Publications and patents are optional
       case 8:
         if (!formData.canCommitToAllProjects) {
           setError("You must commit to viewing all 10 projects");

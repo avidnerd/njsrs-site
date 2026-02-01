@@ -102,10 +102,11 @@ export default function SRARegistrationForm() {
       return;
     }
 
-    // Phone validation (basic)
-    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-    if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
-      setError("Please enter a valid phone number");
+    // Phone validation (basic) - allows digits, dashes, plus, and parentheses
+    const phoneRegex = /^[\d\-\+\(\)]+$/;
+    const phoneWithoutSpaces = formData.phone.replace(/\s/g, '');
+    if (!phoneRegex.test(phoneWithoutSpaces) || phoneWithoutSpaces.length < 10) {
+      setError("Please enter a valid phone number (at least 10 digits)");
       return;
     }
 
