@@ -398,50 +398,49 @@ export default function StatementOfOutsideAssistance({ onFormUpdate }: Statement
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
             />
           </div>
-          {formData.mentorFirstName && (
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium mb-1 text-gray-900">
-                Mentor Email (for signature invitation)
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  value={formData.mentorEmail || ""}
-                  onChange={(e) => updateField("mentorEmail", e.target.value)}
-                  placeholder="mentor@institution.edu"
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
-                />
-                <button
-                  type="button"
-                  onClick={() => sendInvitation("mentor", formData.mentorEmail || "")}
-                  disabled={saving}
-                  className="px-4 py-2 bg-primary-green text-white rounded-md hover:bg-primary-darkGreen disabled:opacity-50"
-                >
-                  {saving ? "Sending..." : formData.mentorInviteSent ? "Resend Invitation" : "Send Invitation"}
-                </button>
-              </div>
-              {formData.mentorInviteSent && (
-                <p className="text-sm text-green-600 mt-1">✓ Invitation sent to {formData.mentorEmail}</p>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium mb-1 text-gray-900">
+              Mentor Email (for signature invitation)
+              {!formData.mentorFirstName && (
+                <span className="text-blue-600 text-xs ml-2">(or Science Research Advisor email if no mentor)</span>
               )}
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={formData.mentorEmail || ""}
+                onChange={(e) => updateField("mentorEmail", e.target.value)}
+                placeholder={formData.mentorFirstName ? "mentor@institution.edu" : "advisor@school.edu or mentor@institution.edu"}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              />
+              <button
+                type="button"
+                onClick={() => sendInvitation("mentor", formData.mentorEmail || "")}
+                disabled={saving || !formData.mentorEmail}
+                className="px-4 py-2 bg-primary-green text-white rounded-md hover:bg-primary-darkGreen disabled:opacity-50"
+              >
+                {saving ? "Sending..." : formData.mentorInviteSent ? "Resend Invitation" : "Send Invitation"}
+              </button>
             </div>
-          )}
+            {formData.mentorInviteSent && (
+              <p className="text-sm text-green-600 mt-1">✓ Invitation sent to {formData.mentorEmail}</p>
+            )}
+          </div>
         </div>
-        {!formData.mentorFirstName && (
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mt-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-blue-700">
-                  <strong>Note:</strong> If the student does not have a mentor, you can enter your Science Research Advisor email address above and send them the mentor form to fill out additional information about the student&apos;s research.
-                </p>
-              </div>
+        <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mt-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-blue-700">
+                <strong>Note:</strong> If the student does not have a mentor, enter your Science Research Advisor&apos;s name and email address in the mentor fields above and send them the mentor form to fill out additional information about your research.
+              </p>
             </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Student Questions */}

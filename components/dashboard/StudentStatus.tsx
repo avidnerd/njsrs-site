@@ -95,15 +95,7 @@ export default function StudentStatus({ student, onUpdate }: StudentStatusProps)
     {
       label: "Mentor Signature (SOA)",
       completed: !!student.statementOfOutsideAssistance?.mentorCompleted,
-    },
-    {
-      label: "Parent Signature (SOA)",
-      completed: !!student.statementOfOutsideAssistance?.parentCompleted,
-    },
-    {
-      label: "Photo Release Form",
-      completed: !!student.photoRelease?.completed,
-    },
+    }
   ];
 
   const allMaterialsComplete = checklistItems.slice(0, 3).every(item => item.completed);
