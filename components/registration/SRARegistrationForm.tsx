@@ -80,20 +80,23 @@ export default function SRARegistrationForm() {
       let schoolId = formData.schoolId;
       let schoolName = formData.schoolName;
       
+      // Create or get school BEFORE authentication
       if (formData.selectedSchool) {
         schoolName = formData.selectedSchool.name;
-        // Check if school exists in Firestore, if not create it
+        // Create school in Firestore (allowed without auth now)
         schoolId = await createSchool({
           name: formData.selectedSchool.name,
           address: formData.selectedSchool.address || `${formData.selectedSchool.city}, ${formData.selectedSchool.state} ${formData.selectedSchool.zip}`,
         });
       } else if (formData.schoolName) {
+        // Create new school
         schoolId = await createSchool({
           name: formData.schoolName,
         });
         schoolName = formData.schoolName;
       }
 
+      // Now register the user (this authenticates them)
       const { verificationCode } = await registerSRA(formData.email, formData.password, {
         firstName: formData.firstName,
         lastName: formData.lastName,

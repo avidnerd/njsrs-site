@@ -32,8 +32,10 @@ service cloud.firestore {
     
     // Schools collection
     match /schools/{schoolId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
+      // Allow anyone to read schools (for school selection during registration)
+      allow read: if true;
+      // Allow anyone to create schools (needed for registration before authentication)
+      allow create: if true;
       allow update, delete: if false; // Only admins can update/delete (add admin check later)
     }
     

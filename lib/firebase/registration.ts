@@ -20,21 +20,12 @@ export async function registerSRA(
     throw new Error(`Failed to create user account: ${error.message || "Unknown error"}`);
   }
 
-  let schoolId = sraData.schoolId;
+  // School should already be created before this function is called
+  const schoolId = sraData.schoolId;
   if (!schoolId) {
-    try {
-      console.log("Step 2: Creating school...");
-      schoolId = await createSchool({
-        name: sraData.schoolName,
-      });
-      console.log("Step 2: School created, ID:", schoolId);
-    } catch (schoolError: any) {
-      console.error("Error creating school:", schoolError);
-      throw new Error(`Failed to create school: ${schoolError.message || "Unknown error"}`);
-    }
-  } else {
-    console.log("Step 2: Using existing school ID:", schoolId);
+    throw new Error("School ID is required");
   }
+  console.log("Step 2: Using school ID:", schoolId);
 
   try {
     console.log("Step 3: Creating SRA document with UID:", userCredential.user.uid);
