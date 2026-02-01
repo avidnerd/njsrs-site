@@ -384,7 +384,7 @@ export async function updateStudentPaymentStatus(
 
 export async function updateStudentMaterials(
   studentId: string,
-  updates: Partial<Pick<Student, "researchReportUrl" | "slideshowUrl" | "srcQuestions" | "ethicsQuestionnaire" | "statementOfOutsideAssistance" | "srcApprovalRequested" | "srcApprovalRequestedAt">>
+  updates: Partial<Pick<Student, "researchReportUrl" | "abstractUrl" | "slideshowUrl" | "srcQuestions" | "ethicsQuestionnaire" | "statementOfOutsideAssistance" | "srcApprovalRequested" | "srcApprovalRequestedAt">>
 ): Promise<void> {
   const dbInstance = ensureDb();
   const studentRef = doc(dbInstance, "students", studentId);

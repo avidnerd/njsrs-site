@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import sgMail from "@sendgrid/mail";
+import * as sgMail from "@sendgrid/mail";
 
 // Initialize SendGrid - use the same environment variable as Firebase Functions
 const sendGridApiKey = process.env.SENDGRID_API_KEY;
@@ -56,8 +56,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("Error sending invitation email:", error);
+    
+    // Provide more detailed error information
+    let errorMessage = "Failed to send invitation email";
+    if (error.response) {
+      console.error("SendGrid API error response:", error.response.body);
+      errorMessage = `SendGrid API error: ${JSON.stringify(error.response.body)}`;
+    } else if (error.message) {
+      errorMessage = `Error: ${error.message}`;
+    }
+    
     return NextResponse.json(
-      { error: "Failed to send invitation email" },
+      { error: errorMessage },
       { status: 500 }
     );
   }
