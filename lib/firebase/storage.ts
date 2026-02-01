@@ -1,5 +1,5 @@
 import { ref, uploadBytes, getDownloadURL, UploadResult } from "firebase/storage";
-import { storage } from "./config";
+import { storage, auth } from "./config";
 
 function ensureStorage() {
   if (!storage) {
@@ -8,16 +8,52 @@ function ensureStorage() {
   return storage;
 }
 
+function ensureAuthenticated(userId: string) {
+  if (!auth) {
+    throw new Error("Firebase Auth is not initialized. Make sure environment variables are set.");
+  }
+  
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    throw new Error("User is not authenticated. Please log in and try again.");
+  }
+  
+  // Verify the userId matches the authenticated user
+  if (currentUser.uid !== userId) {
+    throw new Error("User ID mismatch. You can only upload files to your own folder.");
+  }
+  
+  return currentUser;
+}
+
 export async function uploadFile(
   userId: string,
   file: File,
   path: string
 ): Promise<string> {
+  // Ensure user is authenticated before uploading
+  ensureAuthenticated(userId);
+  
   const storageInstance = ensureStorage();
   const storageRef = ref(storageInstance, `students/${userId}/${path}`);
-  const snapshot: UploadResult = await uploadBytes(storageRef, file);
-  const downloadURL = await getDownloadURL(snapshot.ref);
-  return downloadURL;
+  
+  try {
+    const snapshot: UploadResult = await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+    return downloadURL;
+  } catch (error: any) {
+    // Provide more helpful error messages
+    if (error.code === 'storage/unauthorized') {
+      throw new Error("You don't have permission to upload files. Please check that you're logged in and your account is approved.");
+    } else if (error.code === 'storage/canceled') {
+      throw new Error("Upload was canceled.");
+    } else if (error.code === 'storage/unknown') {
+      throw new Error("An unknown error occurred during upload. Please check your internet connection and try again.");
+    } else if (error.message?.includes('CORS') || error.message?.includes('preflight')) {
+      throw new Error("Upload failed due to authentication or permissions issue. Please try logging out and logging back in, or contact support if the problem persists.");
+    }
+    throw error;
+  }
 }
 
 export async function uploadResearchPlan(
