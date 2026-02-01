@@ -59,8 +59,31 @@ export default function SRARegistrationForm() {
     e.preventDefault();
     setError("");
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
+    // Validate all required fields
+    if (!formData.firstName.trim()) {
+      setError("First name is required");
+      return;
+    }
+
+    if (!formData.lastName.trim()) {
+      setError("Last name is required");
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      setError("Email is required");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    if (!formData.password) {
+      setError("Password is required");
       return;
     }
 
@@ -69,7 +92,29 @@ export default function SRARegistrationForm() {
       return;
     }
 
-    if (!formData.selectedSchool && !formData.schoolName) {
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (!formData.phone.trim()) {
+      setError("Phone number is required");
+      return;
+    }
+
+    // Phone validation (basic)
+    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+    if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
+      setError("Please enter a valid phone number");
+      return;
+    }
+
+    if (!formData.title.trim()) {
+      setError("Title is required");
+      return;
+    }
+
+    if (!formData.selectedSchool && !formData.schoolName.trim()) {
       setError("Please select or create a school");
       return;
     }
@@ -198,19 +243,20 @@ export default function SRARegistrationForm() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label htmlFor="phone" className="block text-sm font-medium mb-1 text-gray-900">
-            Phone
+            Phone *
           </label>
           <input
             id="phone"
             type="tel"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            required
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
           />
         </div>
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-1 text-gray-900">
-            Title
+            Title *
           </label>
           <input
             id="title"
@@ -218,6 +264,7 @@ export default function SRARegistrationForm() {
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             placeholder="e.g., Science Teacher, Administrator"
+            required
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
           />
         </div>

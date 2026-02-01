@@ -51,8 +51,8 @@ export default function DonatePage() {
           </p>
           <p className="text-gray-700">
             Interested organizations can contact{" "}
-            <a href="mailto:faircommittee@njsrs.org" className="text-primary-blue hover:underline">
-              faircommittee@njsrs.org
+            <a href="mailto:fairdirector@njsrs.org" className="text-primary-blue hover:underline">
+              fairdirector@njsrs.org
             </a>{" "}
             to discuss sponsorship levels.
           </p>
@@ -63,7 +63,7 @@ export default function DonatePage() {
             Donate
           </h2>
           <p className="text-gray-700 mb-4">
-          If you would be interested in making a donation to our fair, please contact the fair director at faircommittee@njsrs.org.
+          If you would be interested in making a donation to our fair, please contact the fair director at fairdirector@njsrs.org.
           </p>
           <p className="text-gray-700 mb-6">
           Donations directly fund the symposium, covering logistics, printing, display materials, and awards. Even modest gifts help open more judging slots, invite more schools, and ensure the event&apos;s sustainability. 

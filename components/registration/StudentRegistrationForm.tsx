@@ -64,17 +64,54 @@ export default function StudentRegistrationForm() {
     }
   };
 
+  const countWords = (text: string): number => {
+    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // Validate all required fields
+    if (!formData.firstName.trim()) {
+      setError("First name is required");
+      return;
+    }
+
+    if (!formData.lastName.trim()) {
+      setError("Last name is required");
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      setError("Email is required");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    if (!formData.password) {
+      setError("Password is required");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
+    if (!formData.grade) {
+      setError("Please select your grade");
       return;
     }
 
@@ -86,6 +123,15 @@ export default function StudentRegistrationForm() {
     if (!formData.sraId) {
       setError("Please select your Science Research Advisor");
       return;
+    }
+
+    // Validate project description word count
+    if (formData.projectDescription.trim()) {
+      const wordCount = countWords(formData.projectDescription);
+      if (wordCount > 150) {
+        setError(`Project description must be 150 words or less. Current: ${wordCount} words`);
+        return;
+      }
     }
 
     setLoading(true);
@@ -273,28 +319,33 @@ export default function StudentRegistrationForm() {
 
       <div>
         <label htmlFor="projectTitle" className="block text-sm font-medium mb-1 text-gray-900">
-          Project Title
+          Project Title *
         </label>
         <input
           id="projectTitle"
           type="text"
           value={formData.projectTitle}
           onChange={(e) => setFormData({ ...formData, projectTitle: e.target.value })}
+          required
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
         />
       </div>
 
       <div>
         <label htmlFor="projectDescription" className="block text-sm font-medium mb-1 text-gray-900">
-          Please enter a brief description of your project (150 words max).
+          Please enter a brief description of your project (150 words max). *
         </label>
         <textarea
           id="projectDescription"
           value={formData.projectDescription}
           onChange={(e) => setFormData({ ...formData, projectDescription: e.target.value })}
           rows={4}
+          required
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
         />
+        <p className="mt-1 text-sm text-gray-500">
+          Word count: {countWords(formData.projectDescription)} / 150
+        </p>
       </div>
 
       {error && (

@@ -71,6 +71,8 @@ export interface Student {
   srcNotes?: string;
   // Ethics questionnaire
   ethicsQuestionnaire?: EthicsQuestionnaire;
+  // Statement of Outside Assistance
+  statementOfOutsideAssistance?: StatementOfOutsideAssistance;
 }
 
 export interface SRCQuestions {
@@ -118,6 +120,75 @@ export interface EthicsQuestionnaire {
   aiToolsUsed?: boolean;
   aiUsageDetails?: string;
   aiDisclosed?: boolean;
+}
+
+export interface StatementOfOutsideAssistance {
+  // Student Information
+  studentFirstName?: string;
+  studentLastName?: string;
+  partnerFirstName?: string;
+  partnerLastName?: string;
+  researchReportTitle?: string;
+  school?: string;
+  teacherFirstName?: string;
+  teacherLastName?: string;
+  mentorFirstName?: string;
+  mentorLastName?: string;
+  mentorInstitution?: string;
+  
+  // Student Questions (1-14)
+  question1?: string; // Project idea development
+  question2?: string; // Research question development
+  question3?: string; // Where work was done
+  question4?: string; // Help received
+  question5?: string; // Role in research group
+  question6?: string; // Origin of external data
+  question7?: string; // Why external data was used
+  question8?: string; // Continuation of prior research
+  question9?: string; // Prior research abstract
+  question10?: string; // AI compliance
+  question11?: string; // Methods and materials
+  question12?: string; // Safety and ethics
+  question13?: string; // Professional oversight
+  question14?: string; // IRB oversight
+  
+  // Teacher/Mentor/Parent Sections
+  teacherMentorComments?: string;
+  teacherMentorSafetyStatement?: string;
+  
+  // Signatures
+  studentSignature?: string;
+  studentSignatureDate?: Date | Timestamp;
+  teacherSignature?: string;
+  teacherSignatureDate?: Date | Timestamp;
+  teacherSchool?: string;
+  mentorSignature?: string;
+  mentorSignatureDate?: Date | Timestamp;
+  mentorName?: string;
+  mentorTitle?: string;
+  mentorInstitutionSignature?: string;
+  parentSignature?: string;
+  parentSignatureDate?: Date | Timestamp;
+  parentName?: string;
+  parentPhone?: string;
+  
+  // Invitation tracking
+  teacherEmail?: string;
+  teacherInviteSent?: boolean;
+  teacherInviteToken?: string;
+  mentorEmail?: string;
+  mentorInviteSent?: boolean;
+  mentorInviteToken?: string;
+  parentEmail?: string;
+  parentInviteSent?: boolean;
+  parentInviteToken?: string;
+  
+  // Completion status
+  studentCompleted?: boolean;
+  teacherCompleted?: boolean;
+  mentorCompleted?: boolean;
+  parentCompleted?: boolean;
+  formCompleted?: boolean;
 }
 
 export interface Judge {
@@ -313,7 +384,7 @@ export async function updateStudentPaymentStatus(
 
 export async function updateStudentMaterials(
   studentId: string,
-  updates: Partial<Pick<Student, "researchReportUrl" | "slideshowUrl" | "srcQuestions" | "ethicsQuestionnaire" | "srcApprovalRequested" | "srcApprovalRequestedAt">>
+  updates: Partial<Pick<Student, "researchReportUrl" | "slideshowUrl" | "srcQuestions" | "ethicsQuestionnaire" | "statementOfOutsideAssistance" | "srcApprovalRequested" | "srcApprovalRequestedAt">>
 ): Promise<void> {
   const dbInstance = ensureDb();
   const studentRef = doc(dbInstance, "students", studentId);

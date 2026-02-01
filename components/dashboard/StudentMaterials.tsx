@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { uploadResearchReport, uploadSlideshow } from "@/lib/firebase/storage";
 import { updateStudentMaterials, requestSRCApproval, getStudent } from "@/lib/firebase/database";
 import FileUpload from "@/components/upload/FileUpload";
+import StatementOfOutsideAssistance from "./StatementOfOutsideAssistance";
 import type { Student, SRCQuestions, EthicsQuestionnaire } from "@/lib/firebase/database";
 import Link from "next/link";
 
@@ -13,7 +14,7 @@ export default function StudentMaterials() {
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<"research" | "src" | "ethics" | "slideshow">("research");
+  const [activeSection, setActiveSection] = useState<"research" | "src" | "ethics" | "slideshow" | "statement">("research");
   
   // Form state
   const [srcQuestions, setSRCQuestions] = useState<SRCQuestions>({});
@@ -162,6 +163,16 @@ export default function StudentMaterials() {
           }`}
         >
           4. Slideshow
+        </button>
+        <button
+          onClick={() => setActiveSection("statement")}
+          className={`px-4 py-2 rounded-md font-medium ${
+            activeSection === "statement"
+              ? "bg-primary-blue text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
+        >
+          5. Statement of Outside Assistance
         </button>
       </div>
 
@@ -659,6 +670,11 @@ export default function StudentMaterials() {
             />
           </div>
         </div>
+      )}
+
+      {/* Statement of Outside Assistance Section */}
+      {activeSection === "statement" && (
+        <StatementOfOutsideAssistance />
       )}
     </div>
   );

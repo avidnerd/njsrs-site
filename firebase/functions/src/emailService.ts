@@ -25,7 +25,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
   try {
     await sgMail.send({
       to: options.to,
-      from: options.from || "noreply@njsrs.org",
+      from: options.from || "faircommittee@njsrs.org",
       subject: options.subject,
       html: options.html,
     });

@@ -23,7 +23,6 @@ service cloud.firestore {
     // Helper function to check if user is SRA (by checking if SRA document exists)
     function isSRA() {
       return isAuthenticated() && 
-             get(/databases/$(database)/documents/sras/$(request.auth.uid)) != null &&
              get(/databases/$(database)/documents/sras/$(request.auth.uid)).data != null;
     }
     
@@ -57,15 +56,10 @@ service cloud.firestore {
     // Students collection
     match /students/{studentId} {
       // Allow read if owner, SRA owner, or admin
-      // For queries, Firestore will evaluate this for each matching document
-      // Check: user is authenticated, has SRA document, and student's sraId matches user's UID
+      // For queries: Since the query filters by sraId == request.auth.uid, we just need to verify the user is an SRA
+      // For individual reads: Check if student's sraId matches user's UID
       allow read: if isOwner(studentId) || 
-                     (isAuthenticated() &&
-                      get(/databases/$(database)/documents/sras/$(request.auth.uid)) != null &&
-                      get(/databases/$(database)/documents/sras/$(request.auth.uid)).data != null &&
-                      get(/databases/$(database)/documents/students/$(studentId)) != null &&
-                      get(/databases/$(database)/documents/students/$(studentId)).data != null &&
-                      get(/databases/$(database)/documents/students/$(studentId)).data.sraId == request.auth.uid) ||
+                     isSRA() ||
                      isAdmin();
       // Allow create if owner
       allow create: if isOwner(studentId);

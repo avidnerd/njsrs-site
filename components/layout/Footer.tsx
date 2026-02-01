@@ -1,10 +1,21 @@
+import Image from "next/image";
+
 export default function Footer() {
   return (
     <footer className="bg-gray-800 text-white mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-lg font-semibold mb-4">NJSRS</h3>
+            <div className="flex items-center mb-4">
+              <Image
+                src="/njsrs-icon-only.png"
+                alt="NJSRS Logo"
+                width={60}
+                height={60}
+                className="mr-3"
+              />
+              <h3 className="text-lg font-semibold">NJSRS</h3>
+            </div>
             <p className="text-gray-400 text-sm">
               New Jersey Science Research Symposium hosted at Millburn High School.
             </p>
@@ -37,6 +48,10 @@ export default function Footer() {
               462 Millburn Ave
               <br />
               Millburn, NJ
+              <br />
+              <a href="mailto:fairdirector@njsrs.org" className="text-white hover:text-primary-green mt-2 inline-block">
+                fairdirector@njsrs.org
+              </a>
             </p>
           </div>
         </div>

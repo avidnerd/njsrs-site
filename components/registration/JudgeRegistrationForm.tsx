@@ -44,28 +44,96 @@ export default function JudgeRegistrationForm() {
     
     switch (step) {
       case 1:
-        if (!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.confirmPassword) {
-          setError("Please fill in all required fields");
+        if (!formData.firstName.trim()) {
+          setError("First name is required");
           return false;
         }
-        if (formData.password !== formData.confirmPassword) {
-          setError("Passwords do not match");
+        if (!formData.lastName.trim()) {
+          setError("Last name is required");
+          return false;
+        }
+        if (!formData.email.trim()) {
+          setError("Email is required");
+          return false;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+          setError("Please enter a valid email address");
+          return false;
+        }
+        if (!formData.password) {
+          setError("Password is required");
           return false;
         }
         if (formData.password.length < 6) {
           setError("Password must be at least 6 characters");
           return false;
         }
+        if (formData.password !== formData.confirmPassword) {
+          setError("Passwords do not match");
+          return false;
+        }
         return true;
       case 2:
-      case 3:
-      case 4:
-      case 5:
-      case 6:
-      case 7:
-      case 8:
-      case 9:
+        if (!formData.address.trim()) {
+          setError("Address is required");
+          return false;
+        }
+        if (!formData.cellPhone.trim()) {
+          setError("Cell phone number is required");
+          return false;
+        }
         return true;
+      case 3:
+        if (!formData.institution.trim()) {
+          setError("Institution is required");
+          return false;
+        }
+        if (!formData.department.trim()) {
+          setError("Department is required");
+          return false;
+        }
+        if (!formData.currentPosition.trim()) {
+          setError("Current position is required");
+          return false;
+        }
+        if (!formData.employmentStatus) {
+          setError("Employment status is required");
+          return false;
+        }
+        return true;
+      case 4:
+        if (!formData.highestDegree.trim()) {
+          setError("Highest degree is required");
+          return false;
+        }
+        if (!formData.degreeDate.trim()) {
+          setError("Degree date is required");
+          return false;
+        }
+        if (!formData.degreeDiscipline.trim()) {
+          setError("Degree discipline is required");
+          return false;
+        }
+        return true;
+      case 5:
+        if (!formData.areaOfExpertise.trim()) {
+          setError("Area of expertise is required");
+          return false;
+        }
+        return true;
+      case 6:
+        return true; // Publications and patents are optional
+      case 7:
+        return true; // Experience is a checkbox
+      case 8:
+        if (!formData.canCommitToAllProjects) {
+          setError("You must commit to viewing all 10 projects");
+          return false;
+        }
+        return true;
+      case 9:
+        return true; // Conflicts of interest
       case 10:
         if (!formData.availabilityApril18) {
           setError("Please select your availability for April 18th");
@@ -215,25 +283,27 @@ export default function JudgeRegistrationForm() {
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Contact Information</h2>
             <div>
               <label htmlFor="address" className="block text-sm font-medium mb-1 text-gray-900">
-                Address
+                Address *
               </label>
               <textarea
                 id="address"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 rows={3}
+                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
             <div>
               <label htmlFor="cellPhone" className="block text-sm font-medium mb-1 text-gray-900">
-                Cell Phone Number
+                Cell Phone Number *
               </label>
               <input
                 id="cellPhone"
                 type="tel"
                 value={formData.cellPhone}
                 onChange={(e) => setFormData({ ...formData, cellPhone: e.target.value })}
+                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
@@ -246,13 +316,14 @@ export default function JudgeRegistrationForm() {
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Institution</h2>
             <div>
               <label htmlFor="institution" className="block text-sm font-medium mb-1 text-gray-900">
-                Institution
+                Institution *
               </label>
               <input
                 id="institution"
                 type="text"
                 value={formData.institution}
                 onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
+                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
@@ -270,25 +341,27 @@ export default function JudgeRegistrationForm() {
             </div>
             <div>
               <label htmlFor="department" className="block text-sm font-medium mb-1 text-gray-900">
-                Department
+                Department *
               </label>
               <input
                 id="department"
                 type="text"
                 value={formData.department}
                 onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
             <div>
               <label htmlFor="currentPosition" className="block text-sm font-medium mb-1 text-gray-900">
-                Current Position
+                Current Position *
               </label>
               <input
                 id="currentPosition"
                 type="text"
                 value={formData.currentPosition}
                 onChange={(e) => setFormData({ ...formData, currentPosition: e.target.value })}
+                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
@@ -300,7 +373,7 @@ export default function JudgeRegistrationForm() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Employment Status</h2>
             <div>
-              <label className="block text-sm font-medium mb-3">Are you currently working or retired?</label>
+              <label className="block text-sm font-medium mb-3">Are you currently working or retired? *</label>
               <div className="space-y-2">
                 <label className="flex items-center">
                   <input
@@ -335,7 +408,7 @@ export default function JudgeRegistrationForm() {
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Education</h2>
             <div>
               <label htmlFor="highestDegree" className="block text-sm font-medium mb-1 text-gray-900">
-                Highest Degree
+                Highest Degree *
               </label>
               <input
                 id="highestDegree"
@@ -343,12 +416,13 @@ export default function JudgeRegistrationForm() {
                 value={formData.highestDegree}
                 onChange={(e) => setFormData({ ...formData, highestDegree: e.target.value })}
                 placeholder="e.g., Ph.D., M.S., B.S."
+                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
             <div>
               <label htmlFor="degreeDate" className="block text-sm font-medium mb-1 text-gray-900">
-                Date of Degree
+                Date of Degree *
               </label>
               <input
                 id="degreeDate"
@@ -356,12 +430,13 @@ export default function JudgeRegistrationForm() {
                 value={formData.degreeDate}
                 onChange={(e) => setFormData({ ...formData, degreeDate: e.target.value })}
                 placeholder="e.g., 2010"
+                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
             <div>
               <label htmlFor="degreeDiscipline" className="block text-sm font-medium mb-1 text-gray-900">
-                Discipline
+                Discipline *
               </label>
               <input
                 id="degreeDiscipline"
@@ -369,6 +444,7 @@ export default function JudgeRegistrationForm() {
                 value={formData.degreeDiscipline}
                 onChange={(e) => setFormData({ ...formData, degreeDiscipline: e.target.value })}
                 placeholder="e.g., Biology, Chemistry, Physics"
+                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
@@ -381,7 +457,7 @@ export default function JudgeRegistrationForm() {
             <h2 className="text-2xl font-bold text-primary-blue mb-4">Area of Expertise</h2>
             <div>
               <label htmlFor="areaOfExpertise" className="block text-sm font-medium mb-1 text-gray-900">
-                Primary Area of Expertise
+                Primary Area of Expertise *
               </label>
               <textarea
                 id="areaOfExpertise"
@@ -389,6 +465,7 @@ export default function JudgeRegistrationForm() {
                 onChange={(e) => setFormData({ ...formData, areaOfExpertise: e.target.value })}
                 rows={4}
                 placeholder="Describe your area of expertise..."
+                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
               />
             </div>
