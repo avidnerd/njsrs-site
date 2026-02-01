@@ -2,9 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { getStudent, updateStudentMaterials } from "@/lib/firebase/database";
-import type { Student, StatementOfOutsideAssistance } from "@/lib/firebase/database";
-import { Timestamp } from "firebase/firestore";
+import type { StatementOfOutsideAssistance } from "@/lib/firebase/database";
+
+interface StudentInfo {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
 
 export default function StatementSignPage() {
   const params = useParams();
@@ -13,7 +17,7 @@ export default function StatementSignPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [student, setStudent] = useState<Student | null>(null);
+  const [student, setStudent] = useState<StudentInfo | null>(null);
   const [formData, setFormData] = useState<StatementOfOutsideAssistance | null>(null);
   const [signerType, setSignerType] = useState<"teacher" | "mentor" | "parent" | null>(null);
   const [signature, setSignature] = useState("");
@@ -28,69 +32,34 @@ export default function StatementSignPage() {
 
   const loadFormData = async () => {
     try {
-      // Token format: studentId_type_timestamp_random
-      const parts = token.split("_");
-      if (parts.length < 3) {
-        setError("Invalid invitation link");
-        setLoading(false);
-        return;
-      }
-
-      const studentId = parts[0];
-      const type = parts[1] as "teacher" | "mentor" | "parent";
+      const response = await fetch(`/api/statement-form?token=${encodeURIComponent(token)}`);
       
-      if (!studentId || !type || !["teacher", "mentor", "parent"].includes(type)) {
-        setError("Invalid invitation link");
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to load form");
         setLoading(false);
         return;
       }
 
-      setSignerType(type);
-
-      const studentData = await getStudent(studentId);
-      if (!studentData) {
-        setError("Student not found");
-        setLoading(false);
-        return;
-      }
-
-      setStudent(studentData);
-
-      if (!studentData.statementOfOutsideAssistance) {
-        setError("Statement form not found");
-        setLoading(false);
-        return;
-      }
-
-      const statement = studentData.statementOfOutsideAssistance;
-      
-      // Verify token matches
-      if (
-        (type === "teacher" && statement.teacherInviteToken !== token) ||
-        (type === "mentor" && statement.mentorInviteToken !== token) ||
-        (type === "parent" && statement.parentInviteToken !== token)
-      ) {
-        setError("Invalid or expired invitation link");
-        setLoading(false);
-        return;
-      }
-
-      setFormData(statement);
+      const data = await response.json();
+      setStudent(data.student);
+      setFormData(data.formData);
+      setSignerType(data.signerType);
       
       // Pre-fill signature fields if already completed
-      if (type === "teacher" && statement.teacherSignature) {
-        setSignature(statement.teacherSignature);
-      } else if (type === "mentor" && statement.mentorSignature) {
-        setSignature(statement.mentorSignature);
-      } else if (type === "parent" && statement.parentSignature) {
-        setSignature(statement.parentSignature);
+      if (data.signerType === "teacher" && data.formData.teacherSignature) {
+        setSignature(data.formData.teacherSignature);
+      } else if (data.signerType === "mentor" && data.formData.mentorSignature) {
+        setSignature(data.formData.mentorSignature);
+      } else if (data.signerType === "parent" && data.formData.parentSignature) {
+        setSignature(data.formData.parentSignature);
       }
 
-      if (statement.teacherMentorComments) {
-        setComments(statement.teacherMentorComments);
+      if (data.formData.teacherMentorComments) {
+        setComments(data.formData.teacherMentorComments);
       }
-      if (statement.teacherMentorSafetyStatement) {
-        setSafetyStatement(statement.teacherMentorSafetyStatement);
+      if (data.formData.teacherMentorSafetyStatement) {
+        setSafetyStatement(data.formData.teacherMentorSafetyStatement);
       }
     } catch (error: any) {
       setError(error.message || "Failed to load form");
@@ -154,9 +123,23 @@ export default function StatementSignPage() {
         updatedFormData.formCompleted = true;
       }
 
-      await updateStudentMaterials(student.id!, {
-        statementOfOutsideAssistance: updatedFormData,
+      // Use API route to update the form (no authentication required)
+      const response = await fetch("/api/statement-form", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token,
+          formData: updatedFormData,
+          signerType,
+        }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to submit form");
+      }
 
       setSuccess("Form submitted successfully! Thank you for completing your section.");
       setTimeout(() => {
