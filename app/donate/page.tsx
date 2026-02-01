@@ -26,7 +26,7 @@ export default function DonatePage() {
             Our Mission
           </h2>
           <p className="text-gray-700">
-            NJSRS provides a venue for high school students to present STEM research, compete for prizes, receive feedback, and learn from peers, especially given the suspension of regional science fairs like JSHS.
+            NJSRS provides a venue for high school students to present STEM research, compete for prizes, receive feedback, and learn from peers, especially given the suspension of JSHS this year.
           </p>
         </section>
 
@@ -47,7 +47,7 @@ export default function DonatePage() {
             </div>
           </div>
           <p className="text-gray-700 mb-4">
-            NJSRS relies on support from universities, STEM companies, community organizations, and individual donors. Sponsors help cover costs including venue, judging materials, and student recognition. In return, sponsors receive recognition on our website, event signage, and communications.
+            NJSRS relies on support from universities, STEM companies, community organizations, and individual donors. Sponsors help cover costs including venue, judging materials, and student awards. In return, sponsors receive recognition on our website, event signage, and communications.
           </p>
           <p className="text-gray-700">
             Interested organizations can contact{" "}
@@ -63,10 +63,11 @@ export default function DonatePage() {
             Donate
           </h2>
           <p className="text-gray-700 mb-4">
-            Donations directly fund the symposium, covering logistics, printing, display materials, and awards. Even modest gifts help open more judging slots, invite more schools, and ensure the event&apos;s sustainability.
+          If you would be interested in making a donation to our fair, please contact the fair director at faircommittee@njsrs.org.
           </p>
           <p className="text-gray-700 mb-6">
-            Use the form below to make a contribution, or contact us for information about institutional or larger gifts.
+          Donations directly fund the symposium, covering logistics, printing, display materials, and awards. Even modest gifts help open more judging slots, invite more schools, and ensure the event&apos;s sustainability. 
+          If you would like to fund a special award in honor of a friend, family member, colleague, or business, please mention that in your request. 
           </p>
 
           <div className="bg-blue-50 border-2 border-primary-blue rounded-lg p-6">

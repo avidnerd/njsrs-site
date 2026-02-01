@@ -24,7 +24,7 @@ export default function JudgingPage() {
             Qualifications to Serve as a Judge
           </h2>
           <p className="text-gray-700">
-            Judges should have a strong background in STEM (Science, Technology, Engineering, or Mathematics) with a bachelor&apos;s degree or higher, or equivalent professional experience. We encourage graduate students, industry professionals, university faculty, and experienced high school STEM teachers to apply. Judges must be comfortable evaluating high school-level experimental research, providing written and verbal feedback, and agreeing to NJSRS&apos;s conflict-of-interest and ethics policies.
+            Judges should have a strong background in STEM (Science, Technology, Engineering, or Mathematics) with a bachelor&apos;s degree or higher, or equivalent professional experience. We encourage graduate students, industry professionals, university faculty, and experienced high school STEM teachers to apply. Judges must be comfortable evaluating high school-level experimental research, providing feedback, and agreeing to NJSRS&apos;s conflict-of-interest and ethics policies.
           </p>
         </section>
 
@@ -34,7 +34,7 @@ export default function JudgingPage() {
             Judging Criteria
           </h2>
           <p className="text-gray-700 mb-4">
-            Evaluation is based on the quality of the research question, experimental design, data analysis, conclusions, and the student&apos;s understanding and communication. Separate rubrics are used for each track to clarify expectations.
+            Evaluation is based on the quality of the research question, experimental design, data analysis, conclusions, and the student&apos;s understanding and communication.
           </p>
           <p className="text-gray-700">
             <strong>View Oral Presentation Rubric</strong> for full scoring categories and point distributions.

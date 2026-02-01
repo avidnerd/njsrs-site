@@ -5,6 +5,28 @@ export default function CompetitionPage() {
         <h1 className="text-4xl font-bold text-primary-blue mb-8">Competition</h1>
 
         <section className="mb-12">
+          <div className="bg-primary-blue rounded-lg shadow-lg p-6 text-white hover:shadow-xl transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Competition Rules</h2>
+                <p className="text-blue-100">
+                  Download the complete competition rules, guidelines, and policies document
+                </p>
+              </div>
+              <a
+                href="/2025-2026%20New%20Jersey%20Science%20Research%20Symposium%20Core%20Rules%20260131.5%20%281%29.pdf"
+                download="NJSRS_Competition_Rules.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white text-primary-blue px-6 py-3 rounded-md hover:bg-gray-100 font-semibold transition-colors whitespace-nowrap"
+              >
+                View Competition Rules
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section className="mb-12">
           <h2 className="text-2xl font-semibold text-primary-darkGreen mb-6">
             Timeline & Deadlines
           </h2>
@@ -28,9 +50,6 @@ export default function CompetitionPage() {
             <p className="text-gray-700 mb-4">
               An &apos;experimental research project&apos; is the implementation of the scientific method to answer a question or solve a problem. This involves doing background research on the question/problem, forming a hypothesis or proposed solution, designing and performing experiments to test the hypothesis/solution, analyzing the experimental data, and using the results to draw conclusions about the question or problem being investigated. In <strong>NJSRS</strong>, the research can be in any area of Science, Technology, Engineering, or Mathematics (STEM).
             </p>
-            <p className="text-gray-700">
-              If a project requires SRC approval as per our <strong>SRC Guidelines</strong> (a clickable link), they must submit the appropriate forms at an earlier deadline as shown above.
-            </p>
           </div>
         </section>
 
@@ -39,18 +58,16 @@ export default function CompetitionPage() {
             Competition Format & Rules
           </h2>
           <p className="text-gray-700 mb-6">
-            In NJSRS, every project is presented through a long-form oral presentation with slides and is judged in front of a panel of STEM professionals and an audience. The competition uses a two-stage format: morning category judging in classrooms and afternoon final round presentations for category winners.
+            In NJSRS, every project is presented through a long-form oral presentation with slides and is judged in front of a panel of STEM professionals and an audience. The competition uses a two-stage format: morning category judging in classrooms and afternoon final round presentations for category winners. In addition, there will be an afternoon poster session for all entrants, offering them the opportunity to win special awards.
           </p>
 
           <div className="mb-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-3">
-              Judged Oral Presentations (Category Round)
+              Judged Oral Presentations (Category Round and Final Round)
             </h3>
             <p className="text-gray-700 mb-4">
-              Students present in assigned categories (e.g., Biology, Chemistry, Mathematics & Computer Science), with each category in its own classroom. Every student gives a 10-minute presentation using slides, followed by 5 minutes of judge Q&A and 3 minutes of audience Q&A. Judges then step into the hallway to finalize their scoring and written feedback. Evaluation is based on clarity of explanation, quality of experimental design and analysis, understanding of the science, and ability to respond to questions. First place category winners advance to the final round.
-            </p>
-            <p className="text-gray-700">
-              <strong>View detailed Presentation Rules</strong>
+              Students present in assigned categories (e.g., Biology, Chemistry, Mathematics & Computer Science), with each category in its own classroom. Every student gives a 10-minute presentation using slides, followed by a judge Q&A session and a brief audience Q&A session. Evaluation is based on clarity of explanation, quality of experimental design and analysis, understanding of the science, and ability to respond to questions.
+              First place category winners deliver a second 10-minute slide presentation in the Millburn High School auditorium. These finalists will be eligible to win the Grand Prizes of NJSRS.
             </p>
           </div>
 
@@ -59,10 +76,7 @@ export default function CompetitionPage() {
               Final Round Presentations
             </h3>
             <p className="text-gray-700 mb-4">
-              First place category winners deliver a second 10-minute slide presentation in a common space such as the auditorium, cafeteria, library, or MILL. In the final round, there is no judge Q&A and no audience Q&A; judges score solely on the quality of the presentation and the underlying research. These finalists will be eligible to win the Grand Prizes of NJSRS.
-            </p>
-            <p className="text-gray-700">
-              <strong>View Final Round Guidelines</strong>
+              First place category winners deliver a second 10-minute slide presentation in the Millburn High School auditorium. In the final round, there is no judge Q&A and no audience Q&A; judges score solely on the quality of the presentation and the underlying research. These finalists will be eligible to win the Grand Prizes of NJSRS.
             </p>
           </div>
 
@@ -71,11 +85,80 @@ export default function CompetitionPage() {
               Rules, Safety & Ethics
             </h3>
             <p className="text-gray-700 mb-4">
-              All projects must follow ISEF safety rules and NJSRI&apos;s own rules on research integrity, attribution, and safe use of materials and equipment. Projects involving human participants, vertebrate animals, or potentially hazardous biological agents (PHBAs) require prior SRC (and IRB, if applicable) approval before experimentation begins. Students must accurately represent their own work, maintain proper citations, and may not fabricate or misreport data; serious violations lead to disqualification.
+              All projects must follow ISEF safety rules and NJSRS&apos;s own rules on research integrity, attribution, and safe use of materials and equipment. For projects involving human participants, vertebrate animals, or potentially hazardous biological agents (PHBAs), please refer to the Core Rules of the Competition for more details. Students must accurately represent their own work, maintain proper citations, and may not fabricate or misreport data; serious violations lead to disqualification.
             </p>
-            <p className="text-gray-700">
-              <strong>View Full Rules & Ethics Policy.</strong>
+          </div>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
+            How to Register
+          </h2>
+          <div className="prose max-w-none">
+            <p className="text-gray-700 mb-4">
+              Registration for NJSRS requires a <strong>Science Research Advisor (SRA)</strong> to be registered for each school before students can register.
             </p>
+
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                Science Research Advisor (SRA) Registration
+              </h3>
+              <p className="text-gray-700 mb-4">
+                A faculty member at the student&apos;s school must register their school as a Science Research Advisor. <strong>Each school must have an SRA for students to enter.</strong>
+              </p>
+              <ul className="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li>Students must have an SRA to enter</li>
+                <li>The SRA must attend/chaperone student(s) from their school</li>
+                <li>The SRA does not have to be a science teacher</li>
+                <li>Any school personnel can serve as SRA:
+                  <ul className="list-disc list-inside ml-6 mt-2">
+                    <li>Teacher</li>
+                    <li>Administrator</li>
+                    <li>Other school staff member</li>
+                  </ul>
+                </li>
+              </ul>
+              <p className="text-gray-700 mb-4">
+                <strong>The SRA registers first for each school.</strong> Once an SRA registers, students can register as students and when they choose their school and select the SRA from their school, the SRA will receive an email confirmation to validate their account and admit the student into their cohort.
+              </p>
+              <p className="text-gray-700">
+                The SRA should be able to see the status of all the students&apos; projects/research plans through their dashboard.
+              </p>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                Student Registration
+              </h3>
+              <p className="text-gray-700 mb-4">
+                After an SRA has registered for your school, students can register by:
+              </p>
+              <ol className="list-decimal list-inside text-gray-700 mb-4 space-y-2">
+                <li>Selecting their school from the list</li>
+                <li>Choosing the SRA from their school</li>
+                <li>Completing the registration form</li>
+              </ol>
+              <p className="text-gray-700">
+                Once registered, the SRA will receive an email notification and can approve the student&apos;s registration through their dashboard.
+              </p>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                Payment
+              </h3>
+              <p className="text-gray-700 mb-4">
+                The entry fee is <strong>$30 per student</strong>.
+              </p>
+              <p className="text-gray-700 mb-4">
+                <strong>Payment Process:</strong>
+              </p>
+              <ul className="list-disc list-inside text-gray-700 space-y-2">
+                <li>The student will pay their own school</li>
+                <li>The school will write a Purchase Order (check) to Millburn High School</li>
+                <li>Mail the payment to: <strong>462 Millburn Ave., Millburn, NJ</strong></li>
+              </ul>
+            </div>
           </div>
         </section>
 
@@ -86,24 +169,7 @@ export default function CompetitionPage() {
           <p className="text-gray-700 mb-4">
             The New Jersey Science Research Symposium is hosted at Millburn High School in Millburn, New Jersey. The event uses two main spaces:
           </p>
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Classrooms 100-110 - Oral Presentations
-              </h3>
-              <p className="text-gray-700">
-                A set of adjacent classrooms (100-110) is reserved for oral presentations. In each room, a small panel of judges listens to talks, asks questions, and scores projects.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Auditorium
-              </h3>
-              <p className="text-gray-700">
-                The high school auditorium is used for the final round judging and award ceremony. First place category winners will present their research in front of a larger audience to be evaluated for the Grand Prize Winners Award of NJSRS.
-              </p>
-            </div>
-          </div>
+          
         </section>
       </div>
     </div>

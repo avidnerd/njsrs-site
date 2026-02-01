@@ -11,7 +11,7 @@ export default function HomePage() {
                 The New Jersey Science Research Symposium (NJSRS) is a research competition that brings together high school scientists from across New Jersey to present original STEM research projects.
               </h1>
               <p className="text-lg md:text-xl mb-8 text-blue-100">
-                Hosted at Millburn High School, this invitational is designed to fill the gap left by suspended regional fairs and to give more students a platform to share, defend, and advance their research.
+                Hosted at Millburn High School, this invitational is designed to provide students a platform to share, defend, and advance their research.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
@@ -43,8 +43,8 @@ export default function HomePage() {
 
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-lg shadow-md p-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <Link href="/competition" className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="mb-8 flex justify-center">
                 <img 
                   src="/scientist.png" 
@@ -58,7 +58,7 @@ export default function HomePage() {
               <p className="text-gray-600">
                 NJSRS is for high school students who have conducted experimental STEM research within the past year. Competitors give an oral presentation in front of slides and are scored by STEM professionals.
               </p>
-            </div>
+            </Link>
 
             <div className="bg-white rounded-lg shadow-md p-8">
               <div className="mb-8 flex justify-center">
@@ -76,7 +76,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-8">
+            <Link href="/donate" className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="mb-8 flex justify-center">
                 <img 
                   src="/donate.png" 
@@ -90,6 +90,19 @@ export default function HomePage() {
               <p className="text-gray-600">
                 Donations support event costs, judging, and student awards so that this fair can happen! All contributions go directly toward running the symposium and expanding opportunities for New Jersey student researchers.
               </p>
+            </Link>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <h2 className="text-2xl font-semibold text-primary-blue mb-6 text-center">
+              Timeline & Deadlines
+            </h2>
+            <div className="w-full">
+              <img 
+                src="/fair_timeline.png" 
+                alt="Fair Timeline and Deadlines" 
+                className="w-full h-auto"
+              />
             </div>
           </div>
         </div>
