@@ -205,19 +205,19 @@ export default function StatementSignPage() {
               Student: <strong>{student?.firstName} {student?.lastName}</strong>
             </p>
 
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-              {error}
-            </div>
-          )}
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {error}
+              </div>
+            )}
 
-          {success && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-              {success}
-            </div>
-          )}
+            {success && (
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                {success}
+              </div>
+            )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
             {/* Teacher/Mentor Comments Section */}
             {(signerType === "teacher" || signerType === "mentor") && (
               <div className="border rounded-lg p-4 space-y-4">
@@ -410,6 +410,7 @@ export default function StatementSignPage() {
               </button>
             </div>
           </form>
+          </div>
         </div>
       </div>
     </div>
