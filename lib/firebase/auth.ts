@@ -128,3 +128,32 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   }
   return userDoc.data() as UserProfile;
 }
+
+export async function resendVerificationCode(userId: string): Promise<string> {
+  const dbInstance = ensureDb();
+  const userDoc = await getDoc(doc(dbInstance, "users", userId));
+  
+  if (!userDoc.exists()) {
+    throw new Error("User not found");
+  }
+
+  const userData = userDoc.data();
+  
+  // Don't resend if already verified
+  if (userData.emailVerified) {
+    throw new Error("Email already verified");
+  }
+
+  // Generate new verification code
+  const verificationCode = generateVerificationCode();
+  const verificationCodeExpiry = new Date();
+  verificationCodeExpiry.setHours(verificationCodeExpiry.getHours() + 24);
+
+  // Update user document with new code
+  await updateDoc(doc(dbInstance, "users", userId), {
+    verificationCode,
+    verificationCodeExpiry: Timestamp.fromDate(verificationCodeExpiry),
+  });
+
+  return verificationCode;
+}

@@ -16,27 +16,33 @@ export default function LoginPage() {
       }
 
       if (userProfile) {
+        // Check email verification for all roles except admins
         if (userProfile.role !== "fair_director" && userProfile.role !== "website_manager" && !userProfile.emailVerified) {
           router.push("/verify");
           return;
         }
 
-        switch (userProfile.role) {
-          case "sra":
-            router.push("/dashboard/sra");
-            break;
-          case "student":
-            router.push("/dashboard/student");
-            break;
-          case "judge":
-            router.push("/dashboard/judge");
-            break;
-          case "fair_director":
-          case "website_manager":
-            router.push("/dashboard/admin");
-            break;
-          default:
-            router.push("/");
+        // Only redirect to dashboard if email is verified (or admin)
+        if (userProfile.emailVerified || userProfile.role === "fair_director" || userProfile.role === "website_manager") {
+          switch (userProfile.role) {
+            case "sra":
+              router.push("/dashboard/sra");
+              break;
+            case "student":
+              router.push("/dashboard/student");
+              break;
+            case "judge":
+              router.push("/dashboard/judge");
+              break;
+            case "fair_director":
+            case "website_manager":
+              router.push("/dashboard/admin");
+              break;
+            default:
+              router.push("/");
+          }
+        } else {
+          router.push("/verify");
         }
       }
     }

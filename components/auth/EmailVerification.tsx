@@ -12,6 +12,8 @@ export default function EmailVerification() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
 
   const getDashboardPath = () => {
     if (!userProfile) return "/";
@@ -58,6 +60,38 @@ export default function EmailVerification() {
     }
   };
 
+  const handleResend = async () => {
+    if (!user) {
+      setError("You must be logged in to resend verification email");
+      return;
+    }
+
+    setResending(true);
+    setError("");
+    setResendSuccess(false);
+
+    try {
+      const response = await fetch("/api/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.uid }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to resend verification email");
+      }
+
+      setResendSuccess(true);
+      setTimeout(() => setResendSuccess(false), 5000);
+    } catch (err: any) {
+      setError(err.message || "Failed to resend verification email");
+    } finally {
+      setResending(false);
+    }
+  };
+
   if (verified) {
     return (
       <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
@@ -92,6 +126,11 @@ export default function EmailVerification() {
           {error}
         </div>
       )}
+      {resendSuccess && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+          Verification email sent! Please check your inbox.
+        </div>
+      )}
       <button
         type="submit"
         disabled={loading || code.length !== 6}
@@ -99,6 +138,16 @@ export default function EmailVerification() {
       >
         {loading ? "Verifying..." : "Verify Email"}
       </button>
+      <div className="text-center">
+        <button
+          type="button"
+          onClick={handleResend}
+          disabled={resending}
+          className="text-sm text-primary-blue hover:text-primary-darkBlue underline disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {resending ? "Sending..." : "Resend verification email"}
+        </button>
+      </div>
     </form>
   );
 }

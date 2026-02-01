@@ -23,6 +23,14 @@ export default function ProtectedRoute({
         return;
       }
 
+      // Check email verification for all roles except admins
+      if (userProfile && userProfile.role !== "fair_director" && userProfile.role !== "website_manager") {
+        if (!userProfile.emailVerified) {
+          router.push("/verify");
+          return;
+        }
+      }
+
       if (allowedRoles && userProfile && !allowedRoles.includes(userProfile.role)) {
         switch (userProfile.role) {
           case "sra":
@@ -56,6 +64,13 @@ export default function ProtectedRoute({
 
   if (!user) {
     return null;
+  }
+
+  // Block access if email is not verified (except for admins)
+  if (userProfile && userProfile.role !== "fair_director" && userProfile.role !== "website_manager") {
+    if (!userProfile.emailVerified) {
+      return null;
+    }
   }
 
   if (allowedRoles && userProfile && !allowedRoles.includes(userProfile.role)) {
