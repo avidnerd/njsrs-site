@@ -148,7 +148,7 @@ export default function CompetitionPage() {
               Final Round Presentations
             </h3>
             <p className="text-gray-700 mb-4">
-              First place category winners deliver a second 10-minute slide presentation in the Millburn High School auditorium. In the final round, there is no judge Q&A and no audience Q&A; judges score solely on the quality of the presentation and the underlying research. These finalists will be eligible to win the Grand Prizes of NJSRS.
+              First place category winners deliver a second 10-minute slide presentation in the Millburn High School auditorium. In the final round, there is no audience Q&A. These finalists will be eligible to win the Grand Prizes of NJSRS.
             </p>
           </div>
 
