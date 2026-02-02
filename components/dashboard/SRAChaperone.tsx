@@ -13,6 +13,7 @@ export default function SRAChaperone() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isSelfChaperone, setIsSelfChaperone] = useState(false);
   
   const [chaperoneName, setChaperoneName] = useState("");
   const [chaperonePhone, setChaperonePhone] = useState("");
@@ -34,6 +35,9 @@ export default function SRAChaperone() {
         setChaperoneName(sra.chaperone.name || "");
         setChaperonePhone(sra.chaperone.phone || "");
         setChaperoneEmail(sra.chaperone.email || "");
+        if (sra.chaperone.email === sra.email) {
+          setIsSelfChaperone(true);
+        }
       }
     } catch (error) {
       console.error("Error loading SRA data:", error);
@@ -42,18 +46,38 @@ export default function SRAChaperone() {
     }
   };
 
+  const handleSelfChaperoneToggle = (checked: boolean) => {
+    setIsSelfChaperone(checked);
+    if (checked && sraData) {
+      setChaperoneName(`${sraData.firstName} ${sraData.lastName}`);
+      setChaperoneEmail(sraData.email);
+      setChaperonePhone(sraData.phone || "");
+    } else {
+      setChaperoneName("");
+      setChaperoneEmail("");
+      setChaperonePhone("");
+    }
+  };
+
   const handleSave = async () => {
     if (!user || !sraData) return;
     
-    if (!chaperoneName.trim() || !chaperonePhone.trim() || !chaperoneEmail.trim()) {
-      setError("Please fill in all chaperone fields");
+    if (!chaperonePhone.trim()) {
+      setError("Phone number is required");
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(chaperoneEmail)) {
-      setError("Please enter a valid email address");
-      return;
+    if (!isSelfChaperone) {
+      if (!chaperoneName.trim() || !chaperoneEmail.trim()) {
+        setError("Please fill in all chaperone fields");
+        return;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(chaperoneEmail)) {
+        setError("Please enter a valid email address");
+        return;
+      }
     }
 
     setSaving(true);
@@ -65,16 +89,35 @@ export default function SRAChaperone() {
         name: chaperoneName.trim(),
         phone: chaperonePhone.trim(),
         email: chaperoneEmail.trim(),
-        inviteSent: sraData.chaperone?.inviteSent || false,
-        inviteToken: sraData.chaperone?.inviteToken,
-        confirmed: sraData.chaperone?.confirmed || false,
-        confirmationDate: sraData.chaperone?.confirmationDate,
-        signature: sraData.chaperone?.signature,
       };
+
+      if (sraData.chaperone?.inviteSent !== undefined) {
+        chaperone.inviteSent = sraData.chaperone.inviteSent;
+      }
+      if (sraData.chaperone?.inviteToken) {
+        chaperone.inviteToken = sraData.chaperone.inviteToken;
+      }
+      if (sraData.chaperone?.confirmed !== undefined) {
+        chaperone.confirmed = sraData.chaperone.confirmed;
+      }
+      if (sraData.chaperone?.confirmationDate) {
+        chaperone.confirmationDate = sraData.chaperone.confirmationDate;
+      }
+      if (sraData.chaperone?.signature) {
+        chaperone.signature = sraData.chaperone.signature;
+      }
+
+      if (isSelfChaperone) {
+        chaperone.confirmed = true;
+        chaperone.confirmationDate = new Date();
+        chaperone.signature = chaperoneName.trim();
+      }
 
       await updateSRAChaperone(user.uid, chaperone);
       await loadSRAData();
-      setSuccess("Chaperone information saved successfully!");
+      setSuccess(isSelfChaperone 
+        ? "Chaperone information saved! You are confirmed as the chaperone." 
+        : "Chaperone information saved successfully!");
       setTimeout(() => setSuccess(""), 3000);
     } catch (error) {
       setError("Failed to save chaperone information");
@@ -138,9 +181,22 @@ export default function SRAChaperone() {
       </p>
 
       <div className="space-y-4">
+        <div className="flex items-center gap-2 mb-4">
+          <input
+            id="selfChaperone"
+            type="checkbox"
+            checked={isSelfChaperone}
+            onChange={(e) => handleSelfChaperoneToggle(e.target.checked)}
+            className="w-4 h-4 text-primary-green border-gray-300 rounded focus:ring-primary-green"
+          />
+          <label htmlFor="selfChaperone" className="text-sm font-medium text-gray-900">
+            I will be the chaperone myself
+          </label>
+        </div>
+
         <div>
           <label htmlFor="chaperoneName" className="block text-sm font-medium mb-1 text-gray-900">
-            Chaperone Name *
+            Chaperone Name {!isSelfChaperone && "*"}
           </label>
           <input
             id="chaperoneName"
@@ -148,7 +204,8 @@ export default function SRAChaperone() {
             value={chaperoneName}
             onChange={(e) => setChaperoneName(e.target.value)}
             placeholder="Enter chaperone's full name"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+            disabled={isSelfChaperone}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
         </div>
 
@@ -166,19 +223,21 @@ export default function SRAChaperone() {
           />
         </div>
 
-        <div>
-          <label htmlFor="chaperoneEmail" className="block text-sm font-medium mb-1 text-gray-900">
-            Email Address *
-          </label>
-          <input
-            id="chaperoneEmail"
-            type="email"
-            value={chaperoneEmail}
-            onChange={(e) => setChaperoneEmail(e.target.value)}
-            placeholder="Enter email address"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
-          />
-        </div>
+        {!isSelfChaperone && (
+          <div>
+            <label htmlFor="chaperoneEmail" className="block text-sm font-medium mb-1 text-gray-900">
+              Email Address *
+            </label>
+            <input
+              id="chaperoneEmail"
+              type="email"
+              value={chaperoneEmail}
+              onChange={(e) => setChaperoneEmail(e.target.value)}
+              placeholder="Enter email address"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+            />
+          </div>
+        )}
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -231,7 +290,7 @@ export default function SRAChaperone() {
           >
             {saving ? "Saving..." : "Save Chaperone Info"}
           </button>
-          {chaperoneName && chaperonePhone && chaperoneEmail && (
+          {!isSelfChaperone && chaperoneName && chaperonePhone && chaperoneEmail && (
             <button
               onClick={handleSendInvitation}
               disabled={sending || sraData?.chaperone?.inviteSent}

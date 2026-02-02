@@ -529,7 +529,18 @@ export async function updateSRAApproval(sraId: string, approved: boolean): Promi
 export async function updateSRAChaperone(sraId: string, chaperone: Chaperone): Promise<void> {
   const dbInstance = ensureDb();
   const sraRef = doc(dbInstance, "sras", sraId);
-  await updateDoc(sraRef, { chaperone });
+  
+  const cleanedChaperone: any = {};
+  if (chaperone.name !== undefined) cleanedChaperone.name = chaperone.name;
+  if (chaperone.phone !== undefined) cleanedChaperone.phone = chaperone.phone;
+  if (chaperone.email !== undefined) cleanedChaperone.email = chaperone.email;
+  if (chaperone.inviteToken !== undefined) cleanedChaperone.inviteToken = chaperone.inviteToken;
+  if (chaperone.inviteSent !== undefined) cleanedChaperone.inviteSent = chaperone.inviteSent;
+  if (chaperone.confirmed !== undefined) cleanedChaperone.confirmed = chaperone.confirmed;
+  if (chaperone.confirmationDate !== undefined) cleanedChaperone.confirmationDate = chaperone.confirmationDate;
+  if (chaperone.signature !== undefined) cleanedChaperone.signature = chaperone.signature;
+  
+  await updateDoc(sraRef, { chaperone: cleanedChaperone });
 }
 
 export async function updateJudgeApproval(judgeId: string, approved: boolean): Promise<void> {
