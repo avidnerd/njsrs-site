@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { logoutUser } from "@/lib/firebase/auth";
 import SRAStudentList from "@/components/dashboard/SRAStudentList";
+import SRAChaperone from "@/components/dashboard/SRAChaperone";
 import { getSRA } from "@/lib/firebase/database";
 import { useState } from "react";
 import type { SRA } from "@/lib/firebase/database";
@@ -104,16 +105,26 @@ export default function SRADashboardPage() {
               </p>
             </div>
           ) : (
-            <div>
-              <div className="mb-8">
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  School Chaperone
+                </h2>
+                <p className="text-gray-600 mb-4">
+                  Designate and confirm a chaperone who will supervise all students from your school.
+                </p>
+                <SRAChaperone />
+              </div>
+              
+              <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
                   Your Students
                 </h2>
                 <p className="text-gray-600">
                   Review and approve student registrations from your school.
                 </p>
+                <SRAStudentList />
               </div>
-              <SRAStudentList />
             </div>
           )}
         </div>

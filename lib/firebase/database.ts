@@ -25,6 +25,17 @@ export interface School {
   createdAt: Date | Timestamp;
 }
 
+export interface Chaperone {
+  name?: string;
+  phone?: string;
+  email?: string;
+  inviteToken?: string;
+  inviteSent?: boolean;
+  confirmed?: boolean;
+  confirmationDate?: Date | Timestamp;
+  signature?: string;
+}
+
 export interface SRA {
   id?: string;
   firstName: string;
@@ -38,6 +49,7 @@ export interface SRA {
   approved: boolean;
   adminApproved?: boolean;
   emailVerified?: boolean;
+  chaperone?: Chaperone;
 }
 
 export interface Student {
@@ -512,6 +524,12 @@ export async function updateSRAApproval(sraId: string, approved: boolean): Promi
   const dbInstance = ensureDb();
   const sraRef = doc(dbInstance, "sras", sraId);
   await updateDoc(sraRef, { adminApproved: approved });
+}
+
+export async function updateSRAChaperone(sraId: string, chaperone: Chaperone): Promise<void> {
+  const dbInstance = ensureDb();
+  const sraRef = doc(dbInstance, "sras", sraId);
+  await updateDoc(sraRef, { chaperone });
 }
 
 export async function updateJudgeApproval(judgeId: string, approved: boolean): Promise<void> {

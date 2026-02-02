@@ -13,7 +13,7 @@ export default function ConditionalAuth({
   const pathname = usePathname();
   
   
-  if (pathname?.startsWith('/statement-sign') || pathname?.startsWith('/photo-release-sign')) {
+  if (pathname?.startsWith('/statement-sign') || pathname?.startsWith('/photo-release-sign') || pathname?.startsWith('/chaperone-confirm')) {
     return (
       <>
         <main className="flex-grow">{children}</main>
