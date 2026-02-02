@@ -47,7 +47,7 @@ export default function StudentStatus({ student, onUpdate }: StudentStatusProps)
     if (!user) return;
     
     try {
-      // Reset all signatures if research plan is changed after signatures were submitted
+      
       await updateStudentProject(user.uid, { researchPlanUrl: url }, hasSignatures);
 
       if (onUpdate) {
@@ -104,7 +104,7 @@ export default function StudentStatus({ student, onUpdate }: StudentStatusProps)
 
   return (
     <div className="space-y-6">
-      {/* Registration Status */}
+      {}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Registration Status</h2>
         <div className="space-y-4">
@@ -151,12 +151,12 @@ export default function StudentStatus({ student, onUpdate }: StudentStatusProps)
         </div>
       </div>
 
-      {/* Submission Checklist */}
+      {}
       {student.status === "approved" && (
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Submission Checklist</h2>
           
-          {/* Materials Section */}
+          {}
           <div className="mb-6">
             <h3 className="font-semibold text-gray-900 mb-3">Materials</h3>
             <div className="space-y-2">
@@ -182,7 +182,7 @@ export default function StudentStatus({ student, onUpdate }: StudentStatusProps)
             )}
           </div>
 
-          {/* Signatures Section */}
+          {}
           <div className="border-t pt-4">
             <h3 className="font-semibold text-gray-900 mb-3">Statement of Outside Assistance Signatures</h3>
             <div className="space-y-2">
@@ -208,7 +208,7 @@ export default function StudentStatus({ student, onUpdate }: StudentStatusProps)
             )}
           </div>
 
-          {/* Photo Release Section */}
+          {}
           <div className="border-t pt-4 mt-4">
             <h3 className="font-semibold text-gray-900 mb-3">Photo Release Form</h3>
             <div className="space-y-2">
@@ -236,7 +236,7 @@ export default function StudentStatus({ student, onUpdate }: StudentStatusProps)
         </div>
       )}
 
-      {/* Warning Modal for Research Plan Change */}
+      {}
       {showWarning && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 shadow-lg rounded-md bg-white">

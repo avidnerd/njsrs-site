@@ -25,10 +25,10 @@ export default function FileUpload({
   const [success, setSuccess] = useState(false);
   const previousFileRef = useRef<string | undefined>(currentFile);
 
-  // Track when currentFile changes to show success
+  
   useEffect(() => {
     if (currentFile && currentFile !== previousFileRef.current && uploading === false) {
-      // File was just uploaded
+      
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
@@ -63,7 +63,7 @@ export default function FileUpload({
       setFile(null);
       const input = document.getElementById(`file-${label}`) as HTMLInputElement;
       if (input) input.value = "";
-      // Success will be shown when currentFile updates via useEffect
+      
     } catch (err: any) {
       setError(err.message || "Upload failed");
     } finally {

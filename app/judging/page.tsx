@@ -18,7 +18,7 @@ export default function JudgingPage() {
           </p>
         </div>
 
-        {/* Qualifications */}
+        {}
         <section className="mb-12">
           <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
             Qualifications to Serve as a Judge
@@ -28,7 +28,7 @@ export default function JudgingPage() {
           </p>
         </section>
 
-        {/* Judging Criteria */}
+        {}
         <section className="mb-12">
           <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
             Judging Criteria
@@ -41,7 +41,7 @@ export default function JudgingPage() {
           </p>
         </section>
 
-        {/* Judging Guidelines & Procedure */}
+        {}
         <section>
           <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
             Judging Guidelines & Procedure

@@ -47,9 +47,8 @@ export default function EmailVerification() {
       const isValid = await verifyEmailCode(user.uid, code);
       if (isValid) {
         setVerified(true);
-        setTimeout(() => {
-          router.push(getDashboardPath());
-        }, 2000);
+        
+        window.location.href = getDashboardPath();
       } else {
         setError("Invalid or expired verification code. Please check your email and try again.");
       }

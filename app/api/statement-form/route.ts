@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { initializeApp, getApps, cert, App } from "firebase-admin/app";
 import { getFirestore, Timestamp, Firestore } from "firebase-admin/firestore";
 
-// Initialize Firebase Admin SDK
+
 let db: Firestore;
 
 try {
@@ -16,18 +16,18 @@ try {
         });
       } catch (parseError) {
         console.error("Error parsing FIREBASE_SERVICE_ACCOUNT:", parseError);
-        // Try to initialize with default credentials
+        
         initializeApp();
       }
     } else {
-      // Fallback to default credentials (works on Vercel with Firebase environment)
+      
       initializeApp();
     }
   }
   db = getFirestore();
 } catch (error) {
   console.error("Firebase Admin initialization error:", error);
-  // This will cause errors later, but at least the app won't crash on import
+  
   db = getFirestore();
 }
 
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Token format: studentId_type_timestamp_random
+    
     const parts = token.split("_");
     if (parts.length < 3) {
       return NextResponse.json(
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get student document
+    
     const studentDoc = await db.collection("students").doc(studentId).get();
 
     if (!studentDoc.exists) {
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Verify token matches
+    
     if (
       (type === "teacher" && statement.teacherInviteToken !== token) ||
       (type === "mentor" && statement.mentorInviteToken !== token) ||
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Return only the necessary data
+    
     return NextResponse.json({
       student: {
         id: studentId,
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Token format: studentId_type_timestamp_random
+    
     const parts = token.split("_");
     if (parts.length < 3) {
       return NextResponse.json(
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get student document to verify token
+    
     const studentDoc = await db.collection("students").doc(studentId).get();
 
     if (!studentDoc.exists) {
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify token matches
+    
     if (
       (type === "teacher" && currentStatement.teacherInviteToken !== token) ||
       (type === "mentor" && currentStatement.mentorInviteToken !== token) ||
@@ -176,14 +176,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert Timestamp objects (they come as {seconds, nanoseconds} from JSON.stringify)
+    
     const convertTimestamps = (obj: any): any => {
       if (obj === null || obj === undefined) return obj;
       if (Array.isArray(obj)) {
         return obj.map(convertTimestamps);
       }
       if (typeof obj === 'object' && obj.seconds !== undefined && obj.nanoseconds !== undefined && !(obj instanceof Timestamp)) {
-        // This is a Timestamp-like object from JSON (has seconds and nanoseconds but isn't a Timestamp instance)
+        
         return new Timestamp(obj.seconds, obj.nanoseconds);
       }
       if (typeof obj === 'object' && !(obj instanceof Date) && !(obj instanceof Timestamp)) {
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
 
     const convertedFormData = convertTimestamps(formData);
 
-    // Update the student document with the new form data
+    
     await db.collection("students").doc(studentId).update({
       statementOfOutsideAssistance: convertedFormData,
     });

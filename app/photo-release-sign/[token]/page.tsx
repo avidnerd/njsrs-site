@@ -46,7 +46,7 @@ export default function PhotoReleaseSignPage() {
       setStudent(data.student);
       setFormData(data.formData);
       
-      // Check if form is already completed
+      
       if (data.formData.completed) {
         setIsCompleted(true);
         setParentName(data.formData.parentName || "");
@@ -54,7 +54,7 @@ export default function PhotoReleaseSignPage() {
         setSignature(data.formData.parentSignature || "");
         setSuccess("Form submitted successfully! Thank you for completing the photo release form.");
       } else {
-        // Pre-fill fields if they exist but form isn't completed
+        
         if (data.formData.parentName) {
           setParentName(data.formData.parentName);
         }
@@ -100,7 +100,7 @@ export default function PhotoReleaseSignPage() {
         completed: true,
       };
 
-      // Use API route to update the form (no authentication required)
+      
       const response = await fetch("/api/photo-release-form", {
         method: "POST",
         headers: {
@@ -149,7 +149,7 @@ export default function PhotoReleaseSignPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Simple isolated header */}
+      {}
       <header className="bg-white shadow-sm border-b border-gray-200 py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center">

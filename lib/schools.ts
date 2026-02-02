@@ -15,14 +15,14 @@ async function parseCSV(csvText: string, isPublic: boolean): Promise<SchoolData[
   const lines = csvText.split("\n");
   const schools: SchoolData[] = [];
   
-  // Skip header lines (first 3-4 lines are headers)
+  
   const startLine = isPublic ? 4 : 3;
   
   for (let i = startLine; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
     
-    // Parse CSV line (handling quoted fields)
+    
     const fields: string[] = [];
     let currentField = "";
     let inQuotes = false;
@@ -41,7 +41,7 @@ async function parseCSV(csvText: string, isPublic: boolean): Promise<SchoolData[
     fields.push(currentField.trim().replace(/^="|"$/g, ""));
     
     if (isPublic) {
-      // Public schools: School Name (index 5), City (13), State (14), Zip (15), District (3)
+      
       if (fields.length > 15 && fields[5]) {
         schools.push({
           name: fields[5],
@@ -54,7 +54,7 @@ async function parseCSV(csvText: string, isPublic: boolean): Promise<SchoolData[
         });
       }
     } else {
-      // Non-public schools: School Name (index 3), City (7), State (8), Zip (9)
+      
       if (fields.length > 9 && fields[3]) {
         schools.push({
           name: fields[3],
@@ -116,5 +116,5 @@ export function searchSchools(schools: SchoolData[], searchTerm: string): School
     const cityMatch = school.city.toLowerCase().includes(term);
     const districtMatch = school.district?.toLowerCase().includes(term);
     return nameMatch || cityMatch || districtMatch;
-  }).slice(0, 50); // Limit to 50 results
+  }).slice(0, 50); 
 }

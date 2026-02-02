@@ -12,7 +12,7 @@ export default function ConditionalAuth({
 }) {
   const pathname = usePathname();
   
-  // Skip AuthProvider and Header for statement-sign and photo-release-sign pages (they don't need authentication)
+  
   if (pathname?.startsWith('/statement-sign') || pathname?.startsWith('/photo-release-sign')) {
     return (
       <>
@@ -22,7 +22,7 @@ export default function ConditionalAuth({
     );
   }
   
-  // For all other pages, wrap with AuthProvider and include Header
+  
   return (
     <AuthProvider>
       <Header />

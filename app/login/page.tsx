@@ -16,13 +16,13 @@ export default function LoginPage() {
       }
 
       if (userProfile) {
-        // Check email verification for all roles except admins
+        
         if (userProfile.role !== "fair_director" && userProfile.role !== "website_manager" && !userProfile.emailVerified) {
           router.push("/verify");
           return;
         }
 
-        // Only redirect to dashboard if email is verified (or admin)
+        
         if (userProfile.emailVerified || userProfile.role === "fair_director" || userProfile.role === "website_manager") {
           switch (userProfile.role) {
             case "sra":

@@ -20,7 +20,7 @@ export async function registerSRA(
     throw new Error(`Failed to create user account: ${error.message || "Unknown error"}`);
   }
 
-  // School should already be created before this function is called
+  
   const schoolId = sraData.schoolId;
   if (!schoolId) {
     throw new Error("School ID is required");

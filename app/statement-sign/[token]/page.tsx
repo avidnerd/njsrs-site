@@ -48,7 +48,7 @@ export default function StatementSignPage() {
       setFormData(data.formData);
       setSignerType(data.signerType);
       
-      // Check if form is already completed for this signer
+      
       let alreadyCompleted = false;
       if (data.signerType === "teacher" && data.formData.teacherCompleted) {
         alreadyCompleted = true;
@@ -65,7 +65,7 @@ export default function StatementSignPage() {
         setIsCompleted(true);
         setSuccess("Form submitted successfully! Thank you for completing your section.");
       } else {
-        // Pre-fill fields if they exist but form isn't completed
+        
         if (data.formData.teacherMentorComments) {
           setComments(data.formData.teacherMentorComments);
         }
@@ -122,11 +122,11 @@ export default function StatementSignPage() {
         updatedFormData.parentSignatureDate = Timestamp.now();
         updatedFormData.parentName = updatedFormData.parentName || "";
         updatedFormData.parentPhone = updatedFormData.parentPhone || "";
-        updatedFormData.teacherMentorComments = comments; // Parent uses this field for their role description
+        updatedFormData.teacherMentorComments = comments; 
         updatedFormData.parentCompleted = true;
       }
 
-      // Check if all required signatures are complete
+      
       const allComplete = 
         updatedFormData.studentCompleted &&
         (updatedFormData.teacherCompleted || updatedFormData.mentorCompleted || updatedFormData.parentCompleted);
@@ -135,7 +135,7 @@ export default function StatementSignPage() {
         updatedFormData.formCompleted = true;
       }
 
-      // Use API route to update the form (no authentication required)
+      
       const response = await fetch("/api/statement-form", {
         method: "POST",
         headers: {
@@ -187,7 +187,7 @@ export default function StatementSignPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Simple isolated header */}
+      {}
       <header className="bg-white shadow-sm border-b border-gray-200 py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center">
@@ -245,7 +245,7 @@ export default function StatementSignPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Science Research Advisor Form - Simplified */}
+            {}
             {signerType === "teacher" && (
               <>
                 <div className="border rounded-lg p-4 space-y-4">
@@ -283,7 +283,7 @@ export default function StatementSignPage() {
               </>
             )}
 
-            {/* Mentor Form - Detailed */}
+            {}
             {signerType === "mentor" && (
               <>
                 <div className="border rounded-lg p-4 space-y-4">
@@ -322,7 +322,7 @@ export default function StatementSignPage() {
               </>
             )}
 
-            {/* Additional Fields for Science Research Advisor */}
+            {}
             {signerType === "teacher" && (
               <div className="border rounded-lg p-4 space-y-4">
                 <h3 className="font-semibold text-gray-900">Science Research Advisor Information</h3>
@@ -346,7 +346,7 @@ export default function StatementSignPage() {
               </div>
             )}
 
-            {/* Additional Fields for Mentor */}
+            {}
             {signerType === "mentor" && (
               <div className="border rounded-lg p-4 space-y-4">
                 <h3 className="font-semibold text-gray-900">Mentor Information</h3>
@@ -389,7 +389,7 @@ export default function StatementSignPage() {
               </div>
             )}
 
-            {/* Additional Fields for Parent */}
+            {}
             {signerType === "parent" && (
               <div className="border rounded-lg p-4 space-y-4">
                 <h3 className="font-semibold text-gray-900">Parent Information</h3>
@@ -445,7 +445,7 @@ export default function StatementSignPage() {
               </div>
             )}
 
-            {/* Signature Section */}
+            {}
             <div className="border rounded-lg p-4 space-y-4">
               <h3 className="font-semibold text-gray-900">{signerLabel} Signature *</h3>
               <div>

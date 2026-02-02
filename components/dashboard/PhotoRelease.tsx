@@ -59,10 +59,10 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
     setSuccess("");
 
     try {
-      // Generate a unique token for this invitation
+      
       const token = `${user.uid}_photorelease_${Date.now()}_${Math.random().toString(36).substring(7)}`;
       
-      // Send invitation email via API route FIRST
+      
       const response = await fetch("/api/send-photo-release-invitation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -79,7 +79,7 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
         throw new Error(errorData.error || "Failed to send invitation email");
       }
 
-      // Only update form data AFTER email is successfully sent
+      
       const updatedFormData: PhotoRelease = {
         ...formData,
         parentEmail,
@@ -94,9 +94,9 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
       setFormData(updatedFormData);
       setSuccess(`Invitation sent to ${parentEmail} successfully!`);
       setTimeout(() => setSuccess(""), 3000);
-      await loadStudent(); // Reload to get updated data
+      await loadStudent(); 
       if (onFormUpdate) {
-        onFormUpdate(); // Trigger parent to reload student data
+        onFormUpdate(); 
       }
     } catch (error: any) {
       setError(error.message || "Failed to send invitation");

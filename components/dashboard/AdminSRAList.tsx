@@ -58,7 +58,10 @@ export default function AdminSRAList() {
   const filteredSRAs = sras.filter((sra) => {
     if (filter === "all") return true;
     if (filter === "approved") return sra.adminApproved === true;
-    if (filter === "pending") return sra.adminApproved !== true;
+    if (filter === "pending") {
+      
+      return sra.adminApproved !== true && sra.emailVerified === true;
+    }
     return true;
   });
 
@@ -97,7 +100,7 @@ export default function AdminSRAList() {
               : "bg-gray-200 text-gray-700"
           }`}
         >
-          Pending ({sras.filter((s) => s.adminApproved !== true).length})
+          Pending ({sras.filter((s) => s.adminApproved !== true && s.emailVerified === true).length})
         </button>
       </div>
 
@@ -160,7 +163,7 @@ export default function AdminSRAList() {
         </div>
       )}
 
-      {/* SRA Detail Modal */}
+      {}
       {selectedSRA && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 text-gray-900">
@@ -188,7 +191,7 @@ export default function AdminSRAList() {
                 {selectedSRA.title && <p className="text-gray-900"><strong className="text-gray-900">Title:</strong> {selectedSRA.title}</p>}
               </div>
               
-              {/* Students Section */}
+              {}
               <div className="border-t pt-4 mt-4">
                 <h3 className="font-semibold text-gray-900 mb-3">
                   Registered Students ({students.length})

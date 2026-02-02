@@ -51,7 +51,7 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Tabs */}
+          {}
           <div className="mb-6 border-b border-gray-200">
             <nav className="flex space-x-8">
               <button
@@ -87,7 +87,7 @@ export default function AdminDashboardPage() {
             </nav>
           </div>
 
-          {/* Content */}
+          {}
           {activeTab === "sras" ? (
             <div>
               <div className="mb-6">

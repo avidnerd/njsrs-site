@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as sgMail from "@sendgrid/mail";
 
-// Initialize SendGrid - use the same environment variable as Firebase Functions
+
 const sendGridApiKey = process.env.SENDGRID_API_KEY;
 if (sendGridApiKey) {
   sgMail.setApiKey(sendGridApiKey);
@@ -26,21 +26,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use production URL - prioritize NEXT_PUBLIC_APP_URL, then check if we're in production
-    // In production, NEXT_PUBLIC_APP_URL should be set to https://njsrs.org
+    
+    
     let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
     
     if (!baseUrl) {
-      // If NEXT_PUBLIC_APP_URL is not set, check environment
+      
       if (process.env.VERCEL_ENV === 'production') {
-        // In production, default to njsrs.org
-        baseUrl = 'https://njsrs.org';
+        
+        baseUrl = 'https:
       } else if (process.env.VERCEL_URL) {
-        // For preview deployments, use the preview URL
-        baseUrl = `https://${process.env.VERCEL_URL}`;
+        
+        baseUrl = `https:
       } else {
-        // Local development
-        baseUrl = 'http://localhost:3000';
+        
+        baseUrl = 'http:
       }
     }
 
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("Error sending invitation email:", error);
     
-    // Provide more detailed error information
+    
     let errorMessage = "Failed to send invitation email";
     if (error.response) {
       console.error("SendGrid API error response:", error.response.body);

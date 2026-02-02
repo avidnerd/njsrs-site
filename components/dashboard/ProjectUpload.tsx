@@ -44,7 +44,7 @@ export default function ProjectUpload() {
     
     const url = await uploadResearchPlan(user.uid, file);
     
-    // Check if signatures exist and research plan is being changed
+    
     if (hasSignatures && student?.researchPlanUrl && student.researchPlanUrl !== url) {
       setPendingResearchPlan(url);
       setShowWarning(true);
@@ -126,7 +126,7 @@ export default function ProjectUpload() {
         maxSizeMB={20}
       />
 
-      {/* Warning Modal for Research Plan Change */}
+      {}
       {showWarning && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 shadow-lg rounded-md bg-white">

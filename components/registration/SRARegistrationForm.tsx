@@ -22,7 +22,6 @@ export default function SRARegistrationForm() {
   });
   const [allSchools, setAllSchools] = useState<SchoolData[]>([]);
   const [filteredSchools, setFilteredSchools] = useState<SchoolData[]>([]);
-  const [showNewSchool, setShowNewSchool] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,7 +58,7 @@ export default function SRARegistrationForm() {
     e.preventDefault();
     setError("");
 
-    // Validate all required fields
+    
     if (!formData.firstName.trim()) {
       setError("First name is required");
       return;
@@ -75,7 +74,7 @@ export default function SRARegistrationForm() {
       return;
     }
 
-    // Email validation
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError("Please enter a valid email address");
@@ -102,7 +101,7 @@ export default function SRARegistrationForm() {
       return;
     }
 
-    // Phone validation (basic) - allows digits, dashes, plus, and parentheses
+    
     const phoneRegex = /^[\d\-\+\(\)]+$/;
     const phoneWithoutSpaces = formData.phone.replace(/\s/g, '');
     if (!phoneRegex.test(phoneWithoutSpaces) || phoneWithoutSpaces.length < 10) {
@@ -126,23 +125,23 @@ export default function SRARegistrationForm() {
       let schoolId = formData.schoolId;
       let schoolName = formData.schoolName;
       
-      // Create or get school BEFORE authentication
+      
       if (formData.selectedSchool) {
         schoolName = formData.selectedSchool.name;
-        // Create school in Firestore (allowed without auth now)
+        
         schoolId = await createSchool({
           name: formData.selectedSchool.name,
           address: formData.selectedSchool.address || `${formData.selectedSchool.city}, ${formData.selectedSchool.state} ${formData.selectedSchool.zip}`,
         });
       } else if (formData.schoolName) {
-        // Create new school
+        
         schoolId = await createSchool({
           name: formData.schoolName,
         });
         schoolName = formData.schoolName;
       }
 
-      // Now register the user (this authenticates them)
+      
       const { verificationCode } = await registerSRA(formData.email, formData.password, {
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -272,113 +271,64 @@ export default function SRARegistrationForm() {
       </div>
 
       <div>
-        <div className="flex items-center gap-4 mb-2">
-          <button
-            type="button"
-            onClick={() => setShowNewSchool(false)}
-            className={`px-4 py-2 rounded-md ${
-              !showNewSchool
-                ? "bg-primary-green text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            Select Existing School
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowNewSchool(true)}
-            className={`px-4 py-2 rounded-md ${
-              showNewSchool
-                ? "bg-primary-green text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            Create New School
-          </button>
-        </div>
-
-        {!showNewSchool ? (
-          <div>
-            <label htmlFor="schoolSearch" className="block text-sm font-medium mb-1 text-gray-900">
-              Search for your school *
-            </label>
-            <input
-              id="schoolSearch"
-              type="text"
-              placeholder="Type to search for your school..."
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 mb-2"
-            />
-            {loadingSchools && (
-              <p className="text-sm text-gray-500 mb-2">Loading schools...</p>
-            )}
-            {filteredSchools.length > 0 && (
-              <div className="border border-gray-300 rounded-md max-h-60 overflow-y-auto">
-                {filteredSchools.map((school, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      setFormData({
-                        ...formData,
-                        selectedSchool: school,
-                        schoolName: school.name,
-                        schoolId: "",
-                      });
-                      setSearchTerm(school.name);
-                      setFilteredSchools([]);
-                    }}
-                    className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
-                      formData.selectedSchool?.name === school.name ? "bg-primary-green bg-opacity-10" : ""
-                    }`}
-                  >
-                    <div className="font-medium text-gray-900">{school.name}</div>
-                    <div className="text-sm text-gray-600">
-                      {school.city}, {school.state} {school.zip}
-                      {school.district && ` • ${school.district}`}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            {formData.selectedSchool && (
-              <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
-                <div className="font-medium text-gray-900">Selected: {formData.selectedSchool.name}</div>
+        <label htmlFor="schoolSearch" className="block text-sm font-medium mb-1 text-gray-900">
+          Search for your New Jersey school *
+        </label>
+        <input
+          id="schoolSearch"
+          type="text"
+          placeholder="Type to search for your school..."
+          value={searchTerm}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900 mb-2"
+        />
+        {loadingSchools && (
+          <p className="text-sm text-gray-500 mb-2">Loading schools...</p>
+        )}
+        {filteredSchools.length > 0 && (
+          <div className="border border-gray-300 rounded-md max-h-60 overflow-y-auto">
+            {filteredSchools.map((school, index) => (
+              <div
+                key={index}
+                onClick={() => {
+                  setFormData({
+                    ...formData,
+                    selectedSchool: school,
+                    schoolName: school.name,
+                    schoolId: "",
+                  });
+                  setSearchTerm(school.name);
+                  setFilteredSchools([]);
+                }}
+                className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
+                  formData.selectedSchool?.name === school.name ? "bg-primary-green bg-opacity-10" : ""
+                }`}
+              >
+                <div className="font-medium text-gray-900">{school.name}</div>
                 <div className="text-sm text-gray-600">
-                  {formData.selectedSchool.city}, {formData.selectedSchool.state} {formData.selectedSchool.zip}
+                  {school.city}, {school.state} {school.zip}
+                  {school.district && ` • ${school.district}`}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFormData({ ...formData, selectedSchool: null, schoolName: "", schoolId: "" });
-                    setSearchTerm("");
-                  }}
-                  className="mt-2 text-sm text-red-600 hover:text-red-800"
-                >
-                  Clear selection
-                </button>
               </div>
-            )}
+            ))}
           </div>
-        ) : (
-          <div>
-            <label htmlFor="newSchoolName" className="block text-sm font-medium mb-1 text-gray-900">
-              School Name *
-            </label>
-            <input
-              id="newSchoolName"
-              type="text"
-              value={formData.schoolName}
-              onChange={(e) => {
-                setFormData({
-                  ...formData,
-                  schoolName: e.target.value,
-                  schoolId: "",
-                });
+        )}
+        {formData.selectedSchool && (
+          <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
+            <div className="font-medium text-gray-900">Selected: {formData.selectedSchool.name}</div>
+            <div className="text-sm text-gray-600">
+              {formData.selectedSchool.city}, {formData.selectedSchool.state} {formData.selectedSchool.zip}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({ ...formData, selectedSchool: null, schoolName: "", schoolId: "" });
+                setSearchTerm("");
               }}
-              required={showNewSchool}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
-            />
+              className="mt-2 text-sm text-red-600 hover:text-red-800"
+            >
+              Clear selection
+            </button>
           </div>
         )}
       </div>

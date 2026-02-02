@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as sgMail from "@sendgrid/mail";
 
-// Initialize SendGrid
+
 const sendGridApiKey = process.env.SENDGRID_API_KEY;
 if (sendGridApiKey) {
   sgMail.setApiKey(sendGridApiKey);
@@ -26,20 +26,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use production URL - prioritize NEXT_PUBLIC_APP_URL, then check if we're in production
+    
     let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
     
     if (!baseUrl) {
-      // If NEXT_PUBLIC_APP_URL is not set, check environment
+      
       if (process.env.VERCEL_ENV === 'production') {
-        // In production, default to njsrs.org
-        baseUrl = 'https://njsrs.org';
+        
+        baseUrl = 'https:
       } else if (process.env.VERCEL_URL) {
-        // For preview deployments, use the preview URL
-        baseUrl = `https://${process.env.VERCEL_URL}`;
+        
+        baseUrl = `https:
       } else {
-        // Local development
-        baseUrl = 'http://localhost:3000';
+        
+        baseUrl = 'http:
       }
     }
 

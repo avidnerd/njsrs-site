@@ -64,9 +64,6 @@ export async function registerUser(
     verificationCodeExpiry: Timestamp.fromDate(verificationCodeExpiry),
   });
 
-  // Note: Verification email is sent via Firebase Cloud Function (sendVerificationEmail trigger)
-  // We don't use Firebase Auth's default sendEmailVerification to avoid sending duplicate emails
-
   return { userCredential, verificationCode };
 }
 
@@ -135,17 +132,14 @@ export async function resendVerificationCode(userId: string): Promise<string> {
 
   const userData = userDoc.data();
   
-  // Don't resend if already verified
   if (userData.emailVerified) {
     throw new Error("Email already verified");
   }
 
-  // Generate new verification code
   const verificationCode = generateVerificationCode();
   const verificationCodeExpiry = new Date();
   verificationCodeExpiry.setHours(verificationCodeExpiry.getHours() + 24);
 
-  // Update user document with new code
   await updateDoc(doc(dbInstance, "users", userId), {
     verificationCode,
     verificationCodeExpiry: Timestamp.fromDate(verificationCodeExpiry),

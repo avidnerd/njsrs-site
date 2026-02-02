@@ -125,7 +125,7 @@ export default function JudgeRegistrationForm() {
         }
         return true;
       case 7:
-        return true; // Publications and patents are optional
+        return true; 
       case 8:
         if (!formData.canCommitToAllProjects) {
           setError("You must commit to viewing all 10 projects");
@@ -133,7 +133,7 @@ export default function JudgeRegistrationForm() {
         }
         return true;
       case 9:
-        return true; // Conflicts of interest
+        return true; 
       case 10:
         if (!formData.availabilityApril18) {
           setError("Please select your availability for April 18th");
@@ -189,7 +189,7 @@ export default function JudgeRegistrationForm() {
         availabilityApril18: formData.availabilityApril18 || undefined,
       });
 
-      // Store verification code in sessionStorage temporarily
+      
       sessionStorage.setItem("verificationCode", verificationCode);
       router.push("/verify");
     } catch (err: any) {

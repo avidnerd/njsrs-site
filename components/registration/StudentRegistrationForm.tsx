@@ -72,7 +72,7 @@ export default function StudentRegistrationForm() {
     e.preventDefault();
     setError("");
 
-    // Validate all required fields
+    
     if (!formData.firstName.trim()) {
       setError("First name is required");
       return;
@@ -88,7 +88,7 @@ export default function StudentRegistrationForm() {
       return;
     }
 
-    // Email validation
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError("Please enter a valid email address");
@@ -125,7 +125,7 @@ export default function StudentRegistrationForm() {
       return;
     }
 
-    // Validate project description word count
+    
     if (formData.projectDescription.trim()) {
       const wordCount = countWords(formData.projectDescription);
       if (wordCount > 150) {

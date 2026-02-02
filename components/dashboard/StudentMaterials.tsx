@@ -13,7 +13,7 @@ interface StudentMaterialsProps {
   onFormUpdate?: () => void;
 }
 
-// Deadline: March 23, 2026 at 11:59 PM
+
 const EDITING_DEADLINE = new Date("2026-03-24T00:00:00");
 
 export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps) {
@@ -23,7 +23,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<"research" | "slideshow" | "statement">("research");
   
-  // Check if editing is disabled (after deadline)
+  
   const isEditingDisabled = new Date() >= EDITING_DEADLINE;
 
   useEffect(() => {
@@ -110,7 +110,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
         </div>
       )}
       
-      {/* Section Navigation */}
+      {}
       <div className="mb-6 flex flex-wrap gap-2 border-b pb-4">
         <button
           onClick={() => setActiveSection("research")}
@@ -144,7 +144,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
         </button>
       </div>
 
-      {/* Research Report Section */}
+      {}
       {activeSection === "research" && (
         <div className="space-y-6">
           <div>
@@ -191,7 +191,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
         </div>
       )}
 
-      {/* Slideshow Section */}
+      {}
       {activeSection === "slideshow" && (
         <div className="space-y-4">
           <div>
@@ -216,7 +216,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
         </div>
       )}
 
-      {/* Statement of Outside Assistance Section */}
+      {}
       {activeSection === "statement" && (
         <StatementOfOutsideAssistance onFormUpdate={onFormUpdate} disabled={isEditingDisabled} />
       )}

@@ -18,7 +18,7 @@ function ensureAuthenticated(userId: string) {
     throw new Error("User is not authenticated. Please log in and try again.");
   }
   
-  // Verify the userId matches the authenticated user
+  
   if (currentUser.uid !== userId) {
     throw new Error("User ID mismatch. You can only upload files to your own folder.");
   }
@@ -31,7 +31,7 @@ export async function uploadFile(
   file: File,
   path: string
 ): Promise<string> {
-  // Ensure user is authenticated before uploading
+  
   ensureAuthenticated(userId);
   
   const storageInstance = ensureStorage();
@@ -42,7 +42,7 @@ export async function uploadFile(
     const downloadURL = await getDownloadURL(snapshot.ref);
     return downloadURL;
   } catch (error: any) {
-    // Provide more helpful error messages
+    
     if (error.code === 'storage/unauthorized') {
       throw new Error("You don't have permission to upload files. Please check that you're logged in and your account is approved.");
     } else if (error.code === 'storage/canceled') {

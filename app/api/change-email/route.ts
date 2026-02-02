@@ -2,12 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 import * as sgMail from "@sendgrid/mail";
 
-
 const sendGridApiKey = process.env.SENDGRID_API_KEY;
 if (sendGridApiKey) {
   sgMail.setApiKey(sendGridApiKey);
 }
-
 
 if (!admin.apps.length) {
   try {
@@ -33,11 +31,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { userId } = await request.json();
+    const { userId, newEmail } = await request.json();
 
-    if (!userId) {
+    if (!userId || !newEmail) {
       return NextResponse.json(
-        { error: "Missing userId" },
+        { error: "userId and newEmail are required" },
+        { status: 400 }
+      );
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmail)) {
+      return NextResponse.json(
+        { error: "Invalid email format" },
         { status: 400 }
       );
     }
@@ -54,26 +60,58 @@ export async function POST(request: NextRequest) {
 
     const userData = userDoc.data()!;
 
-    
     if (userData.emailVerified) {
       return NextResponse.json(
-        { error: "Email already verified" },
+        { error: "Email already verified. Cannot change email." },
         { status: 400 }
       );
     }
 
-    
+    try {
+      await admin.auth().updateUser(userId, {
+        email: newEmail,
+      });
+    } catch (error: any) {
+      console.error("Error updating email in Firebase Auth:", error);
+      return NextResponse.json(
+        { error: `Failed to update email: ${error.message}` },
+        { status: 500 }
+      );
+    }
+
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     const verificationCodeExpiry = new Date();
     verificationCodeExpiry.setHours(verificationCodeExpiry.getHours() + 24);
 
-    
     await admin.firestore().collection("users").doc(userId).update({
+      email: newEmail,
       verificationCode,
       verificationCodeExpiry: admin.firestore.Timestamp.fromDate(verificationCodeExpiry),
+      emailVerified: false,
     });
+    if (userData.role === "sra") {
+      const sraDoc = await admin.firestore().collection("sras").doc(userId).get();
+      if (sraDoc.exists) {
+        await admin.firestore().collection("sras").doc(userId).update({
+          email: newEmail,
+        });
+      }
+    } else if (userData.role === "student") {
+      const studentDoc = await admin.firestore().collection("students").doc(userId).get();
+      if (studentDoc.exists) {
+        await admin.firestore().collection("students").doc(userId).update({
+          email: newEmail,
+        });
+      }
+    } else if (userData.role === "judge") {
+      const judgeDoc = await admin.firestore().collection("judges").doc(userId).get();
+      if (judgeDoc.exists) {
+        await admin.firestore().collection("judges").doc(userId).update({
+          email: newEmail,
+        });
+      }
+    }
 
-    
     let userName = "";
     let userDetails: any = null;
 
@@ -97,9 +135,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    
     await sgMail.send({
-      to: userData.email,
+      to: newEmail,
       from: "faircommittee@njsrs.org",
       subject: "Verify Your NJSRS Account",
       html: `
@@ -114,11 +151,14 @@ export async function POST(request: NextRequest) {
       `,
     });
 
-    return NextResponse.json({ success: true, message: "Verification email sent" });
+    return NextResponse.json({ 
+      success: true, 
+      message: "Email updated and verification code sent to new email address" 
+    });
   } catch (error: any) {
-    console.error("Error resending verification email:", error);
+    console.error("Error changing email:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to resend verification email" },
+      { error: error.message || "Failed to change email" },
       { status: 500 }
     );
   }

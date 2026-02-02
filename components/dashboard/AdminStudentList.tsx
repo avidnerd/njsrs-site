@@ -3,6 +3,28 @@
 import { useState, useEffect } from "react";
 import { getAllStudents } from "@/lib/firebase/database";
 import type { Student } from "@/lib/firebase/database";
+import { Timestamp } from "firebase/firestore";
+
+
+function formatDate(dateValue: Date | Timestamp | undefined | null): string {
+  if (!dateValue) return "";
+  
+  if (dateValue instanceof Date) {
+    return dateValue.toLocaleDateString();
+  }
+  
+  
+  if (typeof dateValue === "object" && "toDate" in dateValue && typeof dateValue.toDate === "function") {
+    return dateValue.toDate().toLocaleDateString();
+  }
+  
+  
+  if (typeof dateValue === "object" && "seconds" in dateValue && typeof dateValue.seconds === "number") {
+    return new Date(dateValue.seconds * 1000).toLocaleDateString();
+  }
+  
+  return "";
+}
 
 export default function AdminStudentList() {
   const [students, setStudents] = useState<Student[]>([]);
@@ -43,7 +65,7 @@ export default function AdminStudentList() {
 
   return (
     <div className="space-y-4">
-      {/* Search */}
+      {}
       <div className="mb-4">
         <input
           type="text"
@@ -54,7 +76,7 @@ export default function AdminStudentList() {
         />
       </div>
 
-      {/* Students List */}
+      {}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -129,6 +151,9 @@ export default function AdminStudentList() {
                         {student.statementOfOutsideAssistance?.studentCompleted && (
                           <div className="text-green-600">✓ SOA Form</div>
                         )}
+                        {student.photoRelease?.completed && (
+                          <div className="text-green-600">✓ Photo Release</div>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -147,7 +172,7 @@ export default function AdminStudentList() {
         </div>
       </div>
 
-      {/* Student Detail Modal */}
+      {}
       {selectedStudent && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
@@ -166,7 +191,7 @@ export default function AdminStudentList() {
             </div>
 
             <div className="space-y-4 text-gray-900">
-              {/* Basic Info */}
+              {}
               <div className="border-b pb-4">
                 <h4 className="font-semibold mb-2">Basic Information</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -191,7 +216,7 @@ export default function AdminStudentList() {
                 </div>
               </div>
 
-              {/* Project Description */}
+              {}
               {selectedStudent.projectDescription && (
                 <div className="border-b pb-4">
                   <h4 className="font-semibold mb-2">Project Description</h4>
@@ -199,7 +224,7 @@ export default function AdminStudentList() {
                 </div>
               )}
 
-              {/* Materials */}
+              {}
               <div className="border-b pb-4">
                 <h4 className="font-semibold mb-2">Submitted Materials</h4>
                 <div className="space-y-2 text-sm">
@@ -251,7 +276,7 @@ export default function AdminStudentList() {
                 </div>
               </div>
 
-              {/* Statement of Outside Assistance */}
+              {}
               {selectedStudent.statementOfOutsideAssistance && (
                 <div className="border-b pb-4">
                   <h4 className="font-semibold mb-2">Statement of Outside Assistance</h4>
@@ -264,24 +289,11 @@ export default function AdminStudentList() {
                       <div>
                         <strong>Student Signature:</strong>{" "}
                         {selectedStudent.statementOfOutsideAssistance.studentSignature}
-                      </div>
-                    )}
-                    {selectedStudent.statementOfOutsideAssistance.teacherInviteSent && (
-                      <div>
-                        <strong>Teacher Invitation:</strong> Sent to{" "}
-                        {selectedStudent.statementOfOutsideAssistance.teacherEmail}
-                      </div>
-                    )}
-                    {selectedStudent.statementOfOutsideAssistance.mentorInviteSent && (
-                      <div>
-                        <strong>Mentor Invitation:</strong> Sent to{" "}
-                        {selectedStudent.statementOfOutsideAssistance.mentorEmail}
-                      </div>
-                    )}
-                    {selectedStudent.statementOfOutsideAssistance.parentInviteSent && (
-                      <div>
-                        <strong>Parent Invitation:</strong> Sent to{" "}
-                        {selectedStudent.statementOfOutsideAssistance.parentEmail}
+                        {selectedStudent.statementOfOutsideAssistance.studentSignatureDate && (
+                          <span className="text-gray-500 ml-2">
+                            ({formatDate(selectedStudent.statementOfOutsideAssistance.studentSignatureDate)})
+                          </span>
+                        )}
                       </div>
                     )}
                     {selectedStudent.statementOfOutsideAssistance.researchReportTitle && (
@@ -289,6 +301,221 @@ export default function AdminStudentList() {
                         <strong>Research Report Title:</strong>{" "}
                         {selectedStudent.statementOfOutsideAssistance.researchReportTitle}
                       </div>
+                    )}
+                  </div>
+
+                  {}
+                  {(selectedStudent.statementOfOutsideAssistance.teacherCompleted ||
+                    selectedStudent.statementOfOutsideAssistance.teacherSignature ||
+                    selectedStudent.statementOfOutsideAssistance.teacherInviteSent) && (
+                    <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                      <h5 className="font-semibold mb-2 text-blue-900">Science Research Advisor Response</h5>
+                      <div className="space-y-2 text-sm">
+                        {selectedStudent.statementOfOutsideAssistance.teacherInviteSent && (
+                          <div>
+                            <strong>Invitation Sent To:</strong>{" "}
+                            {selectedStudent.statementOfOutsideAssistance.teacherEmail}
+                          </div>
+                        )}
+                        {selectedStudent.statementOfOutsideAssistance.teacherCompleted ? (
+                          <>
+                            {selectedStudent.statementOfOutsideAssistance.teacherSignature && (
+                              <div>
+                                <strong>Signature:</strong>{" "}
+                                {selectedStudent.statementOfOutsideAssistance.teacherSignature}
+                                {selectedStudent.statementOfOutsideAssistance.teacherSignatureDate && (
+                                  <span className="text-gray-500 ml-2">
+                                    ({formatDate(selectedStudent.statementOfOutsideAssistance.teacherSignatureDate)})
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            {selectedStudent.statementOfOutsideAssistance.teacherSchool && (
+                              <div>
+                                <strong>School:</strong>{" "}
+                                {selectedStudent.statementOfOutsideAssistance.teacherSchool}
+                              </div>
+                            )}
+                            {selectedStudent.statementOfOutsideAssistance.teacherMentorComments && (
+                              <div>
+                                <strong>Comments:</strong>
+                                <p className="mt-1 text-gray-700 whitespace-pre-wrap">
+                                  {selectedStudent.statementOfOutsideAssistance.teacherMentorComments}
+                                </p>
+                              </div>
+                            )}
+                            {selectedStudent.statementOfOutsideAssistance.teacherMentorSafetyStatement && (
+                              <div>
+                                <strong>Safety Statement:</strong>
+                                <p className="mt-1 text-gray-700 whitespace-pre-wrap">
+                                  {selectedStudent.statementOfOutsideAssistance.teacherMentorSafetyStatement}
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="text-gray-500">Not yet completed</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {}
+                  {(selectedStudent.statementOfOutsideAssistance.mentorCompleted ||
+                    selectedStudent.statementOfOutsideAssistance.mentorSignature ||
+                    selectedStudent.statementOfOutsideAssistance.mentorInviteSent) && (
+                    <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-md">
+                      <h5 className="font-semibold mb-2 text-purple-900">Mentor/Sponsor Response</h5>
+                      <div className="space-y-2 text-sm">
+                        {selectedStudent.statementOfOutsideAssistance.mentorInviteSent && (
+                          <div>
+                            <strong>Invitation Sent To:</strong>{" "}
+                            {selectedStudent.statementOfOutsideAssistance.mentorEmail}
+                          </div>
+                        )}
+                        {selectedStudent.statementOfOutsideAssistance.mentorCompleted ? (
+                          <>
+                            {selectedStudent.statementOfOutsideAssistance.mentorSignature && (
+                              <div>
+                                <strong>Signature:</strong>{" "}
+                                {selectedStudent.statementOfOutsideAssistance.mentorSignature}
+                                {selectedStudent.statementOfOutsideAssistance.mentorSignatureDate && (
+                                  <span className="text-gray-500 ml-2">
+                                    ({formatDate(selectedStudent.statementOfOutsideAssistance.mentorSignatureDate)})
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            {selectedStudent.statementOfOutsideAssistance.mentorName && (
+                              <div>
+                                <strong>Name:</strong>{" "}
+                                {selectedStudent.statementOfOutsideAssistance.mentorName}
+                              </div>
+                            )}
+                            {selectedStudent.statementOfOutsideAssistance.mentorTitle && (
+                              <div>
+                                <strong>Title:</strong>{" "}
+                                {selectedStudent.statementOfOutsideAssistance.mentorTitle}
+                              </div>
+                            )}
+                            {selectedStudent.statementOfOutsideAssistance.mentorInstitutionSignature && (
+                              <div>
+                                <strong>Institution:</strong>{" "}
+                                {selectedStudent.statementOfOutsideAssistance.mentorInstitutionSignature}
+                              </div>
+                            )}
+                            {selectedStudent.statementOfOutsideAssistance.teacherMentorComments && (
+                              <div>
+                                <strong>Comments:</strong>
+                                <p className="mt-1 text-gray-700 whitespace-pre-wrap">
+                                  {selectedStudent.statementOfOutsideAssistance.teacherMentorComments}
+                                </p>
+                              </div>
+                            )}
+                            {selectedStudent.statementOfOutsideAssistance.teacherMentorSafetyStatement && (
+                              <div>
+                                <strong>Safety Statement:</strong>
+                                <p className="mt-1 text-gray-700 whitespace-pre-wrap">
+                                  {selectedStudent.statementOfOutsideAssistance.teacherMentorSafetyStatement}
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="text-gray-500">Not yet completed</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {}
+                  {(selectedStudent.statementOfOutsideAssistance.parentCompleted ||
+                    selectedStudent.statementOfOutsideAssistance.parentSignature ||
+                    selectedStudent.statementOfOutsideAssistance.parentInviteSent) && (
+                    <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+                      <h5 className="font-semibold mb-2 text-green-900">Parent Response</h5>
+                      <div className="space-y-2 text-sm">
+                        {selectedStudent.statementOfOutsideAssistance.parentInviteSent && (
+                          <div>
+                            <strong>Invitation Sent To:</strong>{" "}
+                            {selectedStudent.statementOfOutsideAssistance.parentEmail}
+                          </div>
+                        )}
+                        {selectedStudent.statementOfOutsideAssistance.parentCompleted ? (
+                          <>
+                            {selectedStudent.statementOfOutsideAssistance.parentSignature && (
+                              <div>
+                                <strong>Signature:</strong>{" "}
+                                {selectedStudent.statementOfOutsideAssistance.parentSignature}
+                                {selectedStudent.statementOfOutsideAssistance.parentSignatureDate && (
+                                  <span className="text-gray-500 ml-2">
+                                    ({formatDate(selectedStudent.statementOfOutsideAssistance.parentSignatureDate)})
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            {selectedStudent.statementOfOutsideAssistance.parentName && (
+                              <div>
+                                <strong>Name:</strong>{" "}
+                                {selectedStudent.statementOfOutsideAssistance.parentName}
+                              </div>
+                            )}
+                            {selectedStudent.statementOfOutsideAssistance.parentPhone && (
+                              <div>
+                                <strong>Phone:</strong>{" "}
+                                {selectedStudent.statementOfOutsideAssistance.parentPhone}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="text-gray-500">Not yet completed</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {}
+              {selectedStudent.photoRelease && (
+                <div className="border-b pb-4">
+                  <h4 className="font-semibold mb-2">Photo Release Form</h4>
+                  <div className="space-y-2 text-sm">
+                    {selectedStudent.photoRelease.parentInviteSent && (
+                      <div>
+                        <strong>Invitation Sent To:</strong>{" "}
+                        {selectedStudent.photoRelease.parentEmail}
+                      </div>
+                    )}
+                    {selectedStudent.photoRelease.completed ? (
+                      <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+                        <div className="text-green-800 font-semibold mb-2">✓ Completed</div>
+                        {selectedStudent.photoRelease.parentSignature && (
+                          <div>
+                            <strong>Parent Signature:</strong>{" "}
+                            {selectedStudent.photoRelease.parentSignature}
+                            {selectedStudent.photoRelease.parentSignatureDate && (
+                              <span className="text-gray-500 ml-2">
+                                ({formatDate(selectedStudent.photoRelease.parentSignatureDate)})
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {selectedStudent.photoRelease.parentName && (
+                          <div>
+                            <strong>Parent Name:</strong>{" "}
+                            {selectedStudent.photoRelease.parentName}
+                          </div>
+                        )}
+                        {selectedStudent.photoRelease.parentPhone && (
+                          <div>
+                            <strong>Phone:</strong>{" "}
+                            {selectedStudent.photoRelease.parentPhone}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-gray-500">Not yet completed</div>
                     )}
                   </div>
                 </div>

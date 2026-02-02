@@ -171,7 +171,7 @@ export default function CompetitionPage() {
           </p>
           <div className="w-full h-96 rounded-lg overflow-hidden shadow-md mb-4">
             <iframe
-              src="https://www.google.com/maps?q=462+Millburn+Ave,+Millburn,+NJ+07041&output=embed"
+              src="https:
               width="100%"
               height="100%"
               style={{ border: 0 }}

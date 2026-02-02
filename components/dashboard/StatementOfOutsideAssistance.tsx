@@ -39,7 +39,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
           setSignature(studentData.statementOfOutsideAssistance.studentSignature);
         }
       } else {
-        // Initialize with student info
+        
         setFormData({
           studentFirstName: studentData?.firstName || "",
           studentLastName: studentData?.lastName || "",
@@ -92,10 +92,10 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
     setSuccess("");
 
     try {
-      // Generate a unique token for this invitation
+      
       const token = `${user.uid}_${type}_${Date.now()}_${Math.random().toString(36).substring(7)}`;
       
-      // Send invitation email via API route FIRST
+      
       const response = await fetch("/api/send-statement-invitation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -113,7 +113,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
         throw new Error(errorData.error || "Failed to send invitation email");
       }
 
-      // Only update form data AFTER email is successfully sent
+      
       const updatedFormData = { ...formData };
       if (type === "teacher") {
         updatedFormData.teacherEmail = email;
@@ -185,7 +185,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
   const updateField = (field: keyof StatementOfOutsideAssistance, value: any) => {
     const updated = { ...formData, [field]: value };
     
-    // Clear invitation sent status if email is changed
+    
     if (field === "teacherEmail" && value !== formData.teacherEmail) {
       updated.teacherInviteSent = false;
       updated.teacherInviteToken = undefined;
@@ -245,7 +245,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
         </div>
       )}
 
-      {/* Student Information */}
+      {}
       <div className="border rounded-lg p-4 space-y-4">
         <h4 className="font-semibold text-gray-900">Student Information</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -328,7 +328,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
         </div>
       </div>
 
-      {/* Science Research Advisor Information */}
+      {}
       <div className="border rounded-lg p-4 space-y-4">
         <h4 className="font-semibold text-gray-900">Science Research Advisor Information</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -388,7 +388,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
         </div>
       </div>
 
-      {/* Mentor Information */}
+      {}
       <div className="border rounded-lg p-4 space-y-4">
         <h4 className="font-semibold text-gray-900">Research Mentor Information</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -474,7 +474,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
         </div>
       </div>
 
-      {/* Student Questions */}
+      {}
       <div className="border rounded-lg p-4 space-y-4">
         <h4 className="font-semibold text-gray-900">Student Questions</h4>
         
@@ -518,7 +518,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
         })}
       </div>
 
-      {/* Student Signature */}
+      {}
       <div className="border rounded-lg p-4 space-y-4">
         <h4 className="font-semibold text-gray-900">Student Signature *</h4>
         <div>
@@ -559,7 +559,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
         )}
       </div>
 
-      {/* Parent Invitation (if no Science Research Advisor/mentor) */}
+      {}
       {(!formData.teacherFirstName || !formData.mentorFirstName) && (
         <div className="border rounded-lg p-4 space-y-4">
           <h4 className="font-semibold text-gray-900">Parent Information (Required if no Science Research Advisor or Mentor)</h4>
@@ -593,7 +593,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
         </div>
       )}
 
-      {/* Save Button */}
+      {}
       <div className="flex gap-4">
         <button
           type="button"

@@ -37,6 +37,7 @@ export interface SRA {
   createdAt: Date | Timestamp;
   approved: boolean;
   adminApproved?: boolean;
+  emailVerified?: boolean;
 }
 
 export interface Student {
@@ -58,10 +59,8 @@ export interface Student {
   abstractUrl?: string;
   presentationUrl?: string;
   paymentStatus?: "not_received" | "received";
-  // Materials submission fields
   researchReportUrl?: string;
   slideshowUrl?: string;
-  // SRC fields
   srcQuestions?: SRCQuestions;
   srcApprovalRequested?: boolean;
   srcApprovalRequestedAt?: Date | Timestamp | null;
@@ -69,63 +68,50 @@ export interface Student {
   srcApprovedAt?: Date | Timestamp | null;
   srcApprovedBy?: string;
   srcNotes?: string;
-  // Ethics questionnaire
   ethicsQuestionnaire?: EthicsQuestionnaire;
-  // Statement of Outside Assistance
   statementOfOutsideAssistance?: StatementOfOutsideAssistance;
-  // Photo Release Form
   photoRelease?: PhotoRelease;
 }
 
 export interface SRCQuestions {
-  // Human Participants
   involvesHumanParticipants?: boolean;
   humanParticipantsDetails?: string;
   irbApprovalObtained?: boolean;
   irbApprovalDetails?: string;
   informedConsentObtained?: boolean;
-  // Vertebrate Animals
   involvesVertebrateAnimals?: boolean;
   vertebrateAnimalsDetails?: string;
   animalCareProtocol?: string;
   veterinaryOversight?: boolean;
-  // Potentially Hazardous Biological Agents (PHBA)
   involvesPHBA?: boolean;
   phbaDetails?: string;
   biosafetyLevel?: string;
   phbaLocation?: string;
-  // Hazardous Chemicals/Devices
   involvesHazardousMaterials?: boolean;
   hazardousMaterialsDetails?: string;
   safetyProtocols?: string;
-  // Continuation Project
   isContinuationProject?: boolean;
   continuationProjectDetails?: string;
   previousYearAbstract?: string;
 }
 
 export interface EthicsQuestionnaire {
-  // Research Ownership
-  studentOwnership?: string; // Description of work done by student
-  mentorAssistance?: string; // Description of mentor assistance
-  labTechnicianAssistance?: string; // Description of lab tech assistance
-  externalData?: boolean; // Whether external data was used
+  studentOwnership?: string;
+  mentorAssistance?: string;
+  labTechnicianAssistance?: string;
+  externalData?: boolean;
   externalDataDetails?: string;
-  // Attribution
   properAttribution?: boolean;
   literatureReviewCompleted?: boolean;
-  // Research Integrity
   allProceduresReported?: boolean;
   modificationsDisclosed?: boolean;
   dataCollectionTransparent?: boolean;
-  // AI Usage
   aiToolsUsed?: boolean;
   aiUsageDetails?: string;
   aiDisclosed?: boolean;
 }
 
 export interface StatementOfOutsideAssistance {
-  // Student Information
   studentFirstName?: string;
   studentLastName?: string;
   partnerFirstName?: string;
@@ -138,27 +124,24 @@ export interface StatementOfOutsideAssistance {
   mentorLastName?: string;
   mentorInstitution?: string;
   
-  // Student Questions (1-14)
-  question1?: string; // Project idea development
-  question2?: string; // Research question development
-  question3?: string; // Where work was done
-  question4?: string; // Help received
-  question5?: string; // Role in research group
-  question6?: string; // Origin of external data
-  question7?: string; // Why external data was used
-  question8?: string; // Continuation of prior research
-  question9?: string; // Prior research abstract
-  question10?: string; // AI compliance
-  question11?: string; // Methods and materials
-  question12?: string; // Safety and ethics
-  question13?: string; // Professional oversight
-  question14?: string; // IRB oversight
+  question1?: string;
+  question2?: string;
+  question3?: string;
+  question4?: string;
+  question5?: string;
+  question6?: string;
+  question7?: string;
+  question8?: string;
+  question9?: string;
+  question10?: string;
+  question11?: string;
+  question12?: string;
+  question13?: string;
+  question14?: string;
   
-  // Teacher/Mentor/Parent Sections
   teacherMentorComments?: string;
   teacherMentorSafetyStatement?: string;
   
-  // Signatures
   studentSignature?: string;
   studentSignatureDate?: Date | Timestamp;
   teacherSignature?: string;
@@ -174,7 +157,6 @@ export interface StatementOfOutsideAssistance {
   parentName?: string;
   parentPhone?: string;
   
-  // Invitation tracking
   teacherEmail?: string;
   teacherInviteSent?: boolean;
   teacherInviteToken?: string;
@@ -185,7 +167,6 @@ export interface StatementOfOutsideAssistance {
   parentInviteSent?: boolean;
   parentInviteToken?: string;
   
-  // Completion status
   studentCompleted?: boolean;
   teacherCompleted?: boolean;
   mentorCompleted?: boolean;
@@ -239,9 +220,6 @@ export interface Judge {
 export async function createSchool(school: Omit<School, "id" | "createdAt">): Promise<string> {
   const dbInstance = ensureDb();
   
-  // Create a new school document
-  // Note: We're not checking for duplicates to avoid index requirements
-  // Duplicate schools can be handled manually by admins if needed
   const schoolRef = doc(collection(dbInstance, "schools"));
   await setDoc(schoolRef, {
     ...school,
@@ -276,11 +254,9 @@ export async function getAllSchools(): Promise<School[]> {
 
 export async function getSchoolsWithSRAs(): Promise<School[]> {
   const dbInstance = ensureDb();
-  // Get all SRAs
   const srasRef = collection(dbInstance, "sras");
   const srasSnapshot = await getDocs(srasRef);
   
-  // Get unique school IDs from SRAs
   const schoolIds = new Set<string>();
   srasSnapshot.docs.forEach((doc) => {
     const sra = doc.data() as SRA;
@@ -289,7 +265,6 @@ export async function getSchoolsWithSRAs(): Promise<School[]> {
     }
   });
   
-  // Fetch school documents for each unique school ID
   const schools: School[] = [];
   for (const schoolId of schoolIds) {
     const school = await getSchool(schoolId);
@@ -298,7 +273,6 @@ export async function getSchoolsWithSRAs(): Promise<School[]> {
     }
   }
   
-  // Sort by name
   return schools.sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -386,13 +360,11 @@ export async function updateStudentProject(
   const studentRef = doc(dbInstance, "students", studentId);
   
   if (resetSignatures && updates.researchPlanUrl) {
-    // Get current student data
     const studentDoc = await getDoc(studentRef);
     if (studentDoc.exists()) {
       const currentData = studentDoc.data();
       const currentSOA = currentData.statementOfOutsideAssistance || {};
       
-      // Reset all signatures
       const resetSOA = {
         ...currentSOA,
         studentCompleted: false,
@@ -482,7 +454,7 @@ export async function createJudge(judgeId: string, judge: Omit<Judge, "id" | "cr
   const judgeData = {
     ...judge,
     createdAt: Timestamp.now(),
-    adminApproved: false, // Requires admin approval
+    adminApproved: false,
   };
   console.log("Creating judge document with ID:", judgeId);
   console.log("Judge data:", judgeData);
@@ -512,7 +484,21 @@ export async function getAllSRAs(): Promise<SRA[]> {
   const dbInstance = ensureDb();
   const srasRef = collection(dbInstance, "sras");
   const querySnapshot = await getDocs(srasRef);
-  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as SRA));
+  const sras = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as SRA));
+  
+  const usersRef = collection(dbInstance, "users");
+  const usersSnapshot = await getDocs(usersRef);
+  const usersMap = new Map<string, { emailVerified?: boolean }>();
+  
+  usersSnapshot.docs.forEach((doc) => {
+    const userData = doc.data();
+    usersMap.set(doc.id, { emailVerified: userData.emailVerified || false });
+  });
+  
+  return sras.map((sra) => ({
+    ...sra,
+    emailVerified: sra.id ? usersMap.get(sra.id)?.emailVerified || false : false,
+  }));
 }
 
 export async function getAllJudges(): Promise<Judge[]> {
