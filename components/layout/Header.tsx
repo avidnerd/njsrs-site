@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function Header() {
   const { user, userProfile } = useAuth();
   const [showRegisterDropdown, setShowRegisterDropdown] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,15 +44,15 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 py-1">
+    <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center py-3 px-3">
+        <div className="flex justify-between items-center py-2">
+          <div className="flex items-center flex-shrink-0">
+            <Link href="/" className="flex items-center">
               <img 
                 src="/njsrs_logo.jpg" 
                 alt="NJSRS Logo" 
-                className="h-20 w-auto"
+                className="h-12 sm:h-16 md:h-20 w-auto"
               />
             </Link>
           </div>
@@ -77,11 +78,11 @@ export default function Header() {
             </Link>
           </nav>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {user ? (
               <Link
                 href={getDashboardPath()}
-                className="bg-primary-green text-white px-4 py-2 rounded-md hover:bg-primary-darkGreen font-medium"
+                className="bg-primary-green text-white px-3 sm:px-4 py-2 rounded-md hover:bg-primary-darkGreen font-medium text-sm sm:text-base whitespace-nowrap"
               >
                 Dashboard
               </Link>
@@ -89,18 +90,19 @@ export default function Header() {
               <>
                 <Link
                   href="/login"
-                  className="bg-primary-green text-white px-5 py-2.5 rounded-md hover:bg-primary-darkGreen font-semibold transition-colors"
+                  className="bg-primary-green text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-md hover:bg-primary-darkGreen font-semibold transition-colors text-xs sm:text-sm whitespace-nowrap"
                 >
                   LOG IN
                 </Link>
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setShowRegisterDropdown(!showRegisterDropdown)}
-                    className="bg-primary-green text-white px-5 py-2.5 rounded-md hover:bg-primary-darkGreen font-semibold flex items-center transition-colors"
+                    className="bg-primary-green text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-md hover:bg-primary-darkGreen font-semibold flex items-center transition-colors text-xs sm:text-sm whitespace-nowrap"
                   >
-                    REGISTER AS...
+                    <span className="hidden sm:inline">REGISTER AS...</span>
+                    <span className="sm:hidden">REGISTER</span>
                     <svg
-                      className="ml-2 w-4 h-4"
+                      className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -141,8 +143,52 @@ export default function Header() {
                 </div>
               </>
             )}
+            
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="md:hidden p-2 text-gray-700 hover:text-primary-blue focus:outline-none"
+              aria-label="Toggle menu"
+            >
+              {showMobileMenu ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
+
+        {showMobileMenu && (
+          <nav className="md:hidden border-t border-gray-200 py-4">
+            <div className="flex flex-col space-y-3">
+              <Link
+                href="/competition"
+                className="text-gray-900 hover:text-primary-blue font-medium transition-colors px-2 py-1"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Competition
+              </Link>
+              <Link
+                href="/judging"
+                className="text-gray-900 hover:text-primary-blue font-medium transition-colors px-2 py-1"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Judging
+              </Link>
+              <Link
+                href="/donate"
+                className="text-gray-900 hover:text-primary-blue font-medium transition-colors px-2 py-1"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Donate
+              </Link>
+            </div>
+          </nav>
+        )}
       </div>
     </header>
   );
