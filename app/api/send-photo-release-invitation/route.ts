@@ -30,16 +30,12 @@ export async function POST(request: NextRequest) {
     let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
     
     if (!baseUrl) {
-      
       if (process.env.VERCEL_ENV === 'production') {
-        
-        baseUrl = 'https:
+        baseUrl = 'https://njsrs.org';
       } else if (process.env.VERCEL_URL) {
-        
-        baseUrl = `https:
+        baseUrl = `https://${process.env.VERCEL_URL}`;
       } else {
-        
-        baseUrl = 'http:
+        baseUrl = 'http://localhost:3000';
       }
     }
 
