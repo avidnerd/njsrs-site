@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   icons: {
     icon: '/njsrs-icon-only.png',
   },
+  verification: {
+    google: '8jvfqSUGVKpgGljEbfycGtLYA4krAzOj-_8503CXJj8',
+  },
 }
 
 export default function RootLayout({
