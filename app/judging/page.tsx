@@ -34,10 +34,18 @@ export default function JudgingPage() {
             Judging Criteria
           </h2>
           <p className="text-gray-700 mb-4">
-            Evaluation is based on the quality of the research question, experimental design, data analysis, conclusions, and the student&apos;s understanding and communication.
+            Evaluation is based on the quality of the research question, experimental design, data analysis, conclusions, and the student&apos;s understanding and communication. We are using the Oral Presentation Rubric that JSHS has used in past years to evaluate the projects.
           </p>
           <p className="text-gray-700">
-            <strong>View Oral Presentation Rubric</strong> for full scoring categories and point distributions.
+            <a
+              href="/rubric.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary-blue hover:text-primary-darkGreen underline"
+            >
+              View Oral Presentation Rubric
+            </a>{" "}
+            for full scoring categories and point distributions.
           </p>
         </section>
 
@@ -47,7 +55,16 @@ export default function JudgingPage() {
             Judging Guidelines & Procedure
           </h2>
           <p className="text-gray-700">
-            This section provides an overview of the judging day process, including project assignment, timing, scoring, and debriefing. For more detailed information, please review the <strong>Judging Guidelines & Procedure</strong> document.
+            This section provides an overview of the judging day process, including project assignment, timing, scoring, and debriefing. For more detailed information, please review the{" "}
+            <a
+              href="/judging_guidelines.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary-blue hover:text-primary-darkGreen underline"
+            >
+              Judging Guidelines & Procedure
+            </a>{" "}
+            document.
           </p>
         </section>
       </div>
