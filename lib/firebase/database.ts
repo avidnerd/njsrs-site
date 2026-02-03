@@ -64,6 +64,7 @@ export interface Student {
   grade: string;
   projectTitle?: string;
   projectDescription?: string;
+  shirtSize?: "XS" | "S" | "M" | "L" | "XL";
   status: "pending" | "approved" | "rejected";
   createdAt: Date | Timestamp;
   approvedAt?: Date | Timestamp | null;

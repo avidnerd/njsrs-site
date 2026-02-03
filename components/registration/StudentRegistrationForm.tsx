@@ -17,6 +17,7 @@ export default function StudentRegistrationForm() {
     grade: "",
     projectTitle: "",
     projectDescription: "",
+    shirtSize: "",
     schoolId: "",
     sraId: "",
   });
@@ -125,7 +126,11 @@ export default function StudentRegistrationForm() {
       return;
     }
 
-    
+    if (!formData.shirtSize) {
+      setError("Please select your shirt size");
+      return;
+    }
+
     if (formData.projectDescription.trim()) {
       const wordCount = countWords(formData.projectDescription);
       if (wordCount > 150) {
@@ -148,6 +153,7 @@ export default function StudentRegistrationForm() {
         grade: formData.grade,
         projectTitle: formData.projectTitle,
         projectDescription: formData.projectDescription,
+        shirtSize: formData.shirtSize as "XS" | "S" | "M" | "L" | "XL" | undefined,
       });
 
       sessionStorage.setItem("verificationCode", verificationCode);
@@ -346,6 +352,26 @@ export default function StudentRegistrationForm() {
         <p className="mt-1 text-sm text-gray-500">
           Word count: {countWords(formData.projectDescription)} / 150
         </p>
+      </div>
+
+      <div>
+        <label htmlFor="shirtSize" className="block text-sm font-medium mb-1 text-gray-900">
+          Shirt Size *
+        </label>
+        <select
+          id="shirtSize"
+          value={formData.shirtSize}
+          onChange={(e) => setFormData({ ...formData, shirtSize: e.target.value })}
+          required
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+        >
+          <option value="">Select shirt size...</option>
+          <option value="XS">XS</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+        </select>
       </div>
 
       {error && (
