@@ -6,14 +6,24 @@ import ConditionalAuth from '@/components/auth/ConditionalAuth'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'New Jersey Science Research Symposium',
-  description: 'A research competition that brings together high school scientists from across New Jersey',
+  title: 'New Jersey Science Research Symposium | NJSRS',
+  description: 'The New Jersey Science Research Symposium (NJSRS) is a research competition that brings together high school scientists from across New Jersey to present original STEM research projects. Hosted at Millburn High School.',
+  keywords: ['New Jersey Science Research Symposium', 'NJSRS', 'research competitions New Jersey', 'science fair New Jersey', 'STEM competition New Jersey', 'high school science competition', 'New Jersey', 'science research competition', 'student research competition', 'research competitions for high school students', 'science competitions in New Jersey', 'NJ science fair', 'New Jersey STEM competition', 'high school research symposium'],
+  authors: [{ name: 'NJSRS' }],
+  openGraph: {
+    title: 'New Jersey Science Research Symposium | NJSRS',
+    description: 'A research competition that brings together high school scientists from across New Jersey',
+    url: 'https://njsrs.org',
+    siteName: 'NJSRS',
+    type: 'website',
+  },
   icons: {
     icon: '/njsrs-icon-only.png',
   },
   verification: {
     google: '8jvfqSUGVKpgGljEbfycGtLYA4krAzOj-_8503CXJj8',
   },
+  metadataBase: new URL('https://njsrs.org'),
 }
 
 export default function RootLayout({

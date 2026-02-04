@@ -1,4 +1,19 @@
 import Link from "next/link";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Become a Judge | NJSRS - Science Fair Judging',
+  description: 'Join NJSRS as a judge! We need STEM professionals, university faculty, and graduate students to evaluate high school science research projects. Registration opens February 1st.',
+  keywords: ['science fair judge', 'STEM judge', 'judge science competition', 'NJSRS judge', 'volunteer judge', 'science fair evaluation'],
+  openGraph: {
+    title: 'Become a Judge | NJSRS',
+    description: 'Join NJSRS as a judge to evaluate high school science research projects.',
+    url: 'https://njsrs.org/judging',
+  },
+  alternates: {
+    canonical: 'https://njsrs.org/judging',
+  },
+};
 
 export default function JudgingPage() {
   return (

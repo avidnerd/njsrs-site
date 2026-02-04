@@ -1,6 +1,54 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Competition Rules & Information | NJSRS - Research Competitions New Jersey',
+  description: 'Learn about the New Jersey Science Research Symposium competition format, rules, registration process, qualifying projects, and venue information. Entry fee $30 per student. One of the premier research competitions in New Jersey.',
+  keywords: ['NJSRS competition', 'research competitions New Jersey', 'science fair rules', 'STEM competition format', 'student registration', 'science research competition', 'New Jersey science fair', 'research competitions for high school students', 'NJ science competition'],
+  openGraph: {
+    title: 'Competition Rules & Information | NJSRS',
+    description: 'Learn about the NJSRS competition format, rules, and registration process.',
+    url: 'https://njsrs.org/competition',
+  },
+  alternates: {
+    canonical: 'https://njsrs.org/competition',
+  },
+};
+
 export default function CompetitionPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "name": "New Jersey Science Research Symposium",
+    "description": "A research competition for high school students to present original STEM research projects",
+    "startDate": "2025-04-01",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "location": {
+      "@type": "Place",
+      "name": "Millburn High School",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "462 Millburn Ave",
+        "addressLocality": "Millburn",
+        "addressRegion": "NJ",
+        "postalCode": "07041",
+        "addressCountry": "US"
+      }
+    },
+    "organizer": {
+      "@type": "Organization",
+      "name": "New Jersey Science Research Symposium",
+      "url": "https://njsrs.org"
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 className="text-4xl font-bold text-primary-blue mb-8">Competition</h1>
 
@@ -11,7 +59,7 @@ export default function CompetitionPage() {
           <div className="w-full">
             <img 
               src="/fair_timeline.png" 
-              alt="Fair Timeline" 
+              alt="NJSRS competition timeline and registration deadlines" 
               className="w-full h-auto"
             />
           </div>
@@ -187,5 +235,6 @@ export default function CompetitionPage() {
         </section>
       </div>
     </div>
+    </>
   );
 }
