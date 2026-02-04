@@ -2,9 +2,9 @@ import Link from "next/link";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Research Competitions in New Jersey | NJSRS - New Jersey Science Research Symposium',
-  description: 'Looking for research competitions in New Jersey? The New Jersey Science Research Symposium (NJSRS) is a premier research competition in New Jersey for high school students. Present your STEM research, compete for prizes, and receive feedback from STEM professionals. Hosted at Millburn High School.',
-  keywords: ['research competitions in New Jersey', 'research competitions in new jersey', 'New Jersey Science Research Symposium', 'NJSRS', 'research competitions New Jersey', 'science fair New Jersey', 'STEM competition New Jersey', 'high school science competition', 'New Jersey', 'science research competition', 'student research competition', 'research competitions for high school students', 'science competitions in New Jersey', 'NJ science fair', 'New Jersey STEM competition', 'high school research symposium', 'Millburn High School'],
+  title: 'New Jersey High School Research Competitions | NJSRS - New Jersey Science Research Symposium',
+  description: 'The New Jersey Science Research Symposium (NJSRS) is one of the premier New Jersey high school research competitions. High school students present original STEM research projects, compete for awards, and receive feedback from STEM professionals. Hosted at Millburn High School.',
+  keywords: ['New Jersey high school research competitions', 'New Jersey high school research competitions', 'NJSRS', 'New Jersey Science Research Symposium', 'high school research competitions New Jersey', 'NJ high school science competitions', 'research competitions for high school students New Jersey', 'New Jersey STEM competitions high school', 'science research competitions New Jersey', 'high school science fair New Jersey', 'Millburn High School'],
   openGraph: {
     title: 'New Jersey Science Research Symposium | NJSRS',
     description: 'A research competition that brings together high school scientists from across New Jersey to present original STEM research projects.',
@@ -51,18 +51,18 @@ export default function HomePage() {
         "mainEntity": [
           {
             "@type": "Question",
-            "name": "What research competitions in New Jersey are available for high school students?",
+            "name": "What New Jersey high school research competitions are available?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "The New Jersey Science Research Symposium (NJSRS) is one of the premier research competitions in New Jersey for high school students. It brings together students from across the state to present original STEM research projects and compete for prizes."
+              "text": "New Jersey offers several high school research competitions including the New Jersey Science Research Symposium (NJSRS), NJ Regional Science Bowl, NJAS Junior Academy, Northern NJ Junior Science and Humanities Symposium (JSHS) at Rutgers, Terra North Jersey STEM Fair, and New Jersey State Science Day. NJSRS is one of the premier New Jersey high school research competitions for students to present original STEM research."
             }
           },
           {
             "@type": "Question",
-            "name": "How do I participate in research competitions in New Jersey?",
+            "name": "How do I participate in New Jersey high school research competitions?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "To participate in NJSRS, you need a Science Research Advisor (SRA) from your school registered first. Then students can register online, select their school and SRA, and complete the registration form. The entry fee is $30 per student."
+              "text": "To participate in NJSRS, one of the leading New Jersey high school research competitions, you need a Science Research Advisor (SRA) from your school registered first. Then students can register online, select their school and SRA, and complete the registration form. The entry fee is $30 per student."
             }
           },
           {
@@ -75,18 +75,18 @@ export default function HomePage() {
           },
           {
             "@type": "Question",
-            "name": "What types of projects qualify for research competitions in New Jersey?",
+            "name": "What types of projects qualify for New Jersey high school research competitions?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "For NJSRS, qualifying projects include experimental research projects started after April 2025 in any STEM field (Science, Technology, Engineering, or Mathematics). Projects must follow the scientific method with background research, hypothesis, experiments, data analysis, and conclusions."
+              "text": "For NJSRS and other New Jersey high school research competitions, qualifying projects include experimental research projects started after April 2025 in any STEM field (Science, Technology, Engineering, or Mathematics). Projects must follow the scientific method with background research, hypothesis, experiments, data analysis, and conclusions."
             }
           },
           {
             "@type": "Question",
-            "name": "Where can I find research competitions in New Jersey?",
+            "name": "Where are New Jersey high school research competitions held?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "The New Jersey Science Research Symposium (NJSRS) is one of the leading research competitions in New Jersey. Hosted at Millburn High School, NJSRS is open to all high school students in New Jersey who have conducted experimental STEM research. Visit njsrs.org to learn more."
+              "text": "The New Jersey Science Research Symposium (NJSRS) is hosted at Millburn High School in Millburn, New Jersey. Other New Jersey high school research competitions are held at various locations including Rutgers University (Northern NJ JSHS), Princeton Plasma Physics Laboratory (NJ Regional Science Bowl), and other venues across the state."
             }
           }
         ]
@@ -106,10 +106,10 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-16 lg:gap-24 xl:gap-28 items-center">
             <div className="pr-0 lg:pr-8">
               <h1 className="text-xl md:text-3xl lg:text-4xl font-bold mb-6 leading-tight">
-                The New Jersey Science Research Symposium (NJSRS)
+                The New Jersey Science Research Symposium (NJSRS) is a research competition that brings together high school scientists from across New Jersey to present original STEM research projects.
               </h1>
               <p className="text-lg md:text-xl mb-4 text-blue-100">
-                The New Jersey Science Research Symposium (NJSRS) is a premier science research competition for high school students throughout New Jersey. Hosted at Millburn High School, this competition brings together students from across the state to present original STEM research projects and compete for awards.
+                NJSRS is a premier science research competition for high school students throughout New Jersey. Hosted at Millburn High School, this competition is designed to provide students a platform to share, defend, and advance their research. 
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
@@ -154,7 +154,7 @@ export default function HomePage() {
                 The Competition
               </h2>
               <p className="text-gray-600">
-                NJSRS is a research competition for high school students in New Jersey who have conducted experimental STEM research within the past year. Competitors give an oral presentation in front of slides and are scored by STEM professionals.
+                NJSRS is one of the leading New Jersey high school research competitions. High school students who have conducted experimental STEM research within the past year can participate. Competitors give an oral presentation in front of slides and are scored by STEM professionals.
               </p>
             </Link>
 
@@ -209,28 +209,31 @@ export default function HomePage() {
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-primary-blue mb-6 text-center">
-            Research Competitions in New Jersey
+            New Jersey High School Research Competitions
           </h2>
           <div className="prose max-w-none text-gray-700 space-y-4">
             <p className="text-lg">
-              The New Jersey Science Research Symposium (NJSRS) is one of the premier science research competitions for high school students in New Jersey. Whether you're a student, parent, or educator, NJSRS provides an excellent platform for students to showcase their experimental STEM research.
+              The New Jersey Science Research Symposium (NJSRS) is one of the premier New Jersey high school research competitions. Alongside other notable competitions like the NJ Regional Science Bowl, NJAS Junior Academy, and Northern NJ Junior Science and Humanities Symposium (JSHS), NJSRS offers high school students in New Jersey the opportunity to present original STEM research and compete for recognition and awards.
             </p>
             <p>
-              NJSRS stands out as a comprehensive event that brings together students from high schools across the state. This competition offers:
+              <strong>About NJSRS:</strong> As one of the leading New Jersey high school research competitions, NJSRS stands out for its comprehensive format that includes:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>Oral presentations judged by STEM professionals</li>
               <li>Category-based competition with final round presentations</li>
               <li>Poster sessions for all participants</li>
               <li>Detailed feedback on research methodology and findings</li>
-              <li>Opportunities to network with other student researchers</li>
+              <li>Opportunities to network with other student researchers from across New Jersey</li>
               <li>Awards and recognition for outstanding projects</li>
             </ul>
             <p>
-              <strong>Why choose NJSRS?</strong> NJSRS is specifically designed for high school students who have conducted experimental research. The competition is hosted at Millburn High School and welcomes students from all New Jersey high schools. NJSRS provides both competitive opportunities and educational value, making it an excellent choice for students interested in science research competitions.
+              <strong>Eligibility:</strong> NJSRS is open to all high school students in New Jersey (grades 9-12) who have conducted experimental STEM research within the past year. The competition welcomes students from public, private, and charter schools across the state.
             </p>
             <p>
-              To participate, students must have a Science Research Advisor (SRA) from their school registered first. The entry fee is $30 per student, and registration is open to all high school students in New Jersey who have conducted experimental STEM research within the past year.
+              <strong>How to Participate:</strong> To participate in this New Jersey high school research competition, students must have a Science Research Advisor (SRA) from their school registered first. The entry fee is $30 per student. Registration is open to all high school students in New Jersey who have conducted experimental STEM research.
+            </p>
+            <p>
+              <strong>Location:</strong> NJSRS is hosted at Millburn High School in Millburn, New Jersey, making it easily accessible to students throughout the state.
             </p>
           </div>
         </div>
