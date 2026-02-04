@@ -17,14 +17,7 @@ export default function DonatePage() {
   };
 
   return (
-    <>
-      <Head>
-        <title>Donate to NJSRS | Support Science Research Education</title>
-        <meta name="description" content="Support the New Jersey Science Research Symposium through donations. Help fund event costs, judging, student awards, and expand opportunities for New Jersey student researchers." />
-        <meta name="keywords" content="donate to science fair, NJSRS donation, support science education, science fair sponsorship, STEM education funding" />
-        <link rel="canonical" href="https://njsrs.org/donate" />
-      </Head>
-      <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 className="text-4xl font-bold text-primary-blue mb-8">Donate</h1>
 
