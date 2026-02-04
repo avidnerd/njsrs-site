@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Competition Rules & Information | NJSRS - Research Competitions New Jersey',
-  description: 'Learn about the New Jersey Science Research Symposium competition format, rules, registration process, qualifying projects, and venue information. Entry fee $30 per student. One of the premier research competitions in New Jersey.',
+  title: 'Research Competitions in New Jersey | NJSRS Competition Rules & Information',
+  description: 'Learn about research competitions in New Jersey. The New Jersey Science Research Symposium (NJSRS) is one of the premier research competitions in New Jersey for high school students. Learn about competition format, rules, registration, and venue. Entry fee $30 per student.',
   keywords: ['NJSRS competition', 'research competitions New Jersey', 'science fair rules', 'STEM competition format', 'student registration', 'science research competition', 'New Jersey science fair', 'research competitions for high school students', 'NJ science competition'],
   openGraph: {
     title: 'Competition Rules & Information | NJSRS',
