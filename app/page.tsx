@@ -106,13 +106,10 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-16 lg:gap-24 xl:gap-28 items-center">
             <div className="pr-0 lg:pr-8">
               <h1 className="text-xl md:text-3xl lg:text-4xl font-bold mb-6 leading-tight">
-                Research Competitions in New Jersey: The New Jersey Science Research Symposium (NJSRS)
+                The New Jersey Science Research Symposium (NJSRS)
               </h1>
               <p className="text-lg md:text-xl mb-4 text-blue-100">
                 The New Jersey Science Research Symposium (NJSRS) is a premier science research competition for high school students throughout New Jersey. Hosted at Millburn High School, this competition brings together students from across the state to present original STEM research projects and compete for awards.
-              </p>
-              <p className="text-lg md:text-xl mb-8 text-blue-100">
-                NJSRS offers high school students the opportunity to showcase their experimental research, receive feedback from STEM professionals, and gain valuable experience in scientific communication.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
