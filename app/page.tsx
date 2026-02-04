@@ -101,10 +101,7 @@ export default function HomePage() {
                 The New Jersey Science Research Symposium (NJSRS) is a research competition that brings together high school scientists from across New Jersey to present original STEM research projects.
               </h1>
               <p className="text-lg md:text-xl mb-4 text-blue-100">
-                Looking for research competitions in New Jersey? NJSRS is a premier science research competition for high school students throughout New Jersey. Hosted at Millburn High School, this competition is designed to provide students a platform to share, defend, and advance their research.
-              </p>
-              <p className="text-lg md:text-xl mb-8 text-blue-100">
-                If you're a high school student in New Jersey interested in research competitions, NJSRS offers the opportunity to present your experimental STEM research, receive feedback from STEM professionals, and compete for awards.
+                NJSRS is a premier science research competition for high school students throughout New Jersey. Hosted at Millburn High School, this competition is designed to provide students a platform to share, defend, and advance their research. 
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
