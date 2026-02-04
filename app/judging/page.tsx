@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Become a Judge | NJSRS - Science Fair Judging',
   description: 'Join NJSRS as a judge! We need STEM professionals, university faculty, and graduate students to evaluate high school science research projects. Registration opens February 1st.',
-  keywords: ['science fair judge', 'STEM judge', 'judge science competition', 'NJSRS judge', 'volunteer judge', 'science fair evaluation'],
+  keywords: ['science fair judge', 'STEM judge', 'judge science competition', 'NJSRS judge', 'volunteer judge', 'science fair evaluation', 'judge research competition', 'high school science fair judge', 'NJ science fair judge', 'science fair volunteering', 'STEM volunteering'],
   openGraph: {
     title: 'Become a Judge | NJSRS',
     description: 'Join NJSRS as a judge to evaluate high school science research projects.',

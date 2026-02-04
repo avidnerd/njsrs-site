@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'New Jersey High School Research Competitions | NJSRS - New Jersey Science Research Symposium',
   description: 'The New Jersey Science Research Symposium (NJSRS) is one of the premier New Jersey high school research competitions. High school students present original STEM research projects, compete for awards, and receive feedback from STEM professionals. Hosted at Millburn High School.',
-  keywords: ['New Jersey high school research competitions', 'New Jersey high school research competitions', 'NJSRS', 'New Jersey Science Research Symposium', 'high school research competitions New Jersey', 'NJ high school science competitions', 'research competitions for high school students New Jersey', 'New Jersey STEM competitions high school', 'science research competitions New Jersey', 'high school science fair New Jersey', 'Millburn High School'],
+  keywords: ['New Jersey high school research competitions', 'new jersey high school research competitions','New Jersey high school research competitions', 'NJSRS', 'New Jersey Science Research Symposium', 'high school research competitions New Jersey', 'NJ high school science competitions', 'research competitions for high school students New Jersey', 'New Jersey STEM competitions high school', 'science research competitions New Jersey', 'high school science fair New Jersey', 'Millburn High School'],
   openGraph: {
     title: 'New Jersey Science Research Symposium | NJSRS',
     description: 'A research competition that brings together high school scientists from across New Jersey to present original STEM research projects.',

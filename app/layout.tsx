@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'New Jersey Science Research Symposium | NJSRS',
   description: 'The New Jersey Science Research Symposium (NJSRS) is a research competition that brings together high school scientists from across New Jersey to present original STEM research projects. Hosted at Millburn High School.',
-  keywords: ['research competitions in New Jersey', 'research competitions in new jersey', 'New Jersey Science Research Symposium', 'NJSRS', 'research competitions New Jersey', 'science fair New Jersey', 'STEM competition New Jersey', 'high school science competition', 'New Jersey', 'science research competition', 'student research competition', 'research competitions for high school students', 'science competitions in New Jersey', 'NJ science fair', 'New Jersey STEM competition', 'high school research symposium'],
+  keywords: ['research competitions in New Jersey', 'research competitions in new jersey', 'new jersey high school research competitions', 'New Jersey Science Research Symposium', 'NJSRS', 'research competitions New Jersey', 'science fair New Jersey', 'STEM competition New Jersey', 'high school science competition', 'New Jersey', 'science research competition', 'student research competition', 'research competitions for high school students', 'science competitions in New Jersey', 'NJ science fair', 'New Jersey STEM competition', 'high school research symposium'],
   authors: [{ name: 'NJSRS' }],
   openGraph: {
     title: 'New Jersey Science Research Symposium | NJSRS',
