@@ -56,7 +56,7 @@ export default function AboutPage() {
 
         <section className="mb-16">
           <div className="prose max-w-none text-gray-700 space-y-4">
-            <p className="text-lg bold">
+            <p className="text-lg font-bold">
               The New Jersey Science Research Symposium (NJSRS) was created to fill a critical gap in science research opportunities for high school students in New Jersey. With the suspension of JSHS (Junior Science and Humanities Symposium) this year, we recognized the need for a platform where students could continue to showcase their experimental research, receive valuable feedback, and compete for recognition.
             </p>
             <p>
