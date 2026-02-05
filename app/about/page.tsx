@@ -19,7 +19,7 @@ export default function AboutPage() {
   const committeeMembers = [
     {
       name: 'Subhi Stephan',
-      role: 'Tech Committee Chair',
+      role: 'Tech Committee Chair, Logistics Co-Chair',
       description: 'Developer of the website and portal, and lead of technology management',
       image: '/subhi_stephan.jpg',
     },
@@ -31,14 +31,14 @@ export default function AboutPage() {
     },
     {
       name: 'Daniel Han',
-      role: 'Logistics Co-Chair',
-      description: 'Coordinates event logistics and operations',
+      role: 'Logistics Co-Chair, Social Media Co-Chair, Proposal Development Chair',
+      description: 'Led proposal development and coordinates event logistics, social media marketing, and operations',
       image: '/daniel_han.jpg',
     },
     {
       name: 'Ahisha Ravi',
-      role: 'Logistics Co-Chair and Fundraising Chair',
-      description: 'Manages logistics coordination and fundraising efforts',
+      role: 'Logistics Co-Chair, Fundraising Chair, and Social Media Co-Chair',
+      description: 'Manages logistics coordination, social media marketing and fundraising efforts',
       image: '/ahisha_ravi.jpg',
     },
     {
