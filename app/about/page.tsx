@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   const committeeMembers = [
     {
-      name: 'Subhiksha Stephan',
+      name: 'Subhi Stephan',
       role: 'Tech Committee Chair',
       description: 'Developer of the website and portal, and lead of technology management',
       image: '/subhi_stephan.jpg',
