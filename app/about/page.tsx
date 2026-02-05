@@ -19,14 +19,14 @@ export default function AboutPage() {
   const committeeMembers = [
     {
       name: 'Subhiksha (Subhi) Stephan',
-      role: 'Lead of Tech Committee',
-      description: 'Developer of the website and portal',
+      role: 'Tech Committee Chair',
+      description: 'Developer of the website and portal, and lead of technology management',
       image: '/subhi_stephan.jpg',
     },
     {
       name: 'Paridhi (Pari) Tyagi',
       role: 'Chair of Participant Outreach and Venue',
-      description: 'Manages participant recruitment and coordinates venue logistics',
+      description: 'Manages participant advertising and coordinates venue logistics',
       image: '/pari_tyagi.jpg',
     },
     {
