@@ -41,6 +41,12 @@ export default function AboutPage() {
       description: 'Manages logistics coordination and fundraising efforts',
       image: '/ahisha_ravi.jpg',
     },
+    {
+      name: 'Aaron Yu',
+      role: 'Judging Outreach Chair',
+      description: 'Coordinates judge recruitment and outreach efforts',
+      image: '/aaron_yu.jpg',
+    },
   ];
 
   return (
@@ -66,7 +72,7 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold text-primary-blue mb-8 text-center">
             Committee Chairs
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
             {committeeMembers.map((member, index) => (
               <div
                 key={index}
