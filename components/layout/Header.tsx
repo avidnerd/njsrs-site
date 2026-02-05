@@ -76,6 +76,12 @@ export default function Header() {
             >
               Donate
             </Link>
+            <Link
+              href="/about"
+              className="text-gray-900 hover:text-primary-blue font-medium transition-colors"
+            >
+              About
+            </Link>
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-4">
@@ -185,6 +191,13 @@ export default function Header() {
                 onClick={() => setShowMobileMenu(false)}
               >
                 Donate
+              </Link>
+              <Link
+                href="/about"
+                className="text-gray-900 hover:text-primary-blue font-medium transition-colors px-2 py-1"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                About
               </Link>
             </div>
           </nav>

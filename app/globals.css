@@ -133,3 +133,13 @@ section.bg-primary-blue div p {
     color: rgb(17, 24, 39) !important;
   }
 }
+
+.member-card {
+  transform-style: preserve-3d;
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s ease;
+}
+
+.member-card:hover {
+  transform: perspective(1000px) rotateX(-8deg) rotateY(8deg) translateY(-12px) scale(1.02);
+}
