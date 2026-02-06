@@ -75,7 +75,7 @@ export default function CompetitionPage() {
                 </p>
               </div>
               <a
-                href="/2025-2026 New Jersey Science Research Symposium Core Rules 20260131.5 (1).pdf"
+                href="/core_rules.pdf"
                 download="NJSRS_Competition_Rules.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
