@@ -145,7 +145,7 @@ export default function CompetitionPage() {
                     <h3 className="text-lg font-bold text-primary-blue">Poster Session</h3>
                     <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">1:00 - 3:30 PM</span>
                   </div>
-                  <p className="text-gray-600 text-sm">All participants present their research in poster format</p>
+                  <p className="text-gray-600 text-sm">All participants present their research in poster format for sponsored special award judging</p>
                 </div>
               </div>
 
@@ -156,7 +156,7 @@ export default function CompetitionPage() {
                     <h3 className="text-lg font-bold text-primary-blue">Finals for Category Winners</h3>
                     <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">3:30 - 6:00 PM</span>
                   </div>
-                  <p className="text-gray-600 text-sm">Category winners present in the auditorium for Grand Prize consideration</p>
+                  <p className="text-gray-600 text-sm">Category winners present a 10 minute presentation in the auditorium for Grand Prize consideration</p>
                 </div>
               </div>
 
@@ -167,7 +167,7 @@ export default function CompetitionPage() {
                     <h3 className="text-lg font-bold text-primary-blue">Final Deliberation</h3>
                     <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">6:00 - 7:00 PM</span>
                   </div>
-                  <p className="text-gray-600 text-sm">Judges deliberate to determine winners of finals and special awards</p>
+                  <p className="text-gray-600 text-sm">Judges deliberate to determine winners of the Grand Prizes and special awards</p>
                 </div>
               </div>
 
@@ -178,7 +178,7 @@ export default function CompetitionPage() {
                     <h3 className="text-lg font-bold awards-ceremony-text" style={{ color: '#ffffff' }}>Awards Ceremony and Closing Remarks</h3>
                     <span className="text-sm font-semibold bg-white/20 px-3 py-1 rounded-full awards-ceremony-text" style={{ color: '#ffffff' }}>7:00 - 8:30 PM</span>
                   </div>
-                  <p className="text-sm awards-ceremony-text" style={{ color: '#ffffff' }}>Celebration of winners and closing remarks</p>
+                  <p className="text-sm awards-ceremony-text" style={{ color: '#ffffff' }}>Announcement and celebration of winners and closing remarks</p>
                 </div>
               </div>
             </div>
