@@ -82,9 +82,12 @@ div.bg-white span {
   color: rgb(17, 24, 39) !important;
 }
 
+div.bg-gradient-to-r,
 div.bg-gradient-to-r p,
 div.bg-gradient-to-r h3,
-div.bg-gradient-to-r span {
+div.bg-gradient-to-r span,
+div.bg-gradient-to-r div,
+div.bg-gradient-to-r * {
   color: white !important;
 }
 
@@ -151,7 +154,28 @@ section.bg-primary-blue div p {
 }
 
 .awards-ceremony-card,
+.awards-ceremony-card h3,
+.awards-ceremony-card p,
+.awards-ceremony-card span,
+.awards-ceremony-card div,
 .awards-ceremony-card *,
-.awards-ceremony-text {
+.awards-ceremony-text,
+.awards-ceremony-text * {
+  color: white !important;
+}
+
+div.bg-gradient-to-r h3,
+div.bg-gradient-to-r p,
+div.bg-gradient-to-r span,
+div.bg-gradient-to-r div,
+div.bg-gradient-to-r * {
+  color: white !important;
+}
+
+.bg-gradient-to-r.from-primary-blue.to-primary-green h3,
+.bg-gradient-to-r.from-primary-blue.to-primary-green p,
+.bg-gradient-to-r.from-primary-blue.to-primary-green span,
+.bg-gradient-to-r.from-primary-blue.to-primary-green div,
+.bg-gradient-to-r.from-primary-blue.to-primary-green * {
   color: white !important;
 }

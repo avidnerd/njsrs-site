@@ -173,12 +173,12 @@ export default function CompetitionPage() {
 
               <div className="relative pl-12 md:pl-20">
                 <div className="absolute left-2 md:left-6 w-4 h-4 bg-primary-green rounded-full border-4 border-white shadow-lg"></div>
-                <div className="bg-gradient-to-r from-primary-blue to-primary-green rounded-lg shadow-md p-6 border-l-4 border-primary-green hover:shadow-xl transition-shadow awards-ceremony-card">
+                <div className="bg-gradient-to-r from-primary-blue to-primary-green rounded-lg shadow-md p-6 border-l-4 border-primary-green hover:shadow-xl transition-shadow awards-ceremony-card" style={{ color: '#ffffff' }}>
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
-                    <h3 className="text-lg font-bold awards-ceremony-text">Awards Ceremony and Closing Remarks</h3>
-                    <span className="text-sm font-semibold bg-white/20 px-3 py-1 rounded-full awards-ceremony-text">7:00 - 8:30 PM</span>
+                    <h3 className="text-lg font-bold awards-ceremony-text" style={{ color: '#ffffff' }}>Awards Ceremony and Closing Remarks</h3>
+                    <span className="text-sm font-semibold bg-white/20 px-3 py-1 rounded-full awards-ceremony-text" style={{ color: '#ffffff' }}>7:00 - 8:30 PM</span>
                   </div>
-                  <p className="text-sm awards-ceremony-text">Celebration of winners and closing remarks</p>
+                  <p className="text-sm awards-ceremony-text" style={{ color: '#ffffff' }}>Celebration of winners and closing remarks</p>
                 </div>
               </div>
             </div>
