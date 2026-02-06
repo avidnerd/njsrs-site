@@ -82,6 +82,12 @@ div.bg-white span {
   color: rgb(17, 24, 39) !important;
 }
 
+div.bg-gradient-to-r p,
+div.bg-gradient-to-r h3,
+div.bg-gradient-to-r span {
+  color: white !important;
+}
+
 .bg-primary-blue p,
 .bg-primary-blue h2,
 .bg-primary-blue h3,
@@ -142,4 +148,10 @@ section.bg-primary-blue div p {
 
 .member-card:hover {
   transform: perspective(1000px) rotateX(-8deg) rotateY(8deg) translateY(-12px) scale(1.02);
+}
+
+.awards-ceremony-card,
+.awards-ceremony-card *,
+.awards-ceremony-text {
+  color: white !important;
 }
