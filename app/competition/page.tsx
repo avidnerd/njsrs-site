@@ -158,7 +158,7 @@ export default function CompetitionPage() {
                     <h3 className="text-lg font-bold text-primary-blue">Final Deliberation</h3>
                     <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">5:15 - 6:00 PM</span>
                   </div>
-                  <p className="text-gray-600 text-sm">Judges deliberate to determine winners of the Grand Prizes and special awards</p>
+                  <p className="text-gray-600 text-sm">Judges deliberate to determine winners of the special awards and awards are printed</p>
                 </div>
               </div>
 
