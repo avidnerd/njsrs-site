@@ -144,7 +144,7 @@ export default function CompetitionPage() {
                 <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary-blue hover:shadow-lg transition-shadow">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
                     <h3 className="text-lg font-bold text-primary-blue">Poster Session</h3>
-                    <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">3:45 - 5:15 PM</span>
+                    <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">3:45 - 5:00 PM</span>
                   </div>
                   <p className="text-gray-600 text-sm">All participants present their research in poster format for sponsored special award judging</p>
                 </div>
@@ -156,7 +156,7 @@ export default function CompetitionPage() {
                 <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary-blue hover:shadow-lg transition-shadow">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
                     <h3 className="text-lg font-bold text-primary-blue">Final Deliberation</h3>
-                    <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">5:15 - 6:00 PM</span>
+                    <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">5:00 - 5:30 PM</span>
                   </div>
                   <p className="text-gray-600 text-sm">Judges deliberate to determine winners of the special awards and awards are printed</p>
                 </div>
@@ -167,7 +167,7 @@ export default function CompetitionPage() {
                 <div className="bg-gradient-to-r from-primary-blue to-primary-green rounded-lg shadow-md p-6 border-l-4 border-primary-green hover:shadow-xl transition-shadow awards-ceremony-card" style={{ color: '#ffffff' }}>
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
                     <h3 className="text-lg font-bold awards-ceremony-text" style={{ color: '#ffffff' }}>Awards Ceremony and Closing Remarks</h3>
-                    <span className="text-sm font-semibold bg-white/20 px-3 py-1 rounded-full awards-ceremony-text" style={{ color: '#ffffff' }}>6:00 - 7:00 PM</span>
+                    <span className="text-sm font-semibold bg-white/20 px-3 py-1 rounded-full awards-ceremony-text" style={{ color: '#ffffff' }}>5:30 - 6:30 PM</span>
                   </div>
                   <p className="text-sm awards-ceremony-text" style={{ color: '#ffffff' }}>Announcement and celebration of winners and closing remarks</p>
                 </div>
