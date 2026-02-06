@@ -88,6 +88,104 @@ export default function CompetitionPage() {
         </section>
 
         <section className="mb-12">
+          <h2 className="text-2xl font-semibold text-primary-darkGreen mb-6">
+            Event Day Schedule
+          </h2>
+          <div className="relative">
+            <div className="absolute left-4 md:left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary-blue via-primary-green to-primary-blue"></div>
+            <div className="space-y-6">
+              <div className="relative pl-12 md:pl-20">
+                <div className="absolute left-2 md:left-6 w-4 h-4 bg-primary-blue rounded-full border-4 border-white shadow-lg"></div>
+                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary-blue hover:shadow-lg transition-shadow">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                    <h3 className="text-lg font-bold text-primary-blue">Check-in and Set-up</h3>
+                    <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">8:00 - 8:30 AM</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">Participants and judges check in and set up their presentations</p>
+                </div>
+              </div>
+
+              <div className="relative pl-12 md:pl-20">
+                <div className="absolute left-2 md:left-6 w-4 h-4 bg-primary-green rounded-full border-4 border-white shadow-lg"></div>
+                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary-green hover:shadow-lg transition-shadow">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                    <h3 className="text-lg font-bold text-primary-blue">Judge Orientation</h3>
+                    <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">8:30 - 9:00 AM</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">Judges receive orientation and instructions for the competition</p>
+                </div>
+              </div>
+
+              <div className="relative pl-12 md:pl-20">
+                <div className="absolute left-2 md:left-6 w-4 h-4 bg-primary-blue rounded-full border-4 border-white shadow-lg"></div>
+                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary-blue hover:shadow-lg transition-shadow">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                    <h3 className="text-lg font-bold text-primary-blue">Category Judging</h3>
+                    <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">9:00 AM - 12:00 PM</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">Students present their research in assigned categories in classrooms</p>
+                </div>
+              </div>
+
+              <div className="relative pl-12 md:pl-20">
+                <div className="absolute left-2 md:left-6 w-4 h-4 bg-primary-green rounded-full border-4 border-white shadow-lg"></div>
+                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary-green hover:shadow-lg transition-shadow">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                    <h3 className="text-lg font-bold text-primary-blue">Lunch</h3>
+                    <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">12:00 - 1:00 PM</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">Lunch break for students and judges (Lunch provided for judges)</p>
+                </div>
+              </div>
+
+              <div className="relative pl-12 md:pl-20">
+                <div className="absolute left-2 md:left-6 w-4 h-4 bg-primary-blue rounded-full border-4 border-white shadow-lg"></div>
+                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary-blue hover:shadow-lg transition-shadow">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                    <h3 className="text-lg font-bold text-primary-blue">Poster Session</h3>
+                    <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">1:00 - 3:30 PM</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">All participants present their research in poster format</p>
+                </div>
+              </div>
+
+              <div className="relative pl-12 md:pl-20">
+                <div className="absolute left-2 md:left-6 w-4 h-4 bg-primary-green rounded-full border-4 border-white shadow-lg"></div>
+                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary-green hover:shadow-lg transition-shadow">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                    <h3 className="text-lg font-bold text-primary-blue">Finals for Category Winners</h3>
+                    <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">3:30 - 6:00 PM</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">Category winners present in the auditorium for Grand Prize consideration</p>
+                </div>
+              </div>
+
+              <div className="relative pl-12 md:pl-20">
+                <div className="absolute left-2 md:left-6 w-4 h-4 bg-primary-blue rounded-full border-4 border-white shadow-lg"></div>
+                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary-blue hover:shadow-lg transition-shadow">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                    <h3 className="text-lg font-bold text-primary-blue">Final Deliberation</h3>
+                    <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">6:00 - 7:00 PM</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">Judges deliberate to determine winners of finals and special awards</p>
+                </div>
+              </div>
+
+              <div className="relative pl-12 md:pl-20">
+                <div className="absolute left-2 md:left-6 w-4 h-4 bg-primary-green rounded-full border-4 border-white shadow-lg"></div>
+                <div className="bg-gradient-to-r from-primary-blue to-primary-green rounded-lg shadow-md p-6 border-l-4 border-primary-green hover:shadow-xl transition-shadow">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                    <h3 className="text-lg font-bold text-white">Awards Ceremony and Closing Remarks</h3>
+                    <span className="text-sm font-semibold text-white bg-white/20 px-3 py-1 rounded-full">7:00 - 8:30 PM</span>
+                  </div>
+                  <p className="text-white/90 text-sm">Celebration of winners and closing remarks</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mb-12">
           <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
             How to Register
           </h2>
