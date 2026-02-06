@@ -187,6 +187,15 @@ export default function CompetitionPage() {
 
         <section className="mb-12">
           <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
+            Qualifying Projects
+          </h2>
+          <p className="text-gray-700 mb-4">
+            Qualifying projects include <strong>experimental research projects started after April of 2025.</strong>
+          </p>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
             How to Register
           </h2>
           <div className="prose max-w-none">
@@ -259,20 +268,6 @@ export default function CompetitionPage() {
 
         <section className="mb-12">
           <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
-            Qualifying Projects
-          </h2>
-          <div className="prose max-w-none">
-            <p className="text-gray-700 mb-4">
-              Qualifying projects include <strong>experimental research projects started after April of 2025.</strong>
-            </p>
-            <p className="text-gray-700 mb-4">
-              An &apos;experimental research project&apos; is the implementation of the scientific method to answer a question or solve a problem. This involves doing background research on the question/problem, forming a hypothesis or proposed solution, designing and performing experiments to test the hypothesis/solution, analyzing the experimental data, and using the results to draw conclusions about the question or problem being investigated. In <strong>NJSRS</strong>, the research can be in any area of Science, Technology, Engineering, or Mathematics (STEM).
-            </p>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
             Competition Format & Rules
           </h2>
           <p className="text-gray-700 mb-6">
@@ -286,6 +281,15 @@ export default function CompetitionPage() {
             <p className="text-gray-700 mb-4">
               Students present in assigned categories (e.g., Biology, Chemistry, Mathematics & Computer Science), with each category in its own classroom. Every student gives a 10-minute presentation using slides, followed by a judge Q&A session and a brief audience Q&A session. Evaluation is based on clarity of explanation, quality of experimental design and analysis, understanding of the science, and ability to respond to questions.
               First place category winners deliver a second 10-minute slide presentation in the Millburn High School auditorium. These finalists will be eligible to win the Grand Prizes of NJSRS.
+            </p>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              Poster Session (Special Awards)
+            </h3>
+            <p className="text-gray-700 mb-4">
+              All participants present their research in poster format for sponsored special award judging. These are cash awards that are distributed by our sponsors to provide special recognition to research projects that are relevant to their cause.
             </p>
           </div>
 
