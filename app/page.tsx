@@ -230,7 +230,7 @@ export default function HomePage() {
               <strong>Eligibility:</strong> NJSRS is open to all high school students in New Jersey (grades 9-12) who have conducted experimental STEM research within the past year. The competition welcomes students from public and private schools across the state.
             </p>
             <p>
-              <strong>How to Participate:</strong> To participate in this New Jersey high school research competition, students must have a Science Research Advisor (SRA) from their school registered first. The entry fee is $30 per student. Registration is open to all high school students in New Jersey who have conducted experimental STEM research.
+              <strong>How to Participate:</strong> To participate in this New Jersey high school research competition, students must have a Science Research Advisor (SRA) from their school registered first. The entry fee is $30 per student. Registration is open to all high school students in New Jersey who have conducted experimental STEM research. In order to participate in the fair, students must submit a 5-20 page research paper that will undergo preliminary judging for fair selection. See Core Rules for more details on the Competition page.
             </p>
             <p>
               <strong>Location:</strong> NJSRS is hosted at Millburn High School in Millburn, New Jersey, making it easily accessible to students throughout the state.
