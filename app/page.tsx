@@ -170,7 +170,7 @@ export default function HomePage() {
                 How to Participate
               </h2>
               <p className="text-gray-600">
-                NJSRS is open to any high school student currently attending a high school in New Jersey. The competition welcomes students from all New Jersey high schools. Each student must have an adult sponsor (teacher, mentor, parent) in order to participate.
+                NJSRS is open to any high school student currently attending a pubic or private high school in New Jersey. To participate in this New Jersey high school research competition, students must have a Science Research Advisor (SRA) from their school registered first. The entry fee is $30 per student. Registration is open to all high school students in New Jersey who have conducted experimental STEM research.
               </p>
             </div>
 
@@ -227,7 +227,7 @@ export default function HomePage() {
               <li>Awards and recognition for outstanding projects</li>
             </ul>
             <p>
-              <strong>Eligibility:</strong> NJSRS is open to all high school students in New Jersey (grades 9-12) who have conducted experimental STEM research within the past year. The competition welcomes students from public, private, and charter schools across the state.
+              <strong>Eligibility:</strong> NJSRS is open to all high school students in New Jersey (grades 9-12) who have conducted experimental STEM research within the past year. The competition welcomes students from public and private schools across the state.
             </p>
             <p>
               <strong>How to Participate:</strong> To participate in this New Jersey high school research competition, students must have a Science Research Advisor (SRA) from their school registered first. The entry fee is $30 per student. Registration is open to all high school students in New Jersey who have conducted experimental STEM research.

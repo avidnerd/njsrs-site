@@ -119,7 +119,7 @@ export default function CompetitionPage() {
                 <strong>The SRA registers first for each school.</strong> Once an SRA registers, students can register as students and when they choose their school and select the SRA from their school, the SRA will receive an email confirmation to validate their account and admit the student into their cohort.
               </p>
               <p className="text-gray-700">
-                The SRA should be able to see the status of all the students&apos; projects/research plans through their dashboard.
+                The SRA should be able to see the status of all the students&apos; projects through their dashboard.
               </p>
             </div>
 
@@ -151,8 +151,8 @@ export default function CompetitionPage() {
                 <strong>Payment Process:</strong>
               </p>
               <ul className="list-disc list-inside text-gray-700 space-y-2">
-                <li>The student will pay their own school</li>
-                <li>The school will write a Purchase Order (check) to Millburn High School</li>
+                <li>The entry fee for all of the students from a school will be collected by a teacher at that school. </li>
+                <li>The teacher’s school will write a single purchase order (check) for all of the entry fees for the students participating from that school</li>
                 <li>Mail the payment to: <strong>462 Millburn Ave., Millburn, NJ</strong></li>
               </ul>
             </div>
