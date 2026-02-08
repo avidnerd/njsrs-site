@@ -150,18 +150,6 @@ export default function CompetitionPage() {
                 </div>
               </div>
 
-
-              <div className="relative pl-12 md:pl-20">
-                <div className="absolute left-2 md:left-6 w-4 h-4 bg-primary-blue rounded-full border-4 border-white shadow-lg"></div>
-                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary-blue hover:shadow-lg transition-shadow">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
-                    <h3 className="text-lg font-bold text-primary-blue">Final Deliberation</h3>
-                    <span className="text-sm font-semibold text-primary-darkGreen bg-primary-green/10 px-3 py-1 rounded-full">5:00 - 5:30 PM</span>
-                  </div>
-                  <p className="text-gray-600 text-sm">Judges deliberate to determine winners of the special awards and awards are printed</p>
-                </div>
-              </div>
-
               <div className="relative pl-12 md:pl-20">
                 <div className="absolute left-2 md:left-6 w-4 h-4 bg-primary-green rounded-full border-4 border-white shadow-lg"></div>
                 <div className="bg-gradient-to-r from-primary-blue to-primary-green rounded-lg shadow-md p-6 border-l-4 border-primary-green hover:shadow-xl transition-shadow awards-ceremony-card" style={{ color: '#ffffff' }}>
