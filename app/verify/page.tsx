@@ -103,7 +103,7 @@ export default function VerifyPage() {
             Verify Your Email
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            We sent a verification code to {user.email}. Check your spam folder if you don't see it in your inbox!
+            We sent a verification code to {user.email}. Check your spam folder if you don't see it in your inbox! Refresh your page after entering the code.
           </p>
         </div>
         <EmailVerification />
