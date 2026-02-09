@@ -75,6 +75,8 @@ service cloud.firestore {
                         isTeamMember() ||
                         (isSRA() && resource.data.sraId == request.auth.uid) ||
                         isAdmin();
+      // Allow list/query operations - Firestore will filter results based on read rules above
+      allow list: if isAuthenticated() && (getUserRole() == 'student' || isSRA() || isAdmin());
     }
     
     // Judges collection
