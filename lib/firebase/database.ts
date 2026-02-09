@@ -478,16 +478,23 @@ export async function getStudent(studentId: string): Promise<Student | null> {
 
 export async function getStudentsBySRA(sraId: string): Promise<Student[]> {
   const dbInstance = ensureDb();
-  const studentsRef = collection(dbInstance, "students");
-  const q = query(studentsRef, where("sraId", "==", sraId));
-  const querySnapshot = await getDocs(q);
-  const students = querySnapshot.docs.map((doc) => {
-    const data = doc.data();
-    console.log(`Student ${doc.id}: sraId=${data.sraId}, status=${data.status}`);
-    return { id: doc.id, ...data } as Student;
-  });
-  console.log(`Query for sraId=${sraId} returned ${students.length} students`);
-  return students;
+  try {
+    const studentsRef = collection(dbInstance, "students");
+    const q = query(studentsRef, where("sraId", "==", sraId));
+    const querySnapshot = await getDocs(q);
+    const students = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      console.log(`Student ${doc.id}: sraId=${data.sraId}, status=${data.status}`);
+      return { id: doc.id, ...data } as Student;
+    });
+    console.log(`Query for sraId=${sraId} returned ${students.length} students`);
+    return students;
+  } catch (error: any) {
+    console.error("Error in getStudentsBySRA:", error);
+    console.error("Error code:", error.code);
+    console.error("Error message:", error.message);
+    throw error;
+  }
 }
 
 export async function updateStudentStatus(

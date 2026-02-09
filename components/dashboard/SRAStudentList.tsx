@@ -21,14 +21,18 @@ export default function SRAStudentList() {
   const loadStudents = async () => {
     if (!user) return;
     
+    setLoading(true);
     try {
       console.log("Loading students for SRA:", user.uid);
       const studentList = await getStudentsBySRA(user.uid);
       console.log("Found students:", studentList.length, studentList);
       setStudents(studentList);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error loading students:", error);
-      alert(`Error loading students: ${error instanceof Error ? error.message : "Unknown error"}`);
+      console.error("Error code:", error.code);
+      console.error("Error message:", error.message);
+      alert(`Error loading students: ${error instanceof Error ? error.message : "Unknown error"}. Please check the browser console for details.`);
+      setStudents([]);
     } finally {
       setLoading(false);
     }
