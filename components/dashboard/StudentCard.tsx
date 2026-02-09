@@ -29,8 +29,21 @@ export default function StudentCard({ student, onApprove, onReject, onPaymentSta
         <div>
           <h3 className="text-lg font-semibold text-gray-900">
             {student.firstName} {student.lastName}
+            {student.isTeamProject && student.teamMemberFirstName && (
+              <span className="text-base font-normal text-gray-600">
+                {" "}& {student.teamMemberFirstName} {student.teamMemberLastName}
+              </span>
+            )}
           </h3>
           <p className="text-sm text-gray-600">{student.email}</p>
+          {student.isTeamProject && student.teamMemberEmail && (
+            <p className="text-sm text-gray-600">{student.teamMemberEmail}</p>
+          )}
+          {student.isTeamProject && (
+            <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
+              Team Project
+            </span>
+          )}
         </div>
         <span
           className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(
@@ -70,6 +83,45 @@ export default function StudentCard({ student, onApprove, onReject, onPaymentSta
             <span className="text-sm font-medium text-gray-700">Abstract:</span>{" "}
             <a
               href={student.abstractUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-primary-blue hover:underline"
+            >
+              View
+            </a>
+          </div>
+        )}
+        {student.slideshowUrl && (
+          <div>
+            <span className="text-sm font-medium text-gray-700">Slideshow:</span>{" "}
+            <a
+              href={student.slideshowUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-primary-blue hover:underline"
+            >
+              View
+            </a>
+          </div>
+        )}
+        {student.presentationUrl && (
+          <div>
+            <span className="text-sm font-medium text-gray-700">Presentation:</span>{" "}
+            <a
+              href={student.presentationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-primary-blue hover:underline"
+            >
+              View
+            </a>
+          </div>
+        )}
+        {student.researchReportUrl && (
+          <div>
+            <span className="text-sm font-medium text-gray-700">Research Report:</span>{" "}
+            <a
+              href={student.researchReportUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-primary-blue hover:underline"

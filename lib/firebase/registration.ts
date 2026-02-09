@@ -128,10 +128,18 @@ export async function registerStudent(
       throw new Error("Firebase db instance is null");
     }
     
-    await updateDoc(doc(db, "users", teamMemberUserId), {
-      studentDocumentId: primaryStudentId,
-    });
-    console.log("Team member user profile updated successfully");
+    try {
+      await updateDoc(doc(db, "users", teamMemberUserId), {
+        studentDocumentId: primaryStudentId,
+      });
+      console.log("Team member user profile updated successfully");
+    } catch (error: any) {
+      // Silently handle permission errors - the fallback logic will handle it when team member logs in
+      if (error.code !== "permission-denied") {
+        throw error;
+      }
+      console.log("Team member profile update will be handled on first login");
+    }
   }
 
   return { verificationCode };
