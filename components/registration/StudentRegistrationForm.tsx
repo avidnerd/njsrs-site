@@ -187,6 +187,10 @@ export default function StudentRegistrationForm() {
         setError("Team member email must be different from your email");
         return;
       }
+      if (!formData.teamMemberShirtSize) {
+        setError("Team member shirt size is required for team projects");
+        return;
+      }
     }
 
     if (formData.projectDescription.trim()) {
@@ -223,8 +227,11 @@ export default function StudentRegistrationForm() {
       });
 
       sessionStorage.setItem("verificationCode", verificationCode);
+      console.log("Registration completed, redirecting to verify page");
       router.push("/verify");
     } catch (err: any) {
+      console.error("Registration error:", err);
+      console.error("Error details:", err.message, err.stack);
       setError(err.message || "Registration failed");
     } finally {
       setLoading(false);
@@ -314,7 +321,7 @@ export default function StudentRegistrationForm() {
             id="isTeamProject"
             type="checkbox"
             checked={formData.isTeamProject}
-            onChange={(e) => setFormData({ ...formData, isTeamProject: e.target.checked, teamMemberFirstName: "", teamMemberLastName: "", teamMemberEmail: "" })}
+            onChange={(e) => setFormData({ ...formData, isTeamProject: e.target.checked, teamMemberFirstName: "", teamMemberLastName: "", teamMemberEmail: "", teamMemberShirtSize: "" })}
             className="h-4 w-4 text-primary-green focus:ring-primary-green border-gray-300 rounded"
           />
           <label htmlFor="isTeamProject" className="ml-2 block text-sm font-medium text-gray-900">

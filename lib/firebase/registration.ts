@@ -76,20 +76,67 @@ export async function registerStudent(
 
   const primaryStudentId = userCredential.user.uid;
   
-  await createStudent(primaryStudentId, {
-    ...studentData,
-    email,
-    sraName: `${selectedSRA.firstName} ${selectedSRA.lastName}`,
-    teamMemberUserId,
-  });
-
-  if (teamMemberUserId) {
-    const { updateDoc, doc } = await import("firebase/firestore");
+  const { signInWithEmailAndPassword } = await import("firebase/auth");
+  const { auth } = await import("./config");
+  if (!auth) {
+    throw new Error("Firebase Auth not initialized");
+  }
+  
+  await signInWithEmailAndPassword(auth, email, password);
+  console.log("Signed in user to enable Firestore writes");
+  
+  try {
+    console.log("Creating student document with ID:", primaryStudentId);
+    console.log("Student data:", {
+      ...studentData,
+      email,
+      sraName: `${selectedSRA.firstName} ${selectedSRA.lastName}`,
+      teamMemberUserId,
+    });
+    
+    await createStudent(primaryStudentId, {
+      ...studentData,
+      email,
+      sraName: `${selectedSRA.firstName} ${selectedSRA.lastName}`,
+      teamMemberUserId,
+    });
+    
+    console.log("Student document created successfully");
+    
+    const { getDoc, doc } = await import("firebase/firestore");
     const { db } = await import("./config");
     if (db) {
-      await updateDoc(doc(db, "users", teamMemberUserId), {
-        studentDocumentId: primaryStudentId,
-      });
+      const verifyDoc = await getDoc(doc(db, "students", primaryStudentId));
+      if (!verifyDoc.exists()) {
+        throw new Error("Student document was not created - verification failed");
+      }
+      console.log("Verified: Student document exists in Firestore");
+    }
+  } catch (error: any) {
+    console.error("Error creating student document:", error);
+    console.error("Error code:", error.code);
+    console.error("Error message:", error.message);
+    console.error("Error stack:", error.stack);
+    throw new Error(`Failed to create student document: ${error.message || "Unknown error"}`);
+  }
+
+  if (teamMemberUserId) {
+    try {
+      console.log("Updating team member user profile with studentDocumentId:", primaryStudentId);
+      const { updateDoc, doc } = await import("firebase/firestore");
+      const { db } = await import("./config");
+      if (db) {
+        await updateDoc(doc(db, "users", teamMemberUserId), {
+          studentDocumentId: primaryStudentId,
+        });
+        console.log("Team member user profile updated successfully");
+      } else {
+        console.error("Firebase db instance is null");
+      }
+    } catch (error: any) {
+      console.error("Error updating team member user profile:", error);
+      console.error("Error code:", error.code);
+      console.error("Error message:", error.message);
     }
   }
 

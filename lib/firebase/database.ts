@@ -338,12 +338,27 @@ export async function createStudent(
   student: Omit<Student, "id" | "createdAt" | "status">
 ): Promise<void> {
   const dbInstance = ensureDb();
-  await setDoc(doc(dbInstance, "students", studentId), {
+  const studentDocData = {
     ...student,
     status: "pending",
     createdAt: Timestamp.now(),
     paymentStatus: "not_received",
+  };
+  
+  console.log("createStudent called with:", {
+    studentId,
+    studentDocData,
   });
+  
+  try {
+    await setDoc(doc(dbInstance, "students", studentId), studentDocData);
+    console.log("Student document set successfully in Firestore");
+  } catch (error: any) {
+    console.error("Error in setDoc for student:", error);
+    console.error("Error code:", error.code);
+    console.error("Error message:", error.message);
+    throw error;
+  }
 }
 
 export async function getStudent(studentId: string): Promise<Student | null> {
@@ -407,7 +422,50 @@ export async function getStudent(studentId: string): Promise<Student | null> {
       
       return studentData;
     } else {
-      console.log("Query returned no documents");
+      console.log("Query returned no documents - trying to find by teamMemberEmail");
+      const { getUserProfile } = await import("./auth");
+      const userProfile = await getUserProfile(studentId);
+      if (userProfile?.email) {
+        console.log("Searching for student document with teamMemberEmail:", userProfile.email);
+        const emailQuery = query(studentsRef, where("teamMemberEmail", "==", userProfile.email));
+        const emailQuerySnapshot = await getDocs(emailQuery);
+        console.log("Email query returned", emailQuerySnapshot.size, "documents");
+        if (!emailQuerySnapshot.empty) {
+          const teamStudentDoc = emailQuerySnapshot.docs[0];
+          console.log("Found student document via teamMemberEmail:", teamStudentDoc.id);
+          const studentData = { id: teamStudentDoc.id, ...teamStudentDoc.data() } as Student;
+          
+          if (studentData.id && studentData.teamMemberUserId !== studentId) {
+            console.log("Updating student document with correct teamMemberUserId");
+            try {
+              await updateDoc(doc(dbInstance, "students", studentData.id), {
+                teamMemberUserId: studentId,
+              });
+              studentData.teamMemberUserId = studentId;
+            } catch (updateError) {
+              console.error("Error updating student document with teamMemberUserId:", updateError);
+            }
+          }
+          
+          if (studentData.id) {
+            const { updateDoc, doc } = await import("firebase/firestore");
+            try {
+              const userProfile = await getUserProfile(studentId);
+              if (userProfile && !userProfile.studentDocumentId) {
+                await updateDoc(doc(dbInstance, "users", studentId), {
+                  studentDocumentId: studentData.id,
+                });
+                console.log("Updated user profile with studentDocumentId for future lookups");
+              }
+            } catch (updateError) {
+              console.error("Error updating user profile with studentDocumentId:", updateError);
+            }
+          }
+          
+          return studentData;
+        }
+      }
+      console.log("Could not find student document via teamMemberEmail either");
     }
   } catch (error: any) {
     console.error("Error querying for team member student:", error);

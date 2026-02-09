@@ -68,8 +68,9 @@ service cloud.firestore {
                      isTeamMember() ||
                      isSRA() ||
                      isAdmin();
-      // Allow create if owner
-      allow create: if isOwner(studentId);
+      // Allow create if owner (user creating their own student document)
+      // Also allow if authenticated and the document ID matches the user's UID
+      allow create: if isAuthenticated() && request.auth.uid == studentId;
       // Allow update if owner, team member, SRA owner, or admin
       allow update: if isOwner(studentId) || 
                         isTeamMember() ||
