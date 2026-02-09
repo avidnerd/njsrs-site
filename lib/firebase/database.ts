@@ -361,26 +361,58 @@ export async function getStudent(studentId: string): Promise<Student | null> {
   try {
     const { getUserProfile } = await import("./auth");
     const userProfile = await getUserProfile(studentId);
+    console.log("User profile for team member:", userProfile);
     if (userProfile?.studentDocumentId) {
+      console.log("Found studentDocumentId in user profile:", userProfile.studentDocumentId);
       const studentDoc = await getDoc(doc(dbInstance, "students", userProfile.studentDocumentId));
       if (studentDoc.exists()) {
+        console.log("Successfully retrieved student document via studentDocumentId");
         return { id: studentDoc.id, ...studentDoc.data() } as Student;
+      } else {
+        console.log("Student document not found with studentDocumentId:", userProfile.studentDocumentId);
       }
+    } else {
+      console.log("No studentDocumentId in user profile, trying query fallback");
     }
   } catch (error) {
     console.error("Error getting student document from user profile:", error);
   }
   
   try {
+    console.log("Attempting query for teamMemberUserId:", studentId);
     const studentsRef = collection(dbInstance, "students");
     const q = query(studentsRef, where("teamMemberUserId", "==", studentId));
     const querySnapshot = await getDocs(q);
+    console.log("Query returned", querySnapshot.size, "documents");
     if (!querySnapshot.empty) {
       const teamStudentDoc = querySnapshot.docs[0];
-      return { id: teamStudentDoc.id, ...teamStudentDoc.data() } as Student;
+      console.log("Found student document via query:", teamStudentDoc.id);
+      const studentData = { id: teamStudentDoc.id, ...teamStudentDoc.data() } as Student;
+      
+      if (studentData.id) {
+        const { updateDoc, doc } = await import("firebase/firestore");
+        const { getUserProfile } = await import("./auth");
+        try {
+          const userProfile = await getUserProfile(studentId);
+          if (userProfile && !userProfile.studentDocumentId) {
+            await updateDoc(doc(dbInstance, "users", studentId), {
+              studentDocumentId: studentData.id,
+            });
+            console.log("Updated user profile with studentDocumentId for future lookups");
+          }
+        } catch (updateError) {
+          console.error("Error updating user profile with studentDocumentId:", updateError);
+        }
+      }
+      
+      return studentData;
+    } else {
+      console.log("Query returned no documents");
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error querying for team member student:", error);
+    console.error("Error code:", error.code);
+    console.error("Error message:", error.message);
   }
   
   return null;
