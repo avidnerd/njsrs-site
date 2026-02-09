@@ -65,6 +65,10 @@ export interface Student {
   projectTitle?: string;
   projectDescription?: string;
   shirtSize?: "XS" | "S" | "M" | "L" | "XL";
+  primaryScientificDomain?: string[];
+  experimentalMethodology?: string[];
+  primaryRealWorldFocus?: string;
+  primaryRealWorldFocusOther?: string;
   status: "pending" | "approved" | "rejected";
   createdAt: Date | Timestamp;
   approvedAt?: Date | Timestamp | null;

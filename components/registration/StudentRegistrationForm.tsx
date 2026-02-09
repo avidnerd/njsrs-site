@@ -20,6 +20,10 @@ export default function StudentRegistrationForm() {
     shirtSize: "",
     schoolId: "",
     sraId: "",
+    primaryScientificDomain: [] as string[],
+    experimentalMethodology: [] as string[],
+    primaryRealWorldFocus: "",
+    primaryRealWorldFocusOther: "",
   });
   const [schools, setSchools] = useState<School[]>([]);
   const [sras, setSRAs] = useState<SRA[]>([]);
@@ -131,6 +135,31 @@ export default function StudentRegistrationForm() {
       return;
     }
 
+    if (!formData.primaryScientificDomain || formData.primaryScientificDomain.length === 0) {
+      setError("Please select at least one primary scientific domain");
+      return;
+    }
+
+    if (formData.primaryScientificDomain.length > 2) {
+      setError("Please select no more than two primary scientific domains");
+      return;
+    }
+
+    if (!formData.experimentalMethodology || formData.experimentalMethodology.length === 0) {
+      setError("Please select at least one experimental methodology");
+      return;
+    }
+
+    if (!formData.primaryRealWorldFocus) {
+      setError("Please select a primary real-world focus");
+      return;
+    }
+
+    if (formData.primaryRealWorldFocus === "Other" && !formData.primaryRealWorldFocusOther.trim()) {
+      setError("Please specify the other real-world focus");
+      return;
+    }
+
     if (formData.projectDescription.trim()) {
       const wordCount = countWords(formData.projectDescription);
       if (wordCount > 150) {
@@ -154,6 +183,9 @@ export default function StudentRegistrationForm() {
         projectTitle: formData.projectTitle,
         projectDescription: formData.projectDescription,
         shirtSize: formData.shirtSize as "XS" | "S" | "M" | "L" | "XL" | undefined,
+        primaryScientificDomain: formData.primaryScientificDomain,
+        experimentalMethodology: formData.experimentalMethodology,
+        primaryRealWorldFocus: formData.primaryRealWorldFocus === "Other" ? formData.primaryRealWorldFocusOther : formData.primaryRealWorldFocus,
       });
 
       sessionStorage.setItem("verificationCode", verificationCode);
@@ -372,6 +404,232 @@ export default function StudentRegistrationForm() {
           <option value="L">L</option>
           <option value="XL">XL</option>
         </select>
+      </div>
+
+      <div className="border-t border-gray-200 pt-6 mt-6">
+        <h3 className="text-xl font-semibold text-primary-blue mb-4">Project Classification</h3>
+
+        <div className="mb-6">
+          <label className="block text-sm font-medium mb-2 text-gray-900">
+            1. Primary Scientific Domain *
+          </label>
+          <p className="text-sm text-gray-500 mb-3">Select up to TWO primary domains that best represent your project.</p>
+          <div className="space-y-2">
+            {[
+              "Life Sciences (Biology, Microbiology, Neuroscience, Medicine, Biochemistry)",
+              "Physical Sciences (Physics, Chemistry, Materials Science, Astronomy)",
+              "Engineering & Technology (Mechanical, Electrical, Civil, Biomedical, Robotics)",
+              "Computer Science & Artificial Intelligence",
+              "Environmental & Earth Sciences (Ecology, Climate, Geology, Atmospheric Science)",
+              "Mathematics",
+              "Social & Behavioral Sciences (Psychology, Sociology, Behavioral Studies)",
+            ].map((domain) => (
+              <label key={domain} className="flex items-start space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.primaryScientificDomain.includes(domain)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      if (formData.primaryScientificDomain.length < 2) {
+                        setFormData({
+                          ...formData,
+                          primaryScientificDomain: [...formData.primaryScientificDomain, domain],
+                        });
+                      }
+                    } else {
+                      setFormData({
+                        ...formData,
+                        primaryScientificDomain: formData.primaryScientificDomain.filter((d) => d !== domain),
+                      });
+                    }
+                  }}
+                  className="mt-1 h-4 w-4 text-primary-green focus:ring-primary-green border-gray-300 rounded"
+                />
+                <span className="text-sm text-gray-700">{domain}</span>
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-gray-500 mt-2">
+            Selected: {formData.primaryScientificDomain.length} / 2
+          </p>
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-sm font-medium mb-2 text-gray-900">
+            3. Experimental Methodology Used *
+          </label>
+          <p className="text-sm text-gray-500 mb-3">Select all that apply.</p>
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm font-semibold text-gray-700 mb-2">Experimental / Lab-Based:</p>
+              <div className="space-y-2 ml-4">
+                {[
+                  "Wet lab experimentation (biological or chemical testing)",
+                  "Physical experimentation (physics/material testing)",
+                  "Environmental or field data collection",
+                ].map((method) => (
+                  <label key={method} className="flex items-start space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.experimentalMethodology.includes(method)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({
+                            ...formData,
+                            experimentalMethodology: [...formData.experimentalMethodology, method],
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            experimentalMethodology: formData.experimentalMethodology.filter((m) => m !== method),
+                          });
+                        }
+                      }}
+                      className="mt-1 h-4 w-4 text-primary-green focus:ring-primary-green border-gray-300 rounded"
+                    />
+                    <span className="text-sm text-gray-700">{method}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-gray-700 mb-2">Engineering / Applied Testing:</p>
+              <div className="space-y-2 ml-4">
+                {[
+                  "Engineering prototype built and physically tested",
+                  "Device performance testing with measurable output",
+                  "Hardware construction with experimental validation",
+                ].map((method) => (
+                  <label key={method} className="flex items-start space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.experimentalMethodology.includes(method)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({
+                            ...formData,
+                            experimentalMethodology: [...formData.experimentalMethodology, method],
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            experimentalMethodology: formData.experimentalMethodology.filter((m) => m !== method),
+                          });
+                        }
+                      }}
+                      className="mt-1 h-4 w-4 text-primary-green focus:ring-primary-green border-gray-300 rounded"
+                    />
+                    <span className="text-sm text-gray-700">{method}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-gray-700 mb-2">Computational / Data-Driven:</p>
+              <div className="space-y-2 ml-4">
+                {[
+                  "Computational modeling with experimental validation",
+                  "Machine learning model",
+                  "Statistical analysis",
+                  "Simulation",
+                ].map((method) => (
+                  <label key={method} className="flex items-start space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.experimentalMethodology.includes(method)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({
+                            ...formData,
+                            experimentalMethodology: [...formData.experimentalMethodology, method],
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            experimentalMethodology: formData.experimentalMethodology.filter((m) => m !== method),
+                          });
+                        }
+                      }}
+                      className="mt-1 h-4 w-4 text-primary-green focus:ring-primary-green border-gray-300 rounded"
+                    />
+                    <span className="text-sm text-gray-700">{method}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-gray-700 mb-2">Human Subjects Research:</p>
+              <div className="space-y-2 ml-4">
+                {[
+                  "Controlled behavioral experiment",
+                  "Survey study",
+                ].map((method) => (
+                  <label key={method} className="flex items-start space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.experimentalMethodology.includes(method)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({
+                            ...formData,
+                            experimentalMethodology: [...formData.experimentalMethodology, method],
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            experimentalMethodology: formData.experimentalMethodology.filter((m) => m !== method),
+                          });
+                        }
+                      }}
+                      className="mt-1 h-4 w-4 text-primary-green focus:ring-primary-green border-gray-300 rounded"
+                    />
+                    <span className="text-sm text-gray-700">{method}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <label htmlFor="primaryRealWorldFocus" className="block text-sm font-medium mb-2 text-gray-900">
+            5. Primary Real-World Focus *
+          </label>
+          <p className="text-sm text-gray-500 mb-3">What real-world problem or scientific objective does your experiment address?</p>
+          <select
+            id="primaryRealWorldFocus"
+            value={formData.primaryRealWorldFocus}
+            onChange={(e) => setFormData({ ...formData, primaryRealWorldFocus: e.target.value, primaryRealWorldFocusOther: "" })}
+            required
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+          >
+            <option value="">Select a focus...</option>
+            <option value="Healthcare / Disease">Healthcare / Disease</option>
+            <option value="Environmental Sustainability / Climate">Environmental Sustainability / Climate</option>
+            <option value="Energy Systems">Energy Systems</option>
+            <option value="Agriculture / Food Systems">Agriculture / Food Systems</option>
+            <option value="Infrastructure / Engineering Systems">Infrastructure / Engineering Systems</option>
+            <option value="Accessibility / Assistive Technology">Accessibility / Assistive Technology</option>
+            <option value="Education">Education</option>
+            <option value="Public Safety / Cybersecurity">Public Safety / Cybersecurity</option>
+            <option value="Fundamental Scientific Advancement">Fundamental Scientific Advancement</option>
+            <option value="Theoretical Mathematics/Physics">Theoretical Mathematics/Physics</option>
+            <option value="Other">Other (please specify)</option>
+          </select>
+          {formData.primaryRealWorldFocus === "Other" && (
+            <input
+              type="text"
+              value={formData.primaryRealWorldFocusOther}
+              onChange={(e) => setFormData({ ...formData, primaryRealWorldFocusOther: e.target.value })}
+              placeholder="Please specify..."
+              required
+              className="w-full mt-3 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+            />
+          )}
+        </div>
       </div>
 
       {error && (

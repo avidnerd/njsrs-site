@@ -59,21 +59,81 @@ export default function AdminStudentList() {
     );
   });
 
+  const exportToCSV = () => {
+    const headers = [
+      "First Name",
+      "Last Name",
+      "Email",
+      "School",
+      "Grade",
+      "Project Title",
+      "Primary Scientific Domain 1",
+      "Primary Scientific Domain 2",
+      "Experimental Methodology Used",
+      "Primary Real-World Focus",
+      "Shirt Size",
+      "Status",
+    ];
+
+    const rows = students.map((student) => {
+      const domains = student.primaryScientificDomain || [];
+      const methodologies = student.experimentalMethodology || [];
+      const realWorldFocus = student.primaryRealWorldFocus || "";
+      const otherFocus = student.primaryRealWorldFocusOther || "";
+      const finalFocus = realWorldFocus === "Other" && otherFocus ? otherFocus : realWorldFocus;
+      
+      return [
+        student.firstName || "",
+        student.lastName || "",
+        student.email || "",
+        student.schoolName || "",
+        student.grade || "",
+        student.projectTitle || "",
+        domains[0] || "",
+        domains[1] || "",
+        methodologies.join("; ") || "",
+        finalFocus || "",
+        student.shirtSize || "",
+        student.status || "pending",
+      ];
+    });
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `njsrs_project_classifications_${new Date().toISOString().split("T")[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading) {
     return <div className="text-center py-4">Loading students...</div>;
   }
 
   return (
     <div className="space-y-4">
-      {}
-      <div className="mb-4">
+      <div className="flex justify-between items-center mb-4">
         <input
           type="text"
           placeholder="Search by name, school, project title, or email..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-900"
+          className="flex-1 max-w-md px-4 py-2 border border-gray-300 rounded-md text-gray-900"
         />
+        <button
+          onClick={exportToCSV}
+          className="ml-4 bg-primary-green text-white px-6 py-2 rounded-md hover:bg-primary-darkGreen font-semibold whitespace-nowrap"
+        >
+          Export Project Classifications
+        </button>
       </div>
 
       {}
@@ -517,6 +577,47 @@ export default function AdminStudentList() {
                     ) : (
                       <div className="text-gray-500">Not yet completed</div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {(selectedStudent.primaryScientificDomain ||
+                selectedStudent.experimentalMethodology ||
+                selectedStudent.primaryRealWorldFocus) && (
+                <div className="border-b pb-4">
+                  <h4 className="font-semibold mb-2">Project Classification</h4>
+                  <div className="space-y-3 text-sm">
+                    {selectedStudent.primaryScientificDomain && selectedStudent.primaryScientificDomain.length > 0 && (
+                      <div>
+                        <strong>Primary Scientific Domain:</strong>
+                        <ul className="list-disc list-inside mt-1 ml-2">
+                          {selectedStudent.primaryScientificDomain.map((domain, idx) => (
+                            <li key={idx} className="text-gray-700">{domain}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {selectedStudent.experimentalMethodology && selectedStudent.experimentalMethodology.length > 0 && (
+                      <div>
+                        <strong>Experimental Methodology Used:</strong>
+                        <ul className="list-disc list-inside mt-1 ml-2">
+                          {selectedStudent.experimentalMethodology.map((method, idx) => (
+                            <li key={idx} className="text-gray-700">{method}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {(() => {
+                      const realWorldFocus = selectedStudent.primaryRealWorldFocus || "";
+                      const otherFocus = selectedStudent.primaryRealWorldFocusOther || "";
+                      const finalFocus = realWorldFocus === "Other" && otherFocus ? otherFocus : realWorldFocus;
+                      return finalFocus && (
+                        <div>
+                          <strong>Primary Real-World Focus:</strong>{" "}
+                          <span className="text-gray-700">{finalFocus}</span>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               )}
