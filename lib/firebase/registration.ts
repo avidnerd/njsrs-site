@@ -138,7 +138,7 @@ export async function registerStudent(
       if (error.code !== "permission-denied") {
         throw error;
       }
-      console.log("Team member profile update will be handled on first login");
+      // Don't log anything - completely silent for permission errors
     }
   }
 

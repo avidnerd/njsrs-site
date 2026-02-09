@@ -47,16 +47,16 @@ export default function EmailVerification() {
       const isValid = await verifyEmailCode(user.uid, code);
       if (isValid) {
         setVerified(true);
-        // Auto-refresh after a short delay to ensure auth state is updated
+        // Reload the page to refresh auth state, then redirect will happen automatically
         setTimeout(() => {
-          window.location.href = getDashboardPath();
-        }, 500);
+          window.location.reload();
+        }, 300);
       } else {
         setError("Invalid or expired verification code. Please check your email and try again.");
+        setLoading(false);
       }
     } catch (err: any) {
       setError(err.message || "Verification failed");
-    } finally {
       setLoading(false);
     }
   };
