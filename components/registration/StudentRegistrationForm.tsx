@@ -24,6 +24,10 @@ export default function StudentRegistrationForm() {
     experimentalMethodology: [] as string[],
     primaryRealWorldFocus: "",
     primaryRealWorldFocusOther: "",
+    isTeamProject: false,
+    teamMemberFirstName: "",
+    teamMemberLastName: "",
+    teamMemberEmail: "",
   });
   const [schools, setSchools] = useState<School[]>([]);
   const [sras, setSRAs] = useState<SRA[]>([]);
@@ -160,6 +164,30 @@ export default function StudentRegistrationForm() {
       return;
     }
 
+    if (formData.isTeamProject) {
+      if (!formData.teamMemberFirstName.trim()) {
+        setError("Team member first name is required for team projects");
+        return;
+      }
+      if (!formData.teamMemberLastName.trim()) {
+        setError("Team member last name is required for team projects");
+        return;
+      }
+      if (!formData.teamMemberEmail.trim()) {
+        setError("Team member email is required for team projects");
+        return;
+      }
+      const teamEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!teamEmailRegex.test(formData.teamMemberEmail)) {
+        setError("Please enter a valid team member email address");
+        return;
+      }
+      if (formData.teamMemberEmail.toLowerCase() === formData.email.toLowerCase()) {
+        setError("Team member email must be different from your email");
+        return;
+      }
+    }
+
     if (formData.projectDescription.trim()) {
       const wordCount = countWords(formData.projectDescription);
       if (wordCount > 150) {
@@ -186,6 +214,10 @@ export default function StudentRegistrationForm() {
         primaryScientificDomain: formData.primaryScientificDomain,
         experimentalMethodology: formData.experimentalMethodology,
         primaryRealWorldFocus: formData.primaryRealWorldFocus === "Other" ? formData.primaryRealWorldFocusOther : formData.primaryRealWorldFocus,
+        isTeamProject: formData.isTeamProject,
+        teamMemberFirstName: formData.isTeamProject ? formData.teamMemberFirstName : undefined,
+        teamMemberLastName: formData.isTeamProject ? formData.teamMemberLastName : undefined,
+        teamMemberEmail: formData.isTeamProject ? formData.teamMemberEmail : undefined,
       });
 
       sessionStorage.setItem("verificationCode", verificationCode);
@@ -272,6 +304,75 @@ export default function StudentRegistrationForm() {
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
           />
         </div>
+      </div>
+
+      <div className="border rounded-lg p-4 bg-blue-50">
+        <div className="flex items-center mb-4">
+          <input
+            id="isTeamProject"
+            type="checkbox"
+            checked={formData.isTeamProject}
+            onChange={(e) => setFormData({ ...formData, isTeamProject: e.target.checked, teamMemberFirstName: "", teamMemberLastName: "", teamMemberEmail: "" })}
+            className="h-4 w-4 text-primary-green focus:ring-primary-green border-gray-300 rounded"
+          />
+          <label htmlFor="isTeamProject" className="ml-2 block text-sm font-medium text-gray-900">
+            This is a team project (maximum 2 people)
+          </label>
+        </div>
+        {formData.isTeamProject && (
+          <div className="space-y-4 mt-4">
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-4">
+              <p className="text-sm text-yellow-700">
+                <strong>Important:</strong> You and your team member will share the same password. Both team members can log in with their own email addresses to access the same student portal. When you verify your email, your team member will be automatically verified as well.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="teamMemberFirstName" className="block text-sm font-medium mb-1 text-gray-900">
+                  Team Member First Name *
+                </label>
+                <input
+                  id="teamMemberFirstName"
+                  type="text"
+                  value={formData.teamMemberFirstName}
+                  onChange={(e) => setFormData({ ...formData, teamMemberFirstName: e.target.value })}
+                  required={formData.isTeamProject}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+                />
+              </div>
+              <div>
+                <label htmlFor="teamMemberLastName" className="block text-sm font-medium mb-1 text-gray-900">
+                  Team Member Last Name *
+                </label>
+                <input
+                  id="teamMemberLastName"
+                  type="text"
+                  value={formData.teamMemberLastName}
+                  onChange={(e) => setFormData({ ...formData, teamMemberLastName: e.target.value })}
+                  required={formData.isTeamProject}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="teamMemberEmail" className="block text-sm font-medium mb-1 text-gray-900">
+                Team Member Email *
+              </label>
+              <input
+                id="teamMemberEmail"
+                type="email"
+                value={formData.teamMemberEmail}
+                onChange={(e) => setFormData({ ...formData, teamMemberEmail: e.target.value })}
+                required={formData.isTeamProject}
+                placeholder="teammate@email.com"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Your team member will use this email and the same password to log in.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       <div>

@@ -56,9 +56,20 @@ export default function StudentDashboardPage() {
                   Student Dashboard
                 </h1>
                 {student && (
-                  <p className="text-sm text-gray-600">
-                    {student.firstName} {student.lastName} - {student.schoolName}
-                  </p>
+                  <div className="text-sm text-gray-600">
+                    <p>
+                      {student.firstName} {student.lastName}
+                      {student.isTeamProject && student.teamMemberFirstName && (
+                        <span> & {student.teamMemberFirstName} {student.teamMemberLastName}</span>
+                      )}
+                      {" "}- {student.schoolName}
+                    </p>
+                    {student.isTeamProject && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Team Project
+                      </p>
+                    )}
+                  </div>
                 )}
               </div>
               <button

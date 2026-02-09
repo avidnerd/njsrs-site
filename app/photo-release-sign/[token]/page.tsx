@@ -46,23 +46,41 @@ export default function PhotoReleaseSignPage() {
       setStudent(data.student);
       setFormData(data.formData);
       
+      const isTeamMember = token.includes("_teammember_");
       
       if (data.formData.completed) {
         setIsCompleted(true);
-        setParentName(data.formData.parentName || "");
-        setParentPhone(data.formData.parentPhone || "");
-        setSignature(data.formData.parentSignature || "");
+        if (isTeamMember) {
+          setParentName(data.formData.teamMemberParentName || "");
+          setParentPhone(data.formData.teamMemberParentPhone || "");
+          setSignature(data.formData.teamMemberParentSignature || "");
+        } else {
+          setParentName(data.formData.parentName || "");
+          setParentPhone(data.formData.parentPhone || "");
+          setSignature(data.formData.parentSignature || "");
+        }
         setSuccess("Form submitted successfully! Thank you for completing the photo release form.");
       } else {
-        
-        if (data.formData.parentName) {
-          setParentName(data.formData.parentName);
-        }
-        if (data.formData.parentPhone) {
-          setParentPhone(data.formData.parentPhone);
-        }
-        if (data.formData.parentSignature) {
-          setSignature(data.formData.parentSignature);
+        if (isTeamMember) {
+          if (data.formData.teamMemberParentName) {
+            setParentName(data.formData.teamMemberParentName);
+          }
+          if (data.formData.teamMemberParentPhone) {
+            setParentPhone(data.formData.teamMemberParentPhone);
+          }
+          if (data.formData.teamMemberParentSignature) {
+            setSignature(data.formData.teamMemberParentSignature);
+          }
+        } else {
+          if (data.formData.parentName) {
+            setParentName(data.formData.parentName);
+          }
+          if (data.formData.parentPhone) {
+            setParentPhone(data.formData.parentPhone);
+          }
+          if (data.formData.parentSignature) {
+            setSignature(data.formData.parentSignature);
+          }
         }
       }
     } catch (error: any) {
@@ -91,14 +109,26 @@ export default function PhotoReleaseSignPage() {
     }
 
     try {
+      const isTeamMember = token.includes("_teammember_");
       const updatedFormData: PhotoRelease = {
         ...formData,
-        parentName,
-        parentPhone,
-        parentSignature: signature,
-        parentSignatureDate: Timestamp.now(),
-        completed: true,
       };
+      
+      if (isTeamMember) {
+        updatedFormData.teamMemberParentName = parentName;
+        updatedFormData.teamMemberParentPhone = parentPhone;
+        updatedFormData.teamMemberParentSignature = signature;
+        updatedFormData.teamMemberParentSignatureDate = Timestamp.now();
+      } else {
+        updatedFormData.parentName = parentName;
+        updatedFormData.parentPhone = parentPhone;
+        updatedFormData.parentSignature = signature;
+        updatedFormData.parentSignatureDate = Timestamp.now();
+      }
+      
+      const bothParentsSigned = updatedFormData.parentSignature && 
+        (!formData?.teamMemberParentEmail || updatedFormData.teamMemberParentSignature);
+      updatedFormData.completed = bothParentsSigned;
 
       
       const response = await fetch("/api/photo-release-form", {

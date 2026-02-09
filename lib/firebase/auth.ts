@@ -92,6 +92,22 @@ export async function verifyEmailCode(
       verificationCode: null,
       verificationCodeExpiry: null,
     });
+    
+    if (userData.role === "student") {
+      const { getStudent } = await import("./database");
+      const student = await getStudent(userId);
+      if (student?.isTeamProject && student.teamMemberUserId) {
+        const teamMemberUserDoc = await getDoc(doc(dbInstance, "users", student.teamMemberUserId));
+        if (teamMemberUserDoc.exists()) {
+          await updateDoc(doc(dbInstance, "users", student.teamMemberUserId), {
+            emailVerified: true,
+            verificationCode: null,
+            verificationCodeExpiry: null,
+          });
+        }
+      }
+    }
+    
     return true;
   }
 

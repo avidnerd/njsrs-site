@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { studentId, studentName, email, token } = await request.json();
+    const { studentId, studentName, email, token, isTeamMember } = await request.json();
 
     if (!studentId || !studentName || !email || !token) {
       return NextResponse.json(

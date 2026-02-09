@@ -59,10 +59,26 @@ export async function registerStudent(
 
   const { userCredential, verificationCode } = await registerUser(email, password, "student");
 
+  let teamMemberUserId: string | undefined;
+  
+  if (studentData.isTeamProject && studentData.teamMemberEmail) {
+    try {
+      const { userCredential: teamMemberCredential } = await registerUser(
+        studentData.teamMemberEmail,
+        password,
+        "student"
+      );
+      teamMemberUserId = teamMemberCredential.user.uid;
+    } catch (error: any) {
+      throw new Error(`Failed to create team member account: ${error.message}`);
+    }
+  }
+
   await createStudent(userCredential.user.uid, {
     ...studentData,
     email,
     sraName: `${selectedSRA.firstName} ${selectedSRA.lastName}`,
+    teamMemberUserId,
   });
 
   return { verificationCode };

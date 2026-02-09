@@ -53,6 +53,7 @@ export async function GET(request: NextRequest) {
     }
 
     const studentId = parts[0];
+    const isTeamMember = parts[2] === "teammember";
 
     if (!studentId) {
       return NextResponse.json(
@@ -82,7 +83,8 @@ export async function GET(request: NextRequest) {
     }
 
     
-    if (photoRelease.parentInviteToken !== token) {
+    const expectedToken = isTeamMember ? photoRelease.teamMemberParentInviteToken : photoRelease.parentInviteToken;
+    if (expectedToken !== token) {
       return NextResponse.json(
         { error: "Invalid or expired token" },
         { status: 403 }
@@ -129,6 +131,7 @@ export async function POST(request: NextRequest) {
     }
 
     const studentId = parts[0];
+    const isTeamMember = parts[2] === "teammember";
 
     if (!studentId) {
       return NextResponse.json(
@@ -158,7 +161,8 @@ export async function POST(request: NextRequest) {
     }
 
     
-    if (currentPhotoRelease.parentInviteToken !== token) {
+    const expectedToken = isTeamMember ? currentPhotoRelease.teamMemberParentInviteToken : currentPhotoRelease.parentInviteToken;
+    if (expectedToken !== token) {
       return NextResponse.json(
         { error: "Invalid or expired token" },
         { status: 403 }

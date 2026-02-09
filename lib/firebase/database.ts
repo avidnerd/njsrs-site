@@ -69,6 +69,11 @@ export interface Student {
   experimentalMethodology?: string[];
   primaryRealWorldFocus?: string;
   primaryRealWorldFocusOther?: string;
+  isTeamProject?: boolean;
+  teamMemberFirstName?: string;
+  teamMemberLastName?: string;
+  teamMemberEmail?: string;
+  teamMemberUserId?: string;
   status: "pending" | "approved" | "rejected";
   createdAt: Date | Timestamp;
   approvedAt?: Date | Timestamp | null;
@@ -199,6 +204,13 @@ export interface PhotoRelease {
   parentSignature?: string;
   parentSignatureDate?: Date | Timestamp;
   parentPhone?: string;
+  teamMemberParentEmail?: string;
+  teamMemberParentInviteSent?: boolean;
+  teamMemberParentInviteToken?: string;
+  teamMemberParentName?: string;
+  teamMemberParentSignature?: string;
+  teamMemberParentSignatureDate?: Date | Timestamp;
+  teamMemberParentPhone?: string;
   completed?: boolean;
 }
 
@@ -336,10 +348,19 @@ export async function createStudent(
 export async function getStudent(studentId: string): Promise<Student | null> {
   const dbInstance = ensureDb();
   const studentDoc = await getDoc(doc(dbInstance, "students", studentId));
-  if (!studentDoc.exists()) {
-    return null;
+  if (studentDoc.exists()) {
+    return { id: studentDoc.id, ...studentDoc.data() } as Student;
   }
-  return { id: studentDoc.id, ...studentDoc.data() } as Student;
+  
+  const studentsRef = collection(dbInstance, "students");
+  const q = query(studentsRef, where("teamMemberUserId", "==", studentId));
+  const querySnapshot = await getDocs(q);
+  if (!querySnapshot.empty) {
+    const teamStudentDoc = querySnapshot.docs[0];
+    return { id: teamStudentDoc.id, ...teamStudentDoc.data() } as Student;
+  }
+  
+  return null;
 }
 
 export async function getStudentsBySRA(sraId: string): Promise<Student[]> {

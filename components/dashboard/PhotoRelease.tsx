@@ -16,6 +16,7 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<PhotoRelease>({});
   const [parentEmail, setParentEmail] = useState("");
+  const [teamMemberParentEmail, setTeamMemberParentEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -34,6 +35,7 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
       if (studentData?.photoRelease) {
         setFormData(studentData.photoRelease);
         setParentEmail(studentData.photoRelease.parentEmail || "");
+        setTeamMemberParentEmail(studentData.photoRelease.teamMemberParentEmail || "");
       }
     } catch (error) {
       console.error("Error loading student data:", error);
@@ -42,14 +44,15 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
     }
   };
 
-  const sendInvitation = async () => {
-    if (!user || !parentEmail.trim()) {
+  const sendInvitation = async (isTeamMember: boolean = false) => {
+    const email = isTeamMember ? teamMemberParentEmail : parentEmail;
+    if (!user || !email.trim()) {
       setError("Please enter a valid email address");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(parentEmail)) {
+    if (!emailRegex.test(email)) {
       setError("Please enter a valid email address");
       return;
     }
@@ -59,9 +62,7 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
     setSuccess("");
 
     try {
-      
-      const token = `${user.uid}_photorelease_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-      
+      const token = `${user.uid}_photorelease_${isTeamMember ? 'teammember' : 'primary'}_${Date.now()}_${Math.random().toString(36).substring(7)}`;
       
       const response = await fetch("/api/send-photo-release-invitation", {
         method: "POST",
@@ -69,8 +70,9 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
         body: JSON.stringify({
           studentId: user.uid,
           studentName: `${student?.firstName} ${student?.lastName}`,
-          email: parentEmail,
+          email,
           token,
+          isTeamMember,
         }),
       });
 
@@ -79,20 +81,26 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
         throw new Error(errorData.error || "Failed to send invitation email");
       }
 
-      
       const updatedFormData: PhotoRelease = {
         ...formData,
-        parentEmail,
-        parentInviteSent: true,
-        parentInviteToken: token,
       };
+      
+      if (isTeamMember) {
+        updatedFormData.teamMemberParentEmail = email;
+        updatedFormData.teamMemberParentInviteSent = true;
+        updatedFormData.teamMemberParentInviteToken = token;
+      } else {
+        updatedFormData.parentEmail = email;
+        updatedFormData.parentInviteSent = true;
+        updatedFormData.parentInviteToken = token;
+      }
 
       await updateStudentMaterials(user.uid, {
         photoRelease: updatedFormData,
       });
 
       setFormData(updatedFormData);
-      setSuccess(`Invitation sent to ${parentEmail} successfully!`);
+      setSuccess(`Invitation sent to ${email} successfully!`);
       setTimeout(() => setSuccess(""), 3000);
       await loadStudent(); 
       if (onFormUpdate) {
@@ -132,7 +140,7 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
       <div className="border rounded-lg p-4 space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-900">
-            Parent/Guardian Email *
+            {student?.isTeamProject ? "Your Parent/Guardian Email *" : "Parent/Guardian Email *"}
           </label>
           <div className="flex gap-2">
             <input
@@ -150,7 +158,7 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
             />
             <button
               type="button"
-              onClick={sendInvitation}
+              onClick={() => sendInvitation(false)}
               disabled={saving || !parentEmail.trim()}
               className="px-4 py-2 bg-primary-green text-white rounded-md hover:bg-primary-darkGreen disabled:opacity-50"
             >
@@ -161,6 +169,40 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
             <p className="text-sm text-green-600 mt-1">✓ Invitation sent to {formData.parentEmail}</p>
           )}
         </div>
+        
+        {student?.isTeamProject && (
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-900">
+              Team Member&apos;s Parent/Guardian Email *
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={teamMemberParentEmail}
+                onChange={(e) => {
+                  setTeamMemberParentEmail(e.target.value);
+                  if (formData.teamMemberParentEmail !== e.target.value) {
+                    setFormData({ ...formData, teamMemberParentInviteSent: false, teamMemberParentInviteToken: undefined });
+                  }
+                }}
+                placeholder="teammemberparent@email.com"
+                required
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              />
+              <button
+                type="button"
+                onClick={() => sendInvitation(true)}
+                disabled={saving || !teamMemberParentEmail.trim()}
+                className="px-4 py-2 bg-primary-green text-white rounded-md hover:bg-primary-darkGreen disabled:opacity-50"
+              >
+                {saving ? "Sending..." : formData.teamMemberParentInviteSent ? "Resend Invitation" : "Send Invitation"}
+              </button>
+            </div>
+            {formData.teamMemberParentInviteSent && (
+              <p className="text-sm text-green-600 mt-1">✓ Invitation sent to {formData.teamMemberParentEmail}</p>
+            )}
+          </div>
+        )}
       </div>
 
       {formData.completed && (
@@ -173,8 +215,23 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
           </div>
           {formData.parentSignatureDate && (
             <p className="text-sm text-green-600 mt-1">
-              Signed on: {(() => {
+              Your parent signed on: {(() => {
                 const date = formData.parentSignatureDate;
+                if (date instanceof Date) {
+                  return date.toLocaleDateString();
+                } else if (date && typeof date === 'object' && 'toDate' in date && typeof (date as any).toDate === 'function') {
+                  return (date as any).toDate().toLocaleDateString();
+                } else if (date && typeof date === 'object' && 'seconds' in date) {
+                  return new Date((date as any).seconds * 1000).toLocaleDateString();
+                }
+                return 'Unknown date';
+              })()}
+            </p>
+          )}
+          {student?.isTeamProject && formData.teamMemberParentSignatureDate && (
+            <p className="text-sm text-green-600 mt-1">
+              Team member&apos;s parent signed on: {(() => {
+                const date = formData.teamMemberParentSignatureDate;
                 if (date instanceof Date) {
                   return date.toLocaleDateString();
                 } else if (date && typeof date === 'object' && 'toDate' in date && typeof (date as any).toDate === 'function') {
