@@ -121,23 +121,17 @@ export async function registerStudent(
   }
 
   if (teamMemberUserId) {
-    try {
-      console.log("Updating team member user profile with studentDocumentId:", primaryStudentId);
-      const { updateDoc, doc } = await import("firebase/firestore");
-      const { db } = await import("./config");
-      if (db) {
-        await updateDoc(doc(db, "users", teamMemberUserId), {
-          studentDocumentId: primaryStudentId,
-        });
-        console.log("Team member user profile updated successfully");
-      } else {
-        console.error("Firebase db instance is null");
-      }
-    } catch (error: any) {
-      console.error("Error updating team member user profile:", error);
-      console.error("Error code:", error.code);
-      console.error("Error message:", error.message);
+    console.log("Updating team member user profile with studentDocumentId:", primaryStudentId);
+    const { updateDoc, doc } = await import("firebase/firestore");
+    const { db } = await import("./config");
+    if (!db) {
+      throw new Error("Firebase db instance is null");
     }
+    
+    await updateDoc(doc(db, "users", teamMemberUserId), {
+      studentDocumentId: primaryStudentId,
+    });
+    console.log("Team member user profile updated successfully");
   }
 
   return { verificationCode };
