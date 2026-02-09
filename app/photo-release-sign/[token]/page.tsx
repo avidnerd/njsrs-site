@@ -126,8 +126,8 @@ export default function PhotoReleaseSignPage() {
         updatedFormData.parentSignatureDate = Timestamp.now();
       }
       
-      const bothParentsSigned = updatedFormData.parentSignature && 
-        (!formData?.teamMemberParentEmail || updatedFormData.teamMemberParentSignature);
+      const bothParentsSigned = !!updatedFormData.parentSignature && 
+        (!formData?.teamMemberParentEmail || !!updatedFormData.teamMemberParentSignature);
       updatedFormData.completed = bothParentsSigned;
 
       
