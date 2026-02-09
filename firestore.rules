@@ -26,14 +26,21 @@ service cloud.firestore {
              get(/databases/$(database)/documents/sras/$(request.auth.uid)).data != null;
     }
     
+    // Helper function to check if the user being updated is a team member of the authenticated user
+    function isUpdatingTeamMember(userId) {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/students/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/students/$(request.auth.uid)).data.teamMemberUserId == userId;
+    }
+    
     // Users collection
     match /users/{userId} {
       // Allow users to read their own profile, or admins to read any profile
       allow read: if isOwner(userId) || isAdmin();
       // Allow users to create their own profile during registration
       allow create: if isAuthenticated() && request.auth.uid == userId;
-      // Allow users to update their own profile
-      allow update: if isOwner(userId);
+      // Allow users to update their own profile, or primary student to update team member's profile
+      allow update: if isOwner(userId) || isUpdatingTeamMember(userId) || isAdmin();
     }
     
     // Schools collection
