@@ -28,9 +28,14 @@ export default function StudentDashboardPage() {
     
     try {
       const studentData = await getStudent(user.uid);
+      if (!studentData) {
+        console.error("Student data not found for user:", user.uid);
+        console.error("This might be a team member - checking if student document exists with teamMemberUserId");
+      }
       setStudent(studentData);
     } catch (error) {
       console.error("Error loading student data:", error);
+      console.error("Error details:", error);
     } finally {
       setLoading(false);
     }

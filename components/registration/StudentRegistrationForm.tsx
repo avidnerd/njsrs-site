@@ -28,6 +28,7 @@ export default function StudentRegistrationForm() {
     teamMemberFirstName: "",
     teamMemberLastName: "",
     teamMemberEmail: "",
+    teamMemberShirtSize: "",
   });
   const [schools, setSchools] = useState<School[]>([]);
   const [sras, setSRAs] = useState<SRA[]>([]);
@@ -211,6 +212,7 @@ export default function StudentRegistrationForm() {
         projectTitle: formData.projectTitle,
         projectDescription: formData.projectDescription,
         shirtSize: formData.shirtSize as "XS" | "S" | "M" | "L" | "XL" | undefined,
+        teamMemberShirtSize: formData.isTeamProject ? (formData.teamMemberShirtSize as "XS" | "S" | "M" | "L" | "XL" | undefined) : undefined,
         primaryScientificDomain: formData.primaryScientificDomain,
         experimentalMethodology: formData.experimentalMethodology,
         primaryRealWorldFocus: formData.primaryRealWorldFocus === "Other" ? formData.primaryRealWorldFocusOther : formData.primaryRealWorldFocus,
@@ -370,6 +372,25 @@ export default function StudentRegistrationForm() {
               <p className="text-xs text-gray-500 mt-1">
                 Your team member will use this email and the same password to log in.
               </p>
+            </div>
+            <div>
+              <label htmlFor="teamMemberShirtSize" className="block text-sm font-medium mb-1 text-gray-900">
+                Team Member Shirt Size *
+              </label>
+              <select
+                id="teamMemberShirtSize"
+                value={formData.teamMemberShirtSize}
+                onChange={(e) => setFormData({ ...formData, teamMemberShirtSize: e.target.value })}
+                required={formData.isTeamProject}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
+              >
+                <option value="">Select shirt size...</option>
+                <option value="XS">XS</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+              </select>
             </div>
           </div>
         )}

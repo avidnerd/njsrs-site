@@ -62,8 +62,8 @@ service cloud.firestore {
       }
       
       // Allow read if owner, team member, SRA owner, or admin
-      // For queries: Since the query filters by sraId == request.auth.uid, we just need to verify the user is an SRA
-      // For individual reads: Check if student's sraId matches user's UID
+      // For queries: Firestore will apply this rule to each document in the result set
+      // The isTeamMember() check will allow team members to read documents where they are the team member
       allow read: if isOwner(studentId) || 
                      isTeamMember() ||
                      isSRA() ||

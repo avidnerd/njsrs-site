@@ -65,6 +65,7 @@ export interface Student {
   projectTitle?: string;
   projectDescription?: string;
   shirtSize?: "XS" | "S" | "M" | "L" | "XL";
+  teamMemberShirtSize?: "XS" | "S" | "M" | "L" | "XL";
   primaryScientificDomain?: string[];
   experimentalMethodology?: string[];
   primaryRealWorldFocus?: string;
@@ -347,17 +348,27 @@ export async function createStudent(
 
 export async function getStudent(studentId: string): Promise<Student | null> {
   const dbInstance = ensureDb();
-  const studentDoc = await getDoc(doc(dbInstance, "students", studentId));
-  if (studentDoc.exists()) {
-    return { id: studentDoc.id, ...studentDoc.data() } as Student;
+  
+  try {
+    const studentDoc = await getDoc(doc(dbInstance, "students", studentId));
+    if (studentDoc.exists()) {
+      return { id: studentDoc.id, ...studentDoc.data() } as Student;
+    }
+  } catch (error) {
+    console.error("Error getting student document by ID:", error);
   }
   
-  const studentsRef = collection(dbInstance, "students");
-  const q = query(studentsRef, where("teamMemberUserId", "==", studentId));
-  const querySnapshot = await getDocs(q);
-  if (!querySnapshot.empty) {
-    const teamStudentDoc = querySnapshot.docs[0];
-    return { id: teamStudentDoc.id, ...teamStudentDoc.data() } as Student;
+  try {
+    const studentsRef = collection(dbInstance, "students");
+    const q = query(studentsRef, where("teamMemberUserId", "==", studentId));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      const teamStudentDoc = querySnapshot.docs[0];
+      return { id: teamStudentDoc.id, ...teamStudentDoc.data() } as Student;
+    }
+  } catch (error) {
+    console.error("Error querying for team member student:", error);
+    throw error;
   }
   
   return null;
