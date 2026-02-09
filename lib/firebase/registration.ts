@@ -74,12 +74,24 @@ export async function registerStudent(
     }
   }
 
-  await createStudent(userCredential.user.uid, {
+  const primaryStudentId = userCredential.user.uid;
+  
+  await createStudent(primaryStudentId, {
     ...studentData,
     email,
     sraName: `${selectedSRA.firstName} ${selectedSRA.lastName}`,
     teamMemberUserId,
   });
+
+  if (teamMemberUserId) {
+    const { updateDoc, doc } = await import("firebase/firestore");
+    const { db } = await import("./config");
+    if (db) {
+      await updateDoc(doc(db, "users", teamMemberUserId), {
+        studentDocumentId: primaryStudentId,
+      });
+    }
+  }
 
   return { verificationCode };
 }

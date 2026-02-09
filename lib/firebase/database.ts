@@ -359,6 +359,19 @@ export async function getStudent(studentId: string): Promise<Student | null> {
   }
   
   try {
+    const { getUserProfile } = await import("./auth");
+    const userProfile = await getUserProfile(studentId);
+    if (userProfile?.studentDocumentId) {
+      const studentDoc = await getDoc(doc(dbInstance, "students", userProfile.studentDocumentId));
+      if (studentDoc.exists()) {
+        return { id: studentDoc.id, ...studentDoc.data() } as Student;
+      }
+    }
+  } catch (error) {
+    console.error("Error getting student document from user profile:", error);
+  }
+  
+  try {
     const studentsRef = collection(dbInstance, "students");
     const q = query(studentsRef, where("teamMemberUserId", "==", studentId));
     const querySnapshot = await getDocs(q);
@@ -368,7 +381,6 @@ export async function getStudent(studentId: string): Promise<Student | null> {
     }
   } catch (error) {
     console.error("Error querying for team member student:", error);
-    throw error;
   }
   
   return null;

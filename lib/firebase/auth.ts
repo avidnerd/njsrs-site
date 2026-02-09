@@ -16,6 +16,7 @@ export interface UserProfile {
   emailVerified?: boolean;
   verificationCode?: string;
   verificationCodeExpiry?: Date;
+  studentDocumentId?: string;
 }
 
 function ensureAuth() {
