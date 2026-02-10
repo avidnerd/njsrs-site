@@ -745,7 +745,8 @@ export default function StudentRegistrationForm() {
             <option value="Education">Education</option>
             <option value="Public Safety / Cybersecurity">Public Safety / Cybersecurity</option>
             <option value="Fundamental Scientific Advancement">Fundamental Scientific Advancement</option>
-            <option value="Theoretical Mathematics/Physics">Theoretical Mathematics/Physics</option>
+            <option value="Theoretical Mathematics">Theoretical Mathematics</option>
+            <option value="Applied Mathematics/Physics">Applied Mathematics/Physics</option>
             <option value="Other">Other (please specify)</option>
           </select>
           {formData.primaryRealWorldFocus === "Other" && (
