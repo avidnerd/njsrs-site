@@ -114,13 +114,13 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/register/student"
-                  className="bg-primary-green text-white px-6 py-4 rounded-md hover:bg-primary-darkGreen font-semibold text-center transition-colors flex items-center justify-center"
+                  className="bg-primary-green text-white px-6 py-3 my-2rounded-md hover:bg-primary-darkGreen font-semibold text-center transition-colors flex items-center justify-center"
                 >
                   COMPETE
                 </Link>
                 <Link
                   href="/register/judge"
-                  className="bg-white text-primary-green px-6 py-4 rounded-md hover:bg-gray-100 font-semibold text-center transition-colors"
+                  className="bg-white text-primary-green px-6 py-3 my-2 rounded-md hover:bg-gray-100 font-semibold text-center transition-colors"
                 >
                   ARE YOU A QUALIFIED SCIENTIST OR ENGINEER? BECOME A JUDGE!
                 </Link>
