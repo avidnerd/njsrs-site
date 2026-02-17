@@ -109,12 +109,12 @@ export default function HomePage() {
                 The New Jersey Science Research Symposium (NJSRS)
               </h1>
               <p className="text-lg md:text-xl mb-4 text-blue-100">
-                NJSRS is a premier science research competition for high school students throughout New Jersey. Hosted at Millburn High School, this competition is designed to provide students a platform to share, defend, and advance their original STEMresearch. 
+                NJSRS is a premier science research competition for high school students throughout New Jersey. Hosted at Millburn High School, this competition is designed to provide students a platform to share, defend, and advance their original STEM research. 
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/register/student"
-                  className="bg-primary-green text-white px-6 py-3 my-2rounded-md hover:bg-primary-darkGreen font-semibold text-center transition-colors flex items-center justify-center"
+                  className="bg-primary-green text-white px-6 py-3 my-2 rounded-md hover:bg-primary-darkGreen font-semibold text-center transition-colors flex items-center justify-center"
                 >
                   COMPETE
                 </Link>
