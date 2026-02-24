@@ -6,6 +6,7 @@ import {
   UserCredential,
 } from "firebase/auth";
 import { auth, db } from "./config";
+import { snapshotExists } from "./database";
 import { doc, setDoc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
 
 export interface UserProfile {
@@ -74,8 +75,8 @@ export async function verifyEmailCode(
 ): Promise<boolean> {
   const dbInstance = ensureDb();
   const userDoc = await getDoc(doc(dbInstance, "users", userId));
-  
-  if (!userDoc.exists()) {
+
+  if (!snapshotExists(userDoc)) {
     return false;
   }
 
@@ -99,7 +100,7 @@ export async function verifyEmailCode(
       const student = await getStudent(userId);
       if (student?.isTeamProject && student.teamMemberUserId) {
         const teamMemberUserDoc = await getDoc(doc(dbInstance, "users", student.teamMemberUserId));
-        if (teamMemberUserDoc.exists()) {
+        if (snapshotExists(teamMemberUserDoc)) {
           await updateDoc(doc(dbInstance, "users", student.teamMemberUserId), {
             emailVerified: true,
             verificationCode: null,
@@ -133,7 +134,7 @@ export async function logoutUser(): Promise<void> {
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   const dbInstance = ensureDb();
   const userDoc = await getDoc(doc(dbInstance, "users", uid));
-  if (!userDoc.exists()) {
+  if (!snapshotExists(userDoc)) {
     return null;
   }
   return userDoc.data() as UserProfile;
@@ -142,8 +143,8 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
 export async function resendVerificationCode(userId: string): Promise<string> {
   const dbInstance = ensureDb();
   const userDoc = await getDoc(doc(dbInstance, "users", userId));
-  
-  if (!userDoc.exists()) {
+
+  if (!snapshotExists(userDoc)) {
     throw new Error("User not found");
   }
 

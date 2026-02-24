@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase/config";
 import { doc, getDoc } from "firebase/firestore";
+import { snapshotExists } from "@/lib/firebase/database";
 
 interface UserProfile {
   email: string;
@@ -46,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const userDocRef = doc(db, "users", firebaseUser.uid);
           const userDoc = await getDoc(userDocRef);
           
-          if (userDoc.exists()) {
+          if (snapshotExists(userDoc)) {
             const data = userDoc.data();
             
             const profileData: UserProfile = {

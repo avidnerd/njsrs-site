@@ -99,8 +99,18 @@ export default function StudentDashboardPage() {
               <PhotoRelease onFormUpdate={loadStudent} />
             </div>
           ) : (
-            <div className="text-center py-12">
+            <div className="text-center py-12 space-y-4">
               <p className="text-gray-600">Student data not found.</p>
+              <p className="text-sm text-gray-500 max-w-md mx-auto">
+                If you just registered, try logging out and logging back in, or click Retry below.
+              </p>
+              <button
+                type="button"
+                onClick={() => { setLoading(true); loadStudent(); }}
+                className="bg-primary-blue text-white px-4 py-2 rounded-md hover:opacity-90"
+              >
+                Retry
+              </button>
             </div>
           )}
         </div>

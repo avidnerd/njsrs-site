@@ -270,7 +270,7 @@ export async function createSchool(school: Omit<School, "id" | "createdAt">): Pr
 export async function getSchool(schoolId: string): Promise<School | null> {
   const dbInstance = ensureDb();
   const schoolDoc = await getDoc(doc(dbInstance, "schools", schoolId));
-  if (!schoolDoc.exists()) {
+  if (!snapshotExists(schoolDoc)) {
     return null;
   }
   return { id: schoolDoc.id, ...schoolDoc.data() } as School;
@@ -328,7 +328,7 @@ export async function createSRA(sraId: string, sra: Omit<SRA, "id" | "createdAt"
 export async function getSRA(sraId: string): Promise<SRA | null> {
   const dbInstance = ensureDb();
   const sraDoc = await getDoc(doc(dbInstance, "sras", sraId));
-  if (!sraDoc.exists()) {
+  if (!snapshotExists(sraDoc)) {
     return null;
   }
   return { id: sraDoc.id, ...sraDoc.data() } as SRA;
@@ -371,15 +371,27 @@ export async function createStudent(
   }
 }
 
+export function snapshotExists(snapshot: { exists?: boolean | (() => boolean) }): boolean {
+  const s = snapshot;
+  if (typeof s.exists === "function") return s.exists();
+  return Boolean(s.exists);
+}
+
 export async function getStudent(studentId: string): Promise<Student | null> {
   const dbInstance = ensureDb();
-  
+  const studentRef = doc(dbInstance, "students", studentId);
+
   try {
-    const studentDoc = await getDoc(doc(dbInstance, "students", studentId));
-    if (studentDoc.exists()) {
+    let studentDoc = await getDoc(studentRef);
+    if (snapshotExists(studentDoc)) {
       return { id: studentDoc.id, ...studentDoc.data() } as Student;
     }
-  } catch (error) {
+    await new Promise((r) => setTimeout(r, 800));
+    studentDoc = await getDoc(studentRef);
+    if (snapshotExists(studentDoc)) {
+      return { id: studentDoc.id, ...studentDoc.data() } as Student;
+    }
+  } catch (error: unknown) {
     console.error("Error getting student document by ID:", error);
   }
   
@@ -390,7 +402,7 @@ export async function getStudent(studentId: string): Promise<Student | null> {
     if (userProfile?.studentDocumentId) {
       console.log("Found studentDocumentId in user profile:", userProfile.studentDocumentId);
       const studentDoc = await getDoc(doc(dbInstance, "students", userProfile.studentDocumentId));
-      if (studentDoc.exists()) {
+      if (snapshotExists(studentDoc)) {
         console.log("Successfully retrieved student document via studentDocumentId");
         return { id: studentDoc.id, ...studentDoc.data() } as Student;
       } else {
@@ -529,7 +541,7 @@ export async function updateStudentProject(
   
   if (resetSignatures && updates.researchPlanUrl) {
     const studentDoc = await getDoc(studentRef);
-    if (studentDoc.exists()) {
+    if (snapshotExists(studentDoc)) {
       const currentData = studentDoc.data();
       const currentSOA = currentData.statementOfOutsideAssistance || {};
       
@@ -633,7 +645,7 @@ export async function createJudge(judgeId: string, judge: Omit<Judge, "id" | "cr
 export async function getJudge(judgeId: string): Promise<Judge | null> {
   const dbInstance = ensureDb();
   const judgeDoc = await getDoc(doc(dbInstance, "judges", judgeId));
-  if (!judgeDoc.exists()) {
+  if (!snapshotExists(judgeDoc)) {
     return null;
   }
   return { id: judgeDoc.id, ...judgeDoc.data() } as Judge;

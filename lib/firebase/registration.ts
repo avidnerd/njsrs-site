@@ -1,5 +1,5 @@
 import { registerUser } from "./auth";
-import { createSRA, createStudent, createJudge, createSchool, getSRAsBySchool } from "./database";
+import { createSRA, createStudent, createJudge, createSchool, getSRAsBySchool, snapshotExists } from "./database";
 import type { SRA, Student, Judge, School } from "./database";
 
 export async function registerSRA(
@@ -107,7 +107,7 @@ export async function registerStudent(
     const { db } = await import("./config");
     if (db) {
       const verifyDoc = await getDoc(doc(db, "students", primaryStudentId));
-      if (!verifyDoc.exists()) {
+      if (!snapshotExists(verifyDoc)) {
         throw new Error("Student document was not created - verification failed");
       }
       console.log("Verified: Student document exists in Firestore");
