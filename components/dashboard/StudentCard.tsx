@@ -4,12 +4,10 @@ import type { Student } from "@/lib/firebase/database";
 
 interface StudentCardProps {
   student: Student;
-  onApprove: (studentId: string) => void;
-  onReject: (studentId: string) => void;
   onPaymentStatusChange?: (studentId: string, status: "not_received" | "received") => void;
 }
 
-export default function StudentCard({ student, onApprove, onReject, onPaymentStatusChange }: StudentCardProps) {
+export default function StudentCard({ student, onPaymentStatusChange }: StudentCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "approved":
@@ -146,23 +144,7 @@ export default function StudentCard({ student, onApprove, onReject, onPaymentSta
         )}
       </div>
 
-        {student.status === "pending" && (
-        <div className="flex gap-2 mt-4">
-          <button
-            onClick={() => onApprove(student.id!)}
-            className="flex-1 bg-primary-green text-white py-2 px-4 rounded-md hover:bg-primary-darkGreen text-sm font-medium"
-          >
-            Approve
-          </button>
-          <button
-            onClick={() => onReject(student.id!)}
-            className="flex-1 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 text-sm font-medium"
-          >
-            Reject
-          </button>
-        </div>
-      )}
-      {student.status === "approved" && onPaymentStatusChange && (
+      {onPaymentStatusChange && (
         <div className="mt-4 pt-4 border-t">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Payment Status

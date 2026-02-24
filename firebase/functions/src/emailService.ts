@@ -1,7 +1,6 @@
 import * as sgMail from "@sendgrid/mail";
 import * as functions from "firebase-functions";
 
-// Initialize SendGrid - try config first (v1), then environment variable (v2)
 const sendGridApiKey = functions.config().sendgrid?.api_key || process.env.SENDGRID_API_KEY;
 if (sendGridApiKey) {
   sgMail.setApiKey(sendGridApiKey);
@@ -23,7 +22,6 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
     throw new Error(errorMsg);
   }
 
-  // Validate email address
   if (!options.to || typeof options.to !== "string") {
     throw new Error(`Invalid recipient email: ${options.to}`);
   }
@@ -51,8 +49,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
     if (error.response) {
       const errorBody = error.response.body;
       console.error("SendGrid API error response:", JSON.stringify(errorBody, null, 2));
-      
-      // Log specific error details
+
       if (errorBody && Array.isArray(errorBody.errors)) {
         errorBody.errors.forEach((err: any) => {
           console.error(`SendGrid error detail:`, {

@@ -1,18 +1,29 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAllJudges, updateJudgeApproval } from "@/lib/firebase/database";
-import type { Judge } from "@/lib/firebase/database";
+import { getAllJudges, updateJudgeApproval, getCategories, updateJudgeCategories } from "@/lib/firebase/database";
+import type { Judge, Category } from "@/lib/firebase/database";
 
 export default function AdminJudgeList() {
   const [judges, setJudges] = useState<Judge[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "approved" | "pending">("all");
   const [selectedJudge, setSelectedJudge] = useState<Judge | null>(null);
 
   useEffect(() => {
     loadJudges();
+    loadCategories();
   }, []);
+
+  const loadCategories = async () => {
+    try {
+      const list = await getCategories();
+      setCategories(list);
+    } catch (e) {
+      console.error("Error loading categories:", e);
+    }
+  };
 
   const loadJudges = async () => {
     try {
@@ -110,6 +121,11 @@ export default function AdminJudgeList() {
                   {judge.adminApproved ? "APPROVED" : "PENDING"}
                 </span>
               </div>
+              {(judge.categoryIds?.length ?? 0) > 0 && (
+                <p className="text-xs text-gray-500 mb-2">
+                  Categories: {judge.categoryIds!.map((id) => categories.find((c) => c.id === id)?.name).filter(Boolean).join(", ") || "—"}
+                </p>
+              )}
               <div className="space-y-2 mb-4">
                 {judge.highestDegree && (
                   <p className="text-sm text-gray-600">
@@ -202,6 +218,44 @@ export default function AdminJudgeList() {
                 <h3 className="font-semibold text-gray-900">Availability</h3>
                 {selectedJudge.availabilityApril18 && (
                   <p className="text-gray-900"><strong>April 18:</strong> {selectedJudge.availabilityApril18.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}</p>
+                )}
+              </div>
+              <div className="border-t pt-4">
+                <h3 className="font-semibold text-gray-900 mb-3">Category assignment</h3>
+                <p className="text-sm text-gray-600 mb-2">Assign this judge to one or more categories. They will judge projects in these categories.</p>
+                <div className="flex flex-wrap gap-3">
+                  {categories.map((c) => {
+                    const isChecked = (selectedJudge.categoryIds || []).includes(c.id!);
+                    return (
+                      <label key={c.id} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={async () => {
+                            if (!selectedJudge.id) return;
+                            const next = isChecked
+                              ? (selectedJudge.categoryIds || []).filter((id) => id !== c.id)
+                              : [...(selectedJudge.categoryIds || []), c.id!];
+                            try {
+                              await updateJudgeCategories(selectedJudge.id, next);
+                              setSelectedJudge({ ...selectedJudge, categoryIds: next });
+                              setJudges((prev) =>
+                                prev.map((j) => (j.id === selectedJudge.id ? { ...j, categoryIds: next } : j))
+                              );
+                            } catch (err) {
+                              console.error(err);
+                              alert("Failed to update categories.");
+                            }
+                          }}
+                          className="rounded border-gray-300 text-primary-blue"
+                        />
+                        <span className="text-sm text-gray-900">{c.name}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                {categories.length === 0 && (
+                  <p className="text-sm text-gray-500">Create categories under the Categories tab first.</p>
                 )}
               </div>
             </div>

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAllStudents } from "@/lib/firebase/database";
-import type { Student } from "@/lib/firebase/database";
+import { getAllStudents, getCategories, updateStudentCategory } from "@/lib/firebase/database";
+import type { Student, Category } from "@/lib/firebase/database";
 import { Timestamp } from "firebase/firestore";
 
 
@@ -28,21 +28,40 @@ function formatDate(dateValue: Date | Timestamp | undefined | null): string {
 
 export default function AdminStudentList() {
   const [students, setStudents] = useState<Student[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     loadStudents();
+    loadCategories();
   }, []);
+
+  const loadCategories = async () => {
+    try {
+      const list = await getCategories();
+      setCategories(list);
+    } catch (e) {
+      console.error("Error loading categories:", e);
+    }
+  };
 
   const loadStudents = async () => {
     try {
       setLoading(true);
+      setLoadError(null);
       const allStudents = await getAllStudents();
       setStudents(allStudents);
-    } catch (error) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error("Error loading students:", error);
+      setLoadError(
+        message.includes("permission") || message.includes("Permission")
+            ? "Permission denied. Check that your account has role 'fair_director' or 'website_manager' in Firestore (users collection)."
+            : `Failed to load students: ${message}`
+      );
     } finally {
       setLoading(false);
     }
@@ -67,12 +86,14 @@ export default function AdminStudentList() {
       "School",
       "Grade",
       "Project Title",
+      "Project Description",
       "Primary Scientific Domain 1",
       "Primary Scientific Domain 2",
       "Experimental Methodology Used",
       "Primary Real-World Focus",
       "Shirt Size",
       "Status",
+      "Category",
     ];
 
     const rows = students.map((student) => {
@@ -81,7 +102,7 @@ export default function AdminStudentList() {
       const realWorldFocus = student.primaryRealWorldFocus || "";
       const otherFocus = student.primaryRealWorldFocusOther || "";
       const finalFocus = realWorldFocus === "Other" && otherFocus ? otherFocus : realWorldFocus;
-      
+      const description = (student.projectDescription || "").replace(/"/g, '""').replace(/\r?\n/g, " ");
       return [
         student.firstName || "",
         student.lastName || "",
@@ -89,12 +110,14 @@ export default function AdminStudentList() {
         student.schoolName || "",
         student.grade || "",
         student.projectTitle || "",
+        description,
         domains[0] || "",
         domains[1] || "",
         methodologies.join("; ") || "",
         finalFocus || "",
         student.shirtSize || "",
         student.status || "pending",
+        (categories.find((c) => c.id === student.categoryId)?.name) || "",
       ];
     });
 
@@ -116,6 +139,21 @@ export default function AdminStudentList() {
 
   if (loading) {
     return <div className="text-center py-4">Loading students...</div>;
+  }
+
+  if (loadError) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+        <p className="text-red-800 font-medium mb-2">{loadError}</p>
+        <p className="text-sm text-red-700 mb-4">Open the browser console (F12 → Console) for details.</p>
+        <button
+          onClick={loadStudents}
+          className="bg-primary-blue text-white px-4 py-2 rounded-md hover:opacity-90"
+        >
+          Try again
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -155,6 +193,9 @@ export default function AdminStudentList() {
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Category
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Materials
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -165,7 +206,7 @@ export default function AdminStudentList() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredStudents.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
                     No students found
                   </td>
                 </tr>
@@ -185,8 +226,8 @@ export default function AdminStudentList() {
                       {student.projectTitle || "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           student.status === "approved"
                             ? "bg-green-100 text-green-800"
                             : student.status === "rejected"
@@ -196,6 +237,9 @@ export default function AdminStudentList() {
                       >
                         {student.status || "pending"}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {categories.find((c) => c.id === student.categoryId)?.name ?? "—"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="space-y-1">
@@ -274,6 +318,37 @@ export default function AdminStudentList() {
                     <strong>Project Title:</strong> {selectedStudent.projectTitle || "N/A"}
                   </div>
                 </div>
+              </div>
+
+              <div className="border-b pb-4">
+                <h4 className="font-semibold mb-2">Category Assignment</h4>
+                <select
+                  value={selectedStudent.categoryId ?? ""}
+                  onChange={async (e) => {
+                    const categoryId = e.target.value || null;
+                    if (!selectedStudent.id) return;
+                    try {
+                      await updateStudentCategory(selectedStudent.id, categoryId);
+                      setSelectedStudent({ ...selectedStudent, categoryId: categoryId ?? undefined });
+                      setStudents((prev) =>
+                        prev.map((s) =>
+                          s.id === selectedStudent.id ? { ...s, categoryId: categoryId ?? undefined } : s
+                        )
+                      );
+                    } catch (err) {
+                      console.error(err);
+                      alert("Failed to update category.");
+                    }
+                  }}
+                  className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+                >
+                  <option value="">No category</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {}

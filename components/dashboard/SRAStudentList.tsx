@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getStudentsBySRA, updateStudentStatus, updateStudentPaymentStatus } from "@/lib/firebase/database";
+import { getStudentsBySRA, updateStudentPaymentStatus } from "@/lib/firebase/database";
 import { useAuth } from "@/contexts/AuthContext";
 import StudentCard from "./StudentCard";
 import type { Student } from "@/lib/firebase/database";
@@ -35,30 +35,6 @@ export default function SRAStudentList() {
       setStudents([]);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleApprove = async (studentId: string) => {
-    try {
-      await updateStudentStatus(studentId, "approved");
-      await loadStudents();
-    } catch (error) {
-      console.error("Error approving student:", error);
-      alert("Failed to approve student");
-    }
-  };
-
-  const handleReject = async (studentId: string) => {
-    if (!confirm("Are you sure you want to reject this student's registration?")) {
-      return;
-    }
-    
-    try {
-      await updateStudentStatus(studentId, "rejected");
-      await loadStudents();
-    } catch (error) {
-      console.error("Error rejecting student:", error);
-      alert("Failed to reject student");
     }
   };
 
@@ -144,8 +120,6 @@ export default function SRAStudentList() {
             <StudentCard
               key={student.id}
               student={student}
-              onApprove={handleApprove}
-              onReject={handleReject}
               onPaymentStatusChange={handlePaymentStatusChange}
             />
           ))}

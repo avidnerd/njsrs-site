@@ -9,11 +9,12 @@ import AdminSRAList from "@/components/dashboard/AdminSRAList";
 import AdminJudgeList from "@/components/dashboard/AdminJudgeList";
 import AdminSRCApproval from "@/components/dashboard/AdminSRCApproval";
 import AdminStudentList from "@/components/dashboard/AdminStudentList";
+import AdminCategories from "@/components/dashboard/AdminCategories";
 
 export default function AdminDashboardPage() {
   const { user, userProfile } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"sras" | "judges" | "src" | "students">("sras");
+  const [activeTab, setActiveTab] = useState<"sras" | "judges" | "src" | "students" | "categories">("sras");
 
   const handleLogout = async () => {
     try {
@@ -84,6 +85,16 @@ export default function AdminDashboardPage() {
               >
                 All Students
               </button>
+              <button
+                onClick={() => setActiveTab("categories")}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === "categories"
+                    ? "border-primary-blue text-primary-blue"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                Categories
+              </button>
             </nav>
           </div>
 
@@ -124,17 +135,29 @@ export default function AdminDashboardPage() {
               </div>
               <AdminSRCApproval />
             </div>
-          ) : (
+          ) : activeTab === "students" ? (
             <div>
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
                   All Students
                 </h2>
                 <p className="text-gray-600">
-                  View all registered students and their submitted materials, forms, and information.
+                  View all registered students, assign categories, and export project classifications (including project description).
                 </p>
               </div>
               <AdminStudentList />
+            </div>
+          ) : (
+            <div>
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  Categories
+                </h2>
+                <p className="text-gray-600">
+                  Create categories for the fair, then assign students and judges to them under All Students and Judges.
+                </p>
+              </div>
+              <AdminCategories />
             </div>
           )}
         </div>

@@ -6,11 +6,6 @@ export const onStudentRegistered = functions.firestore
   .document("students/{studentId}")
   .onCreate(async (snap, context) => {
     const studentData = snap.data();
-    
-    // Only send email if student is in pending status
-    if (studentData.status !== "pending") {
-      return null;
-    }
 
     const sraId = studentData.sraId;
     if (!sraId) {
@@ -19,7 +14,6 @@ export const onStudentRegistered = functions.firestore
     }
 
     try {
-      // Get SRA information
       const sraDoc = await admin.firestore().collection("sras").doc(sraId).get();
       if (!sraDoc.exists) {
         console.error("SRA not found:", sraId);
@@ -34,13 +28,11 @@ export const onStudentRegistered = functions.firestore
         return null;
       }
 
-      // Create approval link (in production, this would be a proper URL)
-      const approvalLink = `${process.env.APP_URL || "https://njsrs.org"}/dashboard/sra?approve=${context.params.studentId}`;
+      const dashboardLink = `${process.env.APP_URL || "https://njsrs.org"}/dashboard/sra`;
 
-      // Send email to SRA
       await sendEmail({
         to: sraEmail,
-        subject: "New Student Registration - Approval Required",
+        subject: "New Student Registration",
         html: `
           <h2>New Student Registration</h2>
           <p>Dear ${sraData.firstName} ${sraData.lastName},</p>
@@ -52,8 +44,8 @@ export const onStudentRegistered = functions.firestore
             <li>Grade: ${studentData.grade}</li>
             <li>Project Title: ${studentData.projectTitle || "Not provided"}</li>
           </ul>
-          <p>Please log in to your dashboard to review and approve this student's registration.</p>
-          <p><a href="${approvalLink}" style="background-color: #10b981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Review Registration</a></p>
+          <p>Students can access their dashboard after verifying their email. You can view and manage your students in your dashboard.</p>
+          <p><a href="${dashboardLink}" style="background-color: #10b981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">View Dashboard</a></p>
           <p>Best regards,<br>The NJSRS Team</p>
         `,
       });

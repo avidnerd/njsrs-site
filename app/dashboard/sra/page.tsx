@@ -121,7 +121,7 @@ export default function SRADashboardPage() {
                   Your Students
                 </h2>
                 <p className="text-gray-600">
-                  Review and approve student registrations from your school.
+                  View and manage students from your school. Students can access their dashboard after verifying their email.
                 </p>
                 <SRAStudentList />
               </div>

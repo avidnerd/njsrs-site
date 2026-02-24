@@ -1,99 +1,84 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper functions
     function isAuthenticated() {
       return request.auth != null;
     }
-    
+
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
-    
+
     function getUserRole() {
       let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
       return userDoc != null && userDoc.data != null ? userDoc.data.role : null;
     }
-    
+
     function isAdmin() {
       let role = getUserRole();
       return role == 'fair_director' || role == 'website_manager';
     }
-    
-    // Helper function to check if user is SRA (by checking if SRA document exists)
+
     function isSRA() {
-      return isAuthenticated() && 
+      return isAuthenticated() &&
              get(/databases/$(database)/documents/sras/$(request.auth.uid)).data != null;
     }
-    
-    // Helper function to check if the user being updated is a team member of the authenticated user
+
     function isUpdatingTeamMember(userId) {
-      return isAuthenticated() && 
+      return isAuthenticated() &&
              exists(/databases/$(database)/documents/students/$(request.auth.uid)) &&
              get(/databases/$(database)/documents/students/$(request.auth.uid)).data.teamMemberUserId == userId;
     }
-    
-    // Users collection
+
+    function isPrimaryStudentOfTeamMember(userId) {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/students/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/students/$(request.auth.uid)).data.teamMemberUserId == userId;
+    }
+
     match /users/{userId} {
-      // Allow users to read their own profile, or admins to read any profile
-      allow read: if isOwner(userId) || isAdmin();
-      // Allow users to create their own profile during registration
+      allow read: if isOwner(userId) || isAdmin() || isPrimaryStudentOfTeamMember(userId);
       allow create: if isAuthenticated() && request.auth.uid == userId;
-      // Allow users to update their own profile, or primary student to update team member's profile
       allow update: if isOwner(userId) || isUpdatingTeamMember(userId) || isAdmin();
     }
-    
-    // Schools collection
+
     match /schools/{schoolId} {
-      // Allow anyone to read schools (for school selection during registration)
       allow read: if true;
-      // Allow anyone to create schools (needed for registration before authentication)
       allow create: if true;
-      allow update, delete: if false; // Only admins can update/delete (add admin check later)
+      allow update, delete: if false;
     }
-    
-    // SRAs collection
+
     match /sras/{sraId} {
-      // Allow anyone to read SRAs (needed for student registration to select SRA)
       allow read: if true;
       allow create: if isOwner(sraId);
       allow update: if isOwner(sraId) || isAdmin();
     }
-    
-    // Students collection
+
     match /students/{studentId} {
-      // Helper function to check if user is a team member
       function isTeamMember() {
-        return isAuthenticated() && 
+        return isAuthenticated() &&
                resource.data.teamMemberUserId == request.auth.uid;
       }
-      
-      // Allow read if owner, team member, SRA owner, or admin
-      // For queries: Firestore will apply this rule to each document in the result set
-      // The isTeamMember() check will allow team members to read documents where they are the team member
-      allow read: if isOwner(studentId) || 
+
+      allow read: if isOwner(studentId) ||
                      isTeamMember() ||
                      isSRA() ||
                      isAdmin();
-      // Allow create if owner (user creating their own student document)
-      // Also allow if authenticated and the document ID matches the user's UID
       allow create: if isAuthenticated() && request.auth.uid == studentId;
-      // Allow update if owner, team member, SRA owner, or admin
-      allow update: if isOwner(studentId) || 
+      allow update: if isOwner(studentId) ||
                         isTeamMember() ||
                         (isSRA() && resource.data.sraId == request.auth.uid) ||
                         isAdmin();
-      // Allow list/query operations - Firestore will filter results based on read rules above
       allow list: if isAuthenticated() && (getUserRole() == 'student' || isSRA() || isAdmin());
     }
-    
-    // Judges collection
+
+    match /categories/{categoryId} {
+      allow read, write: if isAdmin();
+    }
+
     match /judges/{judgeId} {
-      // Allow authenticated users to read (for admin dashboard)
       allow read: if isAuthenticated();
-      // Allow judges to create their own document
       allow create: if isOwner(judgeId);
-      // Allow judges to update their own document, or admins to update (for approval)
       allow update: if isOwner(judgeId) || isAdmin();
     }
   }

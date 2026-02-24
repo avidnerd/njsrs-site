@@ -3,12 +3,10 @@ import { sendEmail } from "../emailService";
 
 export const onJudgeApproved = functions.firestore
   .document("judges/{judgeId}")
-  // eslint-disable-next-line no-unused-vars
   .onUpdate(async (change, _context) => {
     const before = change.before.data();
     const after = change.after.data();
 
-    // Check if adminApproved changed from false/undefined to true
     if (!before.adminApproved && after.adminApproved) {
       try {
         await sendEmail({

@@ -3,7 +3,6 @@ import * as admin from "firebase-admin";
 
 admin.initializeApp();
 
-// Email service
 import { sendEmail } from "./emailService";
 import { onStudentRegistered } from "./triggers/studentRegistered";
 import { onSRARegistered } from "./triggers/sraRegistered";
@@ -12,10 +11,8 @@ import { onUserCreated } from "./triggers/sendVerificationEmail";
 import { onSRAApproved } from "./triggers/sraApproved";
 import { onJudgeApproved } from "./triggers/judgeApproved";
 
-// Export Cloud Functions
 export { onStudentRegistered, onSRARegistered, onJudgeRegistered, onUserCreated, onSRAApproved, onJudgeApproved };
 
-// HTTP function for SRA approval
 export const approveStudent = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError(
@@ -28,7 +25,6 @@ export const approveStudent = functions.https.onCall(async (data, context) => {
   const sraId = context.auth.uid;
 
   try {
-    // Verify SRA owns this student
     const studentDoc = await admin.firestore().collection("students").doc(studentId).get();
     if (!studentDoc.exists) {
       throw new functions.https.HttpsError("not-found", "Student not found");
@@ -42,13 +38,11 @@ export const approveStudent = functions.https.onCall(async (data, context) => {
       );
     }
 
-    // Update student status
     await admin.firestore().collection("students").doc(studentId).update({
       status: approved ? "approved" : "rejected",
       approvedAt: approved ? admin.firestore.FieldValue.serverTimestamp() : null,
     });
 
-    // Send confirmation email to student
     if (approved && studentData?.email) {
       await sendEmail({
         to: studentData.email,

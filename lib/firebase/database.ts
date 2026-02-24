@@ -5,6 +5,7 @@ import {
   getDocs,
   setDoc,
   updateDoc,
+  deleteDoc,
   query,
   where,
   Timestamp,
@@ -94,6 +95,7 @@ export interface Student {
   ethicsQuestionnaire?: EthicsQuestionnaire;
   statementOfOutsideAssistance?: StatementOfOutsideAssistance;
   photoRelease?: PhotoRelease;
+  categoryId?: string;
 }
 
 export interface SRCQuestions {
@@ -245,6 +247,13 @@ export interface Judge {
   expertise?: string[];
   createdAt: Date | Timestamp;
   adminApproved?: boolean;
+  categoryIds?: string[];
+}
+
+export interface Category {
+  id?: string;
+  name: string;
+  order?: number;
 }
 
 export async function createSchool(school: Omit<School, "id" | "createdAt">): Promise<string> {
@@ -340,7 +349,8 @@ export async function createStudent(
   const dbInstance = ensureDb();
   const studentDocData = {
     ...student,
-    status: "pending",
+    status: "approved",
+    approvedAt: Timestamp.now(),
     createdAt: Timestamp.now(),
     paymentStatus: "not_received",
   };
@@ -693,4 +703,41 @@ export async function updateJudgeApproval(judgeId: string, approved: boolean): P
   const dbInstance = ensureDb();
   const judgeRef = doc(dbInstance, "judges", judgeId);
   await updateDoc(judgeRef, { adminApproved: approved });
+}
+
+export async function getCategories(): Promise<Category[]> {
+  const dbInstance = ensureDb();
+  const categoriesRef = collection(dbInstance, "categories");
+  const querySnapshot = await getDocs(categoriesRef);
+  return querySnapshot.docs
+    .map((doc) => ({ id: doc.id, ...doc.data() } as Category))
+    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+}
+
+export async function createCategory(name: string): Promise<string> {
+  const dbInstance = ensureDb();
+  const categoriesRef = collection(dbInstance, "categories");
+  const snapshot = await getDocs(categoriesRef);
+  const order = snapshot.size;
+  const newRef = doc(categoriesRef);
+  await setDoc(newRef, { name, order });
+  return newRef.id;
+}
+
+export async function deleteCategory(categoryId: string): Promise<void> {
+  const dbInstance = ensureDb();
+  const categoryRef = doc(dbInstance, "categories", categoryId);
+  await deleteDoc(categoryRef);
+}
+
+export async function updateStudentCategory(studentId: string, categoryId: string | null): Promise<void> {
+  const dbInstance = ensureDb();
+  const studentRef = doc(dbInstance, "students", studentId);
+  await updateDoc(studentRef, { categoryId: categoryId || null });
+}
+
+export async function updateJudgeCategories(judgeId: string, categoryIds: string[]): Promise<void> {
+  const dbInstance = ensureDb();
+  const judgeRef = doc(dbInstance, "judges", judgeId);
+  await updateDoc(judgeRef, { categoryIds });
 }

@@ -6,9 +6,9 @@ export default function StudentPendingPage() {
       <div className="max-w-2xl mx-auto text-center">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="mb-6">
-            <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center">
+            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
               <svg
-                className="w-8 h-8 text-yellow-600"
+                className="w-8 h-8 text-green-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -17,19 +17,19 @@ export default function StudentPendingPage() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
             </div>
           </div>
           <h1 className="text-3xl font-bold text-primary-blue mb-4">
-            Registration Pending Approval
+            Registration Complete
           </h1>
           <p className="text-gray-600 mb-6">
-            Your registration has been submitted successfully! Your Science Research Advisor has been notified and will review your registration.
+            Your registration has been submitted successfully. Your Science Research Advisor has been notified.
           </p>
           <p className="text-gray-600 mb-6">
-            You will receive an email once your registration has been approved. You can then log in to your dashboard to upload your research plan and abstract.
+            After verifying your email, you can log in to your dashboard to upload your research plan, abstract, and complete required forms.
           </p>
           <div className="space-y-4">
             <a

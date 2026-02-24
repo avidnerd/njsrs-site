@@ -4,12 +4,10 @@ import { sendEmail } from "../emailService";
 
 export const onJudgeRegistered = functions.firestore
   .document("judges/{judgeId}")
-  // eslint-disable-next-line no-unused-vars
   .onCreate(async (snap, _context) => {
     const judgeData = snap.data();
 
     try {
-      // Get all admins
       const adminsSnapshot = await admin.firestore()
         .collection("users")
         .where("role", "in", ["fair_director", "website_manager"])
@@ -17,7 +15,6 @@ export const onJudgeRegistered = functions.firestore
 
       const adminEmails = adminsSnapshot.docs.map((doc) => doc.data().email);
 
-      // Send email to all admins
       const emailPromises = adminEmails.map((adminEmail) =>
         sendEmail({
           to: adminEmail,

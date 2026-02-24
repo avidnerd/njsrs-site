@@ -134,11 +134,9 @@ export async function registerStudent(
       });
       console.log("Team member user profile updated successfully");
     } catch (error: any) {
-      // Silently handle permission errors - the fallback logic will handle it when team member logs in
       if (error.code !== "permission-denied") {
         throw error;
       }
-      // Don't log anything - completely silent for permission errors
     }
   }
 

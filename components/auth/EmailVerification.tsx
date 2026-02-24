@@ -47,7 +47,6 @@ export default function EmailVerification() {
       const isValid = await verifyEmailCode(user.uid, code);
       if (isValid) {
         setVerified(true);
-        // Reload the page to refresh auth state, then redirect will happen automatically
         setTimeout(() => {
           window.location.reload();
         }, 300);

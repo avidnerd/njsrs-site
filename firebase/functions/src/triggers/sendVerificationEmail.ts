@@ -8,7 +8,6 @@ export const onUserCreated = functions.firestore
     const userData = snap.data();
     const userId = context.params.userId;
 
-    // Only send verification email if user is not an admin
     if (userData.role === "fair_director" || userData.role === "website_manager") {
       return null;
     }
@@ -17,7 +16,6 @@ export const onUserCreated = functions.firestore
       return null;
     }
 
-    // Validate email address
     if (!userData.email || typeof userData.email !== "string") {
       console.error(`Invalid email address for user ${userId}: ${userData.email}`);
       return null;
@@ -30,8 +28,6 @@ export const onUserCreated = functions.firestore
     }
 
     try {
-      // Get user details from their role-specific collection
-      // Use a retry mechanism in case the document doesn't exist yet
       let userName = "";
       let userDetails: any = null;
       let attempts = 0;
@@ -72,7 +68,6 @@ export const onUserCreated = functions.firestore
         console.warn(`Role-specific document not found for user ${userId} after ${maxAttempts} attempts, proceeding with generic name`);
       }
 
-      // Send verification email
       await sendEmail({
         to: userData.email,
         subject: "Verify Your NJSRS Account",
@@ -91,13 +86,11 @@ export const onUserCreated = functions.firestore
       console.log(`✓ Verification email sent successfully to ${userData.email} for user ${userId}`);
       return null;
     } catch (error: any) {
-      // Enhanced error logging
       console.error(`✗ Error sending verification email to ${userData.email} for user ${userId}:`, error);
-      
+
       if (error.response) {
         console.error("SendGrid API error response:", JSON.stringify(error.response.body, null, 2));
-        
-        // Log specific SendGrid error codes
+
         if (error.response.body && Array.isArray(error.response.body.errors)) {
           error.response.body.errors.forEach((err: any) => {
             console.error(`SendGrid error: ${err.message} (field: ${err.field}, help: ${err.help || 'N/A'})`);
@@ -107,7 +100,6 @@ export const onUserCreated = functions.firestore
         console.error("Error message:", error.message);
       }
 
-      // Store error in user document for debugging (optional)
       try {
         await admin.firestore().collection("users").doc(userId).update({
           emailError: error.message || "Unknown error",

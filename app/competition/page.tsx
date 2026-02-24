@@ -222,7 +222,7 @@ export default function CompetitionPage() {
                 <li>Completing the registration form</li>
               </ol>
               <p className="text-gray-700">
-                Once registered, the SRA will receive an email notification and can approve the student&apos;s registration through their dashboard.
+                Once registered, the SRA will receive an email notification. Students can access their dashboard after verifying their email to upload materials and complete required forms.
               </p>
             </div>
 
