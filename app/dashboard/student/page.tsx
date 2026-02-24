@@ -25,12 +25,16 @@ export default function StudentDashboardPage() {
 
   const loadStudent = async () => {
     if (!user) return;
-    
+    const email = user.email ?? undefined;
     try {
-      let studentData = await getStudent(user.uid);
+      let studentData = await getStudent(user.uid, { email });
       if (!studentData) {
         await new Promise((r) => setTimeout(r, 2000));
-        studentData = await getStudent(user.uid);
+        studentData = await getStudent(user.uid, { email });
+      }
+      if (!studentData) {
+        await new Promise((r) => setTimeout(r, 3000));
+        studentData = await getStudent(user.uid, { email });
       }
       if (!studentData) {
         console.error("Student data not found for user:", user.uid);

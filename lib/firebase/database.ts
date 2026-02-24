@@ -2,6 +2,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocFromServer,
   getDocs,
   setDoc,
   updateDoc,
@@ -404,17 +405,20 @@ export async function ensurePlaceholderStudentDoc(uid: string, email: string): P
   }
 }
 
-export async function getStudent(studentId: string): Promise<Student | null> {
+export async function getStudent(
+  studentId: string,
+  options?: { email?: string }
+): Promise<Student | null> {
   const dbInstance = ensureDb();
   const studentRef = doc(dbInstance, "students", studentId);
 
   try {
-    let studentDoc = await getDoc(studentRef);
+    let studentDoc = await getDocFromServer(studentRef);
     if (snapshotExists(studentDoc)) {
       return { id: studentDoc.id, ...studentDoc.data() } as Student;
     }
     await new Promise((r) => setTimeout(r, 800));
-    studentDoc = await getDoc(studentRef);
+    studentDoc = await getDocFromServer(studentRef);
     if (snapshotExists(studentDoc)) {
       return { id: studentDoc.id, ...studentDoc.data() } as Student;
     }
@@ -521,7 +525,21 @@ export async function getStudent(studentId: string): Promise<Student | null> {
     console.error("Error code:", error.code);
     console.error("Error message:", error.message);
   }
-  
+
+  if (options?.email) {
+    try {
+      const studentsRef = collection(dbInstance, "students");
+      const emailQ = query(studentsRef, where("email", "==", options.email));
+      const emailSnap = await getDocs(emailQ);
+      const match = emailSnap.docs.find((d) => d.id === studentId);
+      if (match) {
+        return { id: match.id, ...match.data() } as Student;
+      }
+    } catch (err) {
+      console.error("Error finding student by email:", err);
+    }
+  }
+
   return null;
 }
 
