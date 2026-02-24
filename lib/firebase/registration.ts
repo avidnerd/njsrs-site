@@ -84,8 +84,6 @@ export async function registerStudent(
   
   await signInWithEmailAndPassword(auth, email, password);
   console.log("Signed in user to enable Firestore writes");
-  await userCredential.user.getIdToken(true);
-  await new Promise((r) => setTimeout(r, 800));
 
   try {
     console.log("Creating student document with ID:", primaryStudentId);
@@ -105,15 +103,10 @@ export async function registerStudent(
 
     console.log("Student document created successfully");
 
-    const { getDocFromServer, doc } = await import("firebase/firestore");
+    const { getDoc, doc } = await import("firebase/firestore");
     const { db } = await import("./config");
     if (db) {
-      const studentRef = doc(db, "students", primaryStudentId);
-      let verifyDoc = await getDocFromServer(studentRef);
-      if (!snapshotExists(verifyDoc)) {
-        await new Promise((r) => setTimeout(r, 1500));
-        verifyDoc = await getDocFromServer(studentRef);
-      }
+      const verifyDoc = await getDoc(doc(db, "students", primaryStudentId));
       if (!snapshotExists(verifyDoc)) {
         throw new Error("Student document was not created - verification failed");
       }

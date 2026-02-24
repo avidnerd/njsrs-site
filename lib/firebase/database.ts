@@ -2,7 +2,6 @@ import {
   collection,
   doc,
   getDoc,
-  getDocFromServer,
   getDocs,
   setDoc,
   updateDoc,
@@ -378,47 +377,17 @@ export function snapshotExists(snapshot: { exists?: boolean | (() => boolean) })
   return Boolean(s.exists);
 }
 
-export async function ensurePlaceholderStudentDoc(uid: string, email: string): Promise<boolean> {
-  const dbInstance = ensureDb();
-  const studentRef = doc(dbInstance, "students", uid);
-  const existing = await getDoc(studentRef);
-  if (snapshotExists(existing)) return false;
-  try {
-    await setDoc(studentRef, {
-      firstName: "Pending",
-      lastName: "Sync",
-      email,
-      schoolId: "",
-      schoolName: "(Unknown – add in dashboard)",
-      sraId: "",
-      sraName: "(Unknown – add in dashboard)",
-      grade: "?",
-      status: "approved",
-      approvedAt: Timestamp.now(),
-      createdAt: Timestamp.now(),
-      paymentStatus: "not_received",
-    });
-    return true;
-  } catch (error: unknown) {
-    console.error("Error creating placeholder student doc:", error);
-    return false;
-  }
-}
-
-export async function getStudent(
-  studentId: string,
-  options?: { email?: string }
-): Promise<Student | null> {
+export async function getStudent(studentId: string): Promise<Student | null> {
   const dbInstance = ensureDb();
   const studentRef = doc(dbInstance, "students", studentId);
 
   try {
-    let studentDoc = await getDocFromServer(studentRef);
+    let studentDoc = await getDoc(studentRef);
     if (snapshotExists(studentDoc)) {
       return { id: studentDoc.id, ...studentDoc.data() } as Student;
     }
     await new Promise((r) => setTimeout(r, 800));
-    studentDoc = await getDocFromServer(studentRef);
+    studentDoc = await getDoc(studentRef);
     if (snapshotExists(studentDoc)) {
       return { id: studentDoc.id, ...studentDoc.data() } as Student;
     }
@@ -524,20 +493,6 @@ export async function getStudent(
     console.error("Error querying for team member student:", error);
     console.error("Error code:", error.code);
     console.error("Error message:", error.message);
-  }
-
-  if (options?.email) {
-    try {
-      const studentsRef = collection(dbInstance, "students");
-      const emailQ = query(studentsRef, where("email", "==", options.email));
-      const emailSnap = await getDocs(emailQ);
-      const match = emailSnap.docs.find((d) => d.id === studentId);
-      if (match) {
-        return { id: match.id, ...match.data() } as Student;
-      }
-    } catch (err) {
-      console.error("Error finding student by email:", err);
-    }
   }
 
   return null;
