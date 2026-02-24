@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { logoutUser } from "@/lib/firebase/auth";
-import { getStudent, ensurePlaceholderStudentDoc } from "@/lib/firebase/database";
+import { getStudent } from "@/lib/firebase/database";
 import StudentStatus from "@/components/dashboard/StudentStatus";
 import StudentMaterials from "@/components/dashboard/StudentMaterials";
 import PhotoRelease from "@/components/dashboard/PhotoRelease";
@@ -28,9 +28,9 @@ export default function StudentDashboardPage() {
     
     try {
       let studentData = await getStudent(user.uid);
-      if (!studentData && user.email) {
-        const created = await ensurePlaceholderStudentDoc(user.uid, user.email);
-        if (created) studentData = await getStudent(user.uid);
+      if (!studentData) {
+        await new Promise((r) => setTimeout(r, 2000));
+        studentData = await getStudent(user.uid);
       }
       if (!studentData) {
         console.error("Student data not found for user:", user.uid);
