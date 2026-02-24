@@ -49,14 +49,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           
           if (snapshotExists(userDoc)) {
             const data = userDoc.data();
-            
-            const profileData: UserProfile = {
-              ...data,
-              createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
-              verificationCodeExpiry: data.verificationCodeExpiry?.toDate ? data.verificationCodeExpiry.toDate() : data.verificationCodeExpiry,
-            } as UserProfile;
-            
-            setUserProfile(profileData);
+            if (data) {
+              const profileData: UserProfile = {
+                ...data,
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
+                verificationCodeExpiry: data.verificationCodeExpiry?.toDate ? data.verificationCodeExpiry.toDate() : data.verificationCodeExpiry,
+              } as UserProfile;
+
+              setUserProfile(profileData);
+            } else {
+              setUserProfile(null);
+            }
           } else {
             setUserProfile(null);
           }
