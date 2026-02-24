@@ -84,6 +84,8 @@ export async function registerStudent(
   
   await signInWithEmailAndPassword(auth, email, password);
   console.log("Signed in user to enable Firestore writes");
+  await userCredential.user.getIdToken(true);
+  await new Promise((r) => setTimeout(r, 600));
 
   try {
     console.log("Creating student document with ID:", primaryStudentId);
