@@ -1,23 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 
-if (!admin.apps.length) {
-  try {
-    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
-    if (serviceAccount) {
-      const serviceAccountJson = JSON.parse(serviceAccount);
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccountJson),
-      });
+function getDb() {
+  if (!admin.apps.length) {
+    try {
+      const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+      if (serviceAccount) {
+        const serviceAccountJson = JSON.parse(serviceAccount);
+        admin.initializeApp({
+          credential: admin.credential.cert(serviceAccountJson),
+        });
+      }
+    } catch (error) {
+      console.error("Error initializing Firebase Admin:", error);
     }
-  } catch (error) {
-    console.error("Error initializing Firebase Admin:", error);
   }
+  return admin.apps.length ? admin.firestore() : null;
 }
 
-const db = admin.firestore();
-
 export async function GET(request: NextRequest) {
+  const db = getDb();
+  if (!db) {
+    return NextResponse.json({ error: "Server configuration error" }, { status: 503 });
+  }
   try {
     const { searchParams } = new URL(request.url);
     const token = searchParams.get("token");
@@ -75,6 +80,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const db = getDb();
+  if (!db) {
+    return NextResponse.json({ error: "Server configuration error" }, { status: 503 });
+  }
   try {
     const body = await request.json();
     const { token, signature } = body;

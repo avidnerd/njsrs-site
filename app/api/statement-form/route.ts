@@ -1,37 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
-import { initializeApp, getApps, cert, App } from "firebase-admin/app";
+import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getFirestore, Timestamp, Firestore } from "firebase-admin/firestore";
 
-
-let db: Firestore;
-
-try {
-  if (!getApps().length) {
-    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
-    if (serviceAccount) {
-      try {
-        const serviceAccountJson = JSON.parse(serviceAccount);
-        initializeApp({
-          credential: cert(serviceAccountJson),
-        });
-      } catch (parseError) {
-        console.error("Error parsing FIREBASE_SERVICE_ACCOUNT:", parseError);
-        
+function getDb(): Firestore | null {
+  try {
+    if (!getApps().length) {
+      const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+      if (serviceAccount) {
+        try {
+          const serviceAccountJson = JSON.parse(serviceAccount);
+          initializeApp({ credential: cert(serviceAccountJson) });
+        } catch {
+          initializeApp();
+        }
+      } else {
         initializeApp();
       }
-    } else {
-      
-      initializeApp();
     }
+    return getFirestore();
+  } catch (error) {
+    console.error("Firebase Admin initialization error:", error);
+    return null;
   }
-  db = getFirestore();
-} catch (error) {
-  console.error("Firebase Admin initialization error:", error);
-  
-  db = getFirestore();
 }
 
 export async function GET(request: NextRequest) {
+  const db = getDb();
+  if (!db) {
+    return NextResponse.json({ error: "Server configuration error" }, { status: 503 });
+  }
   try {
     const { searchParams } = new URL(request.url);
     const token = searchParams.get("token");
@@ -114,6 +111,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const db = getDb();
+  if (!db) {
+    return NextResponse.json({ error: "Server configuration error" }, { status: 503 });
+  }
   try {
     const body = await request.json();
     const { token, formData, signerType } = body;

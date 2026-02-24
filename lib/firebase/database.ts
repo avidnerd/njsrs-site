@@ -543,28 +543,29 @@ export async function updateStudentProject(
     const studentDoc = await getDoc(studentRef);
     if (snapshotExists(studentDoc)) {
       const currentData = studentDoc.data();
-      const currentSOA = currentData.statementOfOutsideAssistance || {};
-      
-      const resetSOA = {
-        ...currentSOA,
-        studentCompleted: false,
-        studentSignature: null,
-        teacherCompleted: false,
-        mentorCompleted: false,
-        parentCompleted: false,
-        teacherInviteSent: false,
-        mentorInviteSent: false,
-        parentInviteSent: false,
-      };
-      
-      await updateDoc(studentRef, {
-        ...updates,
-        statementOfOutsideAssistance: resetSOA,
-      });
-      return;
+      if (currentData) {
+        const currentSOA = currentData.statementOfOutsideAssistance || {};
+        const resetSOA = {
+          ...currentSOA,
+          studentCompleted: false,
+          studentSignature: null,
+          teacherCompleted: false,
+          mentorCompleted: false,
+          parentCompleted: false,
+          teacherInviteSent: false,
+          mentorInviteSent: false,
+          parentInviteSent: false,
+        };
+        await updateDoc(studentRef, {
+          ...updates,
+          statementOfOutsideAssistance: resetSOA,
+        });
+        return;
+      }
     }
   }
-  
+
+
   await updateDoc(studentRef, updates);
 }
 

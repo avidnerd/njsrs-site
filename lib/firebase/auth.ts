@@ -81,8 +81,10 @@ export async function verifyEmailCode(
   }
 
   const userData = userDoc.data();
+  if (!userData) return false;
+
   const now = new Date();
-  const expiry = userData.verificationCodeExpiry?.toDate();
+  const expiry = userData.verificationCodeExpiry?.toDate?.();
 
   if (
     userData.verificationCode === code &&
@@ -137,7 +139,8 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   if (!snapshotExists(userDoc)) {
     return null;
   }
-  return userDoc.data() as UserProfile;
+  const data = userDoc.data();
+  return data ? (data as UserProfile) : null;
 }
 
 export async function resendVerificationCode(userId: string): Promise<string> {
@@ -149,7 +152,8 @@ export async function resendVerificationCode(userId: string): Promise<string> {
   }
 
   const userData = userDoc.data();
-  
+  if (!userData) throw new Error("User not found");
+
   if (userData.emailVerified) {
     throw new Error("Email already verified");
   }

@@ -1,5 +1,7 @@
 const nextConfig = {
   reactStrictMode: true,
+  serverExternalPackages: ["@sendgrid/mail"],
+  turbopack: {},
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
