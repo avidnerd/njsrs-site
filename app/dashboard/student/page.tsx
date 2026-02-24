@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { logoutUser } from "@/lib/firebase/auth";
-import { getStudent } from "@/lib/firebase/database";
+import { getStudent, ensurePlaceholderStudentDoc } from "@/lib/firebase/database";
 import StudentStatus from "@/components/dashboard/StudentStatus";
 import StudentMaterials from "@/components/dashboard/StudentMaterials";
 import PhotoRelease from "@/components/dashboard/PhotoRelease";
@@ -27,15 +27,17 @@ export default function StudentDashboardPage() {
     if (!user) return;
     
     try {
-      const studentData = await getStudent(user.uid);
+      let studentData = await getStudent(user.uid);
+      if (!studentData && user.email) {
+        const created = await ensurePlaceholderStudentDoc(user.uid, user.email);
+        if (created) studentData = await getStudent(user.uid);
+      }
       if (!studentData) {
         console.error("Student data not found for user:", user.uid);
-        console.error("This might be a team member - checking if student document exists with teamMemberUserId");
       }
       setStudent(studentData);
     } catch (error) {
       console.error("Error loading student data:", error);
-      console.error("Error details:", error);
     } finally {
       setLoading(false);
     }

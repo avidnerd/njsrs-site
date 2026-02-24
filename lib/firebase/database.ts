@@ -377,6 +377,33 @@ export function snapshotExists(snapshot: { exists?: boolean | (() => boolean) })
   return Boolean(s.exists);
 }
 
+export async function ensurePlaceholderStudentDoc(uid: string, email: string): Promise<boolean> {
+  const dbInstance = ensureDb();
+  const studentRef = doc(dbInstance, "students", uid);
+  const existing = await getDoc(studentRef);
+  if (snapshotExists(existing)) return false;
+  try {
+    await setDoc(studentRef, {
+      firstName: "Pending",
+      lastName: "Sync",
+      email,
+      schoolId: "",
+      schoolName: "(Unknown – add in dashboard)",
+      sraId: "",
+      sraName: "(Unknown – add in dashboard)",
+      grade: "?",
+      status: "approved",
+      approvedAt: Timestamp.now(),
+      createdAt: Timestamp.now(),
+      paymentStatus: "not_received",
+    });
+    return true;
+  } catch (error: unknown) {
+    console.error("Error creating placeholder student doc:", error);
+    return false;
+  }
+}
+
 export async function getStudent(studentId: string): Promise<Student | null> {
   const dbInstance = ensureDb();
   const studentRef = doc(dbInstance, "students", studentId);
