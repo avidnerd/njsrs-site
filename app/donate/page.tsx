@@ -76,9 +76,9 @@ export default function DonatePage() {
             Sponsorship Levels
           </h2>
           <p className="text-gray-700 mb-8 max-w-2xl">
-            Donors at our sponsorship levels will be featured on event T-shirts, signage, and our website. Choose the tier that fits your organization and receive recognition that helps inspire the next generation of scientists.
+            Donors at our sponsorship levels will be featured on event T-shirts, signage, and our website. Choose the tier that fits your organization and receive recognition that helps inspire the next generation of scientists. 
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="relative overflow-hidden rounded-xl border-2 border-gray-300 bg-gradient-to-b from-gray-50 to-gray-100 p-6 shadow-lg hover:shadow-xl transition-shadow">
               <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gray-300 to-gray-400 rounded-bl-full opacity-80" />
               <div className="relative">
@@ -89,7 +89,6 @@ export default function DonatePage() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-1">Silver</h3>
                 <p className="text-3xl font-extrabold text-gray-700 mb-4">$100</p>
-                <p className="text-gray-600 text-sm">Ideal for individuals and local businesses supporting student research.</p>
               </div>
             </div>
             <div className="relative overflow-hidden rounded-xl border-2 border-amber-400 bg-gradient-to-b from-amber-50 to-amber-100 p-6 shadow-lg hover:shadow-xl transition-shadow ring-2 ring-amber-300/50">
@@ -102,7 +101,18 @@ export default function DonatePage() {
                 </div>
                 <h3 className="text-xl font-bold text-amber-900 mb-1">Gold</h3>
                 <p className="text-3xl font-extrabold text-amber-800 mb-4">$250</p>
-                <p className="text-amber-900/80 text-sm">Perfect for companies and foundations making a meaningful impact.</p>
+              </div>
+            </div>
+            <div className="relative overflow-hidden rounded-xl border-2 border-slate-400 bg-gradient-to-b from-slate-50 to-slate-200 p-6 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-slate-300 to-slate-500 rounded-bl-full opacity-80" />
+              <div className="relative">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center mb-4 shadow-inner">
+                  <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l2.4 7.2h7.6l-6 4.6 2.3 7-6.3-4.5-6.3 4.5 2.3-7-6-4.6h7.6L12 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-1">Platinum</h3>
+                <p className="text-3xl font-extrabold text-slate-700 mb-4">$500</p>
               </div>
             </div>
             <div className="relative overflow-hidden rounded-xl border-2 border-indigo-400 bg-gradient-to-b from-indigo-50 via-purple-50 to-indigo-100 p-6 shadow-lg hover:shadow-xl transition-shadow ring-2 ring-indigo-300/50">
@@ -114,8 +124,7 @@ export default function DonatePage() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-indigo-900 mb-1">Diamond</h3>
-                <p className="text-3xl font-extrabold text-indigo-800 mb-4">$500</p>
-                <p className="text-indigo-900/80 text-sm">Premier visibility for major supporters of STEM education.</p>
+                <p className="text-3xl font-extrabold text-indigo-800 mb-4">$750+</p>
               </div>
             </div>
           </div>
