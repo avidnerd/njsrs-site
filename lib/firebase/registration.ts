@@ -1,5 +1,5 @@
 import { registerUser } from "./auth";
-import { createSRA, createStudent, createJudge, createSchool, getSRAsBySchool, snapshotExists } from "./database";
+import { createSRA, createJudge, createSchool, getSRAsBySchool, snapshotExists } from "./database";
 import type { SRA, Student, Judge, School } from "./database";
 
 export async function registerSRA(
@@ -84,41 +84,29 @@ export async function registerStudent(
   
   await signInWithEmailAndPassword(auth, email, password);
   console.log("Signed in user to enable Firestore writes");
-  await userCredential.user.getIdToken(true);
-  await new Promise((r) => setTimeout(r, 600));
+
+  const payload = {
+    ...studentData,
+    email,
+    sraName: `${selectedSRA.firstName} ${selectedSRA.lastName}`,
+    teamMemberUserId,
+  };
 
   try {
-    console.log("Creating student document with ID:", primaryStudentId);
-    console.log("Student data:", {
-      ...studentData,
-      email,
-      sraName: `${selectedSRA.firstName} ${selectedSRA.lastName}`,
-      teamMemberUserId,
+    const idToken = await userCredential.user.getIdToken(true);
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL || "";
+    const res = await fetch(`${baseUrl}/api/create-student`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken, studentData: payload }),
     });
-
-    await createStudent(primaryStudentId, {
-      ...studentData,
-      email,
-      sraName: `${selectedSRA.firstName} ${selectedSRA.lastName}`,
-      teamMemberUserId,
-    });
-
-    console.log("Student document created successfully");
-
-    const { getDoc, doc } = await import("firebase/firestore");
-    const { db } = await import("./config");
-    if (db) {
-      const verifyDoc = await getDoc(doc(db, "students", primaryStudentId));
-      if (!snapshotExists(verifyDoc)) {
-        throw new Error("Student document was not created - verification failed");
-      }
-      console.log("Verified: Student document exists in Firestore");
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.error || `Server returned ${res.status}`);
     }
+    console.log("Student document created successfully via API");
   } catch (error: any) {
     console.error("Error creating student document:", error);
-    console.error("Error code:", error.code);
-    console.error("Error message:", error.message);
-    console.error("Error stack:", error.stack);
     throw new Error(`Failed to create student document: ${error.message || "Unknown error"}`);
   }
 
