@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import ConditionalAuth from '@/components/auth/ConditionalAuth'
+import DeadlineBanner from '@/components/DeadlineBanner'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -34,6 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} flex flex-col min-h-screen`}>
+        <DeadlineBanner />
         <style dangerouslySetInnerHTML={{
           __html: `
             label, label.block, label.text-sm, form label, div label {
