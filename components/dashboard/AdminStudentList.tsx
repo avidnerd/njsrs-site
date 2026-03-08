@@ -158,6 +158,12 @@ export default function AdminStudentList() {
 
   return (
     <div className="space-y-4">
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold text-gray-900">
+          All Students ({filteredStudents.length}
+          {searchTerm ? ` of ${students.length}` : ""})
+        </h3>
+      </div>
       <div className="flex justify-between items-center mb-4">
         <input
           type="text"
