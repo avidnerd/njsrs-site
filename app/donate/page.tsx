@@ -88,7 +88,8 @@ export default function DonatePage() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-1">Silver</h3>
-                <p className="text-3xl font-extrabold text-gray-700 mb-4">$100</p>
+                <p className="text-2xl font-extrabold text-gray-700 mb-3">$100 – $249</p>
+                <p className="text-sm text-gray-600">Recognition on the NJSRS website.</p>
               </div>
             </div>
             <div className="relative overflow-hidden rounded-xl border-2 border-amber-400 bg-gradient-to-b from-amber-50 to-amber-100 p-6 shadow-lg hover:shadow-xl transition-shadow ring-2 ring-amber-300/50">
@@ -100,7 +101,8 @@ export default function DonatePage() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-amber-900 mb-1">Gold</h3>
-                <p className="text-3xl font-extrabold text-amber-800 mb-4">$250</p>
+                <p className="text-2xl font-extrabold text-amber-800 mb-3">$250 – $499</p>
+                <p className="text-sm text-amber-900/80">Recognition on the NJSRS website and event signage.</p>
               </div>
             </div>
             <div className="relative overflow-hidden rounded-xl border-2 border-slate-400 bg-gradient-to-b from-slate-50 to-slate-200 p-6 shadow-lg hover:shadow-xl transition-shadow">
@@ -112,7 +114,8 @@ export default function DonatePage() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-slate-800 mb-1">Platinum</h3>
-                <p className="text-3xl font-extrabold text-slate-700 mb-4">$500</p>
+                <p className="text-2xl font-extrabold text-slate-700 mb-3">$500 – $749</p>
+                <p className="text-sm text-slate-700/90">Recognition on the NJSRS website, event signage, and event merchandise (t-shirts).</p>
               </div>
             </div>
             <div className="relative overflow-hidden rounded-xl border-2 border-indigo-400 bg-gradient-to-b from-indigo-50 via-purple-50 to-indigo-100 p-6 shadow-lg hover:shadow-xl transition-shadow ring-2 ring-indigo-300/50">
@@ -124,7 +127,8 @@ export default function DonatePage() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-indigo-900 mb-1">Diamond</h3>
-                <p className="text-3xl font-extrabold text-indigo-800 mb-4">$750+</p>
+                <p className="text-2xl font-extrabold text-indigo-800 mb-3">$750+</p>
+                <p className="text-sm text-indigo-900/80">Recognition on the website, signage, and merchandise, plus a special acknowledgment during the awards ceremony.</p>
               </div>
             </div>
           </div>
