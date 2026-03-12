@@ -188,13 +188,13 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
     
     if (field === "teacherEmail" && value !== formData.teacherEmail) {
       updated.teacherInviteSent = false;
-      updated.teacherInviteToken = undefined;
+      delete updated.teacherInviteToken;
     } else if (field === "mentorEmail" && value !== formData.mentorEmail) {
       updated.mentorInviteSent = false;
-      updated.mentorInviteToken = undefined;
+      delete updated.mentorInviteToken;
     } else if (field === "parentEmail" && value !== formData.parentEmail) {
       updated.parentInviteSent = false;
-      updated.parentInviteToken = undefined;
+      delete updated.parentInviteToken;
     }
     
     setFormData(updated);
