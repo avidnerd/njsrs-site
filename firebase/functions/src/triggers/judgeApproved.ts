@@ -17,7 +17,7 @@ export const onJudgeApproved = functions.firestore
             <p>Dear ${after.firstName} ${after.lastName},</p>
             <p>Great news! Your judge application has been reviewed and approved by the Fair Director.</p>
             <p>You can now access your judge dashboard. Additional information about judging assignments will be sent closer to the event date.</p>
-            <p><a href="https://your-domain.com/dashboard/judge" style="background-color: #10b981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Access Your Dashboard</a></p>
+            <p>To access your dashboard, log in with your account and click <strong>Dashboard</strong> in the site navigation.</p>
             <p>Thank you for your commitment to the New Jersey Science Research Symposium!</p>
             <p>Best regards,<br>The NJSRS Team</p>
           `,

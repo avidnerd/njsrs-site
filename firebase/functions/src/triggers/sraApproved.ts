@@ -17,7 +17,7 @@ export const onSRAApproved = functions.firestore
             <p>Dear ${after.firstName} ${after.lastName},</p>
             <p>Great news! Your Science Research Advisor registration has been approved by the Fair Director.</p>
             <p>You can now access your dashboard to manage students from ${after.schoolName}.</p>
-            <p><a href="https://your-domain.com/dashboard/sra" style="background-color: #10b981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Access Your Dashboard</a></p>
+            <p>To access your dashboard, log in with your account and click <strong>Dashboard</strong> in the site navigation.</p>
             <p>Best regards,<br>The NJSRS Team</p>
           `,
         });
