@@ -36,14 +36,21 @@ export default function DonatePage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="bg-white h-32 rounded border border-gray-200 flex items-center justify-center p-4">
-              <img 
-                src="/mef_logo.png" 
-                alt="Millburn Education Foundation" 
+              <img
+                src="/mef_logo.png"
+                alt="Millburn Education Foundation"
                 className="max-h-full max-w-full object-contain"
               />
             </div>
-            <div className="bg-gray-200 h-32 rounded flex items-center justify-center">
-              <span className="text-gray-500">Coming Soon</span>
+            <div className="bg-gradient-to-b from-amber-50 to-amber-100/80 min-h-[9.5rem] rounded border-2 border-amber-300 flex flex-col items-center justify-center gap-2 p-4 shadow-sm">
+              <span className="text-xs font-bold uppercase tracking-wide text-amber-900">
+                Gold sponsor
+              </span>
+              <img
+                src="/beyond_young.jpeg"
+                alt="Beyond Young"
+                className="max-h-24 w-full object-contain"
+              />
             </div>
           </div>
           <p className="text-gray-700 mb-4">

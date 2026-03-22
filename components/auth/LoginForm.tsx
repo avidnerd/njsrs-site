@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { loginUser } from "@/lib/firebase/auth";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginForm() {
@@ -10,7 +9,6 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const { user, userProfile, loading: authLoading } = useAuth();
 
   useEffect(() => {
@@ -22,11 +20,6 @@ export default function LoginForm() {
       setLoading(false);
     }
   }, [user, userProfile, authLoading, loading]);
-
-  useEffect(() => {
-    return () => {
-    };
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +33,7 @@ export default function LoginForm() {
 
     try {
       await loginUser(email, password);
+      clearTimeout(timeoutId);
     } catch (err: any) {
       clearTimeout(timeoutId);
       setError(err.message || "Failed to log in");

@@ -19,7 +19,7 @@ export default function AboutPage() {
   const committeeMembers = [
     {
       name: 'Subhi Stephan',
-      role: 'Tech Committee Chair, Logistics Co-Chair',
+      role: 'Tech Committee Chair, Administrative Manager, Logistics Co-Chair',
       description: 'Developer of the website and portal, and lead of technology management',
       image: '/subhi_stephan.jpg',
     },
