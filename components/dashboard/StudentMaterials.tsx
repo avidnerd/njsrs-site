@@ -14,7 +14,7 @@ interface StudentMaterialsProps {
 }
 
 
-const EDITING_DEADLINE = new Date("2026-03-24T00:00:00");
+const EDITING_DEADLINE = new Date("2026-03-28T00:00:00");
 
 export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps) {
   const { user } = useAuth();
