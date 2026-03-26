@@ -82,7 +82,7 @@ export async function registerStudent(
     throw new Error("Firebase Auth not initialized");
   }
   
-  await signInWithEmailAndPassword(auth, email, password);
+  const signInResult = await signInWithEmailAndPassword(auth, email, password);
   console.log("Signed in user to enable Firestore writes");
 
   const payload = {
@@ -93,7 +93,7 @@ export async function registerStudent(
   };
 
   try {
-    const idToken = await userCredential.user.getIdToken(true);
+    const idToken = await signInResult.user.getIdToken(true);
     const baseUrl = typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL || "";
     const res = await fetch(`${baseUrl}/api/create-student`, {
       method: "POST",
