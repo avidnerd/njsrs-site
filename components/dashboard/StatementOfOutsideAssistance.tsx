@@ -54,13 +54,13 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
   };
 
   const saveForm = async () => {
-    if (!user) return;
+    if (!user || !student?.id) return;
     setSaving(true);
     setError("");
     setSuccess("");
-    
+
     try {
-      await updateStudentMaterials(user.uid, {
+      await updateStudentMaterials(student.id, {
         statementOfOutsideAssistance: formData,
       });
       setSuccess("Form saved successfully!");
@@ -76,7 +76,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
   };
 
   const sendInvitation = async (type: "teacher" | "mentor" | "parent", email: string) => {
-    if (!user || !email.trim()) {
+    if (!user || !student?.id || !email.trim()) {
       setError("Please enter a valid email address");
       return;
     }
@@ -92,15 +92,13 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
     setSuccess("");
 
     try {
-      
-      const token = `${user.uid}_${type}_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-      
-      
+      const token = `${student.id}_${type}_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
       const response = await fetch("/api/send-statement-invitation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          studentId: user.uid,
+          studentId: student.id,
           studentName: `${student?.firstName} ${student?.lastName}`,
           type,
           email,
@@ -113,7 +111,6 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
         throw new Error(errorData.error || "Failed to send invitation email");
       }
 
-      
       const updatedFormData = { ...formData };
       if (type === "teacher") {
         updatedFormData.teacherEmail = email;
@@ -129,7 +126,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
         updatedFormData.parentInviteToken = token;
       }
 
-      await updateStudentMaterials(user.uid, {
+      await updateStudentMaterials(student.id, {
         statementOfOutsideAssistance: updatedFormData,
       });
 
@@ -165,7 +162,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
         studentCompleted: true,
       };
 
-      await updateStudentMaterials(user.uid, {
+      await updateStudentMaterials(student.id, {
         statementOfOutsideAssistance: updatedFormData,
       });
 

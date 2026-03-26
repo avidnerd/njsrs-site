@@ -14,7 +14,8 @@ interface StudentMaterialsProps {
 }
 
 
-const EDITING_DEADLINE = new Date("2026-04-01T00:00:00");
+const REPORT_ABSTRACT_DEADLINE = new Date("2026-04-01T00:00:00");
+const SLIDES_SOA_DEADLINE = new Date("2026-04-13T00:00:00");
 
 export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps) {
   const { user } = useAuth();
@@ -22,9 +23,10 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<"research" | "slideshow" | "statement">("research");
-  
-  
-  const isEditingDisabled = new Date() >= EDITING_DEADLINE;
+
+  const now = new Date();
+  const isReportAbstractDisabled = now >= REPORT_ABSTRACT_DEADLINE;
+  const isSlidesSOADisabled = now >= SLIDES_SOA_DEADLINE;
 
   useEffect(() => {
     if (user) {
@@ -93,7 +95,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-2xl font-bold text-primary-blue mb-6">Submit Competition Materials</h2>
       
-      {isEditingDisabled && (
+      {(isReportAbstractDisabled || isSlidesSOADisabled) && (
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
           <div className="flex">
             <div className="flex-shrink-0">
@@ -103,7 +105,11 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
             </div>
             <div className="ml-3">
               <p className="text-sm text-yellow-700">
-                <strong>Editing Deadline Passed:</strong> The deadline for editing materials was April 1, 2026. You can still view your submitted materials, but editing is no longer available.
+                {isSlidesSOADisabled ? (
+                  <><strong>All Deadlines Passed:</strong> The deadline for all competition materials was April 13, 2026. You can still view your submitted materials, but editing is no longer available.</>
+                ) : (
+                  <><strong>Partial Deadline Passed:</strong> The deadline for the research report and abstract was April 1, 2026. You may still edit your slideshow and Statement of Outside Assistance until April 13, 2026.</>
+                )}
               </p>
             </div>
           </div>
@@ -161,7 +167,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
               onUpload={handleResearchReportUpload}
               currentFile={student.researchReportUrl}
               maxSizeMB={15}
-              disabled={isEditingDisabled}
+              disabled={isReportAbstractDisabled}
             />
           </div>
 
@@ -185,7 +191,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
               onUpload={handleAbstractUpload}
               currentFile={student.abstractUrl}
               maxSizeMB={5}
-              disabled={isEditingDisabled}
+              disabled={isReportAbstractDisabled}
             />
           </div>
         </div>
@@ -210,7 +216,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
               onUpload={handleSlideshowUpload}
               currentFile={student.slideshowUrl}
               maxSizeMB={25}
-              disabled={isEditingDisabled}
+              disabled={isSlidesSOADisabled}
             />
           </div>
         </div>
@@ -218,7 +224,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
 
       {}
       {activeSection === "statement" && (
-        <StatementOfOutsideAssistance onFormUpdate={onFormUpdate} disabled={isEditingDisabled} />
+        <StatementOfOutsideAssistance onFormUpdate={onFormUpdate} disabled={isSlidesSOADisabled} />
       )}
     </div>
   );
