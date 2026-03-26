@@ -84,6 +84,14 @@ export default function StudentDashboardPage() {
           </div>
         </div>
 
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+            <p className="text-sm text-blue-800">
+              <strong>Deadline Reminder:</strong> All research reports and competition materials must be submitted by <strong>April 1, 2026</strong>. No submissions will be accepted after this date.
+            </p>
+          </div>
+        </div>
+
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {loading ? (
             <div className="text-center py-12">

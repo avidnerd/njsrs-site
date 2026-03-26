@@ -14,7 +14,7 @@ interface StudentMaterialsProps {
 }
 
 
-const EDITING_DEADLINE = new Date("2026-03-28T00:00:00");
+const EDITING_DEADLINE = new Date("2026-04-01T00:00:00");
 
 export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps) {
   const { user } = useAuth();
@@ -103,7 +103,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
             </div>
             <div className="ml-3">
               <p className="text-sm text-yellow-700">
-                <strong>Editing Deadline Passed:</strong> The deadline for editing materials was March 28, 2026. You can still view your submitted materials, but editing is no longer available.
+                <strong>Editing Deadline Passed:</strong> The deadline for editing materials was April 1, 2026. You can still view your submitted materials, but editing is no longer available.
               </p>
             </div>
           </div>
