@@ -28,7 +28,7 @@ export default function DeadlineBanner() {
   return (
     <div className="bg-amber-500 text-amber-950 px-4 py-2.5 flex items-center justify-center gap-4 text-center text-sm font-medium shadow">
       <span>
-        <strong>REGISTRATION FOR THE 2026 NJSRS HAS ENDED.</strong>
+        <strong>REGISTRATION FOR THE 2026 NJSRS HAS ENDED. See you next year!</strong>
       </span>
       <button
         type="button"
