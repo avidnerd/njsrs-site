@@ -67,16 +67,22 @@ export default function AdminStudentList() {
     }
   };
 
-  const filteredStudents = students.filter((student) => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      student.firstName?.toLowerCase().includes(searchLower) ||
-      student.lastName?.toLowerCase().includes(searchLower) ||
-      student.schoolName?.toLowerCase().includes(searchLower) ||
-      student.projectTitle?.toLowerCase().includes(searchLower) ||
-      student.email?.toLowerCase().includes(searchLower)
-    );
-  });
+  const filteredStudents = students
+    .filter((student) => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        student.firstName?.toLowerCase().includes(searchLower) ||
+        student.lastName?.toLowerCase().includes(searchLower) ||
+        student.schoolName?.toLowerCase().includes(searchLower) ||
+        student.projectTitle?.toLowerCase().includes(searchLower) ||
+        student.email?.toLowerCase().includes(searchLower)
+      );
+    })
+    .sort((a, b) => {
+      const last = (a.lastName ?? "").localeCompare(b.lastName ?? "");
+      if (last !== 0) return last;
+      return (a.firstName ?? "").localeCompare(b.firstName ?? "");
+    });
 
   const exportToCSV = () => {
     const headers = [
