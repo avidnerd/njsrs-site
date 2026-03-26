@@ -149,7 +149,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
       return;
     }
 
-    if (!user) return;
+    if (!user || !student?.id) return;
     setSaving(true);
     setError("");
     setSuccess("");
