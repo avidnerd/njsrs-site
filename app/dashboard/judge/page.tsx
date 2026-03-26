@@ -7,12 +7,16 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { logoutUser } from "@/lib/firebase/auth";
 import { getJudge } from "@/lib/firebase/database";
 import type { Judge } from "@/lib/firebase/database";
+import JudgeScoringPanel from "@/components/judging/JudgeScoringPanel";
+
+type PhaseTab = "category" | "final";
 
 export default function JudgeDashboardPage() {
   const { user, userProfile } = useAuth();
   const router = useRouter();
   const [judgeData, setJudgeData] = useState<Judge | null>(null);
   const [loading, setLoading] = useState(true);
+  const [phaseTab, setPhaseTab] = useState<PhaseTab>("category");
 
   useEffect(() => {
     if (user && userProfile?.role === "judge") {
@@ -22,7 +26,7 @@ export default function JudgeDashboardPage() {
 
   const loadJudgeData = async () => {
     if (!user) return;
-    
+
     try {
       const judge = await getJudge(user.uid);
       setJudgeData(judge);
@@ -44,12 +48,12 @@ export default function JudgeDashboardPage() {
 
   return (
     <ProtectedRoute allowedRoles={["judge"]}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 pb-10">
         <div className="bg-white shadow">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex justify-between items-center">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex justify-between items-center gap-3">
               <div>
-                <h1 className="text-2xl font-bold text-primary-blue">
+                <h1 className="text-xl sm:text-2xl font-bold text-primary-blue">
                   Judge Dashboard
                 </h1>
                 {judgeData && (
@@ -60,7 +64,7 @@ export default function JudgeDashboardPage() {
               </div>
               <button
                 onClick={handleLogout}
-                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300"
+                className="shrink-0 bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 text-sm min-h-[44px]"
               >
                 Logout
               </button>
@@ -68,46 +72,54 @@ export default function JudgeDashboardPage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {loading ? (
             <div className="text-center py-12">
-              <div className="text-lg">Loading...</div>
+              <div className="text-lg text-gray-600">Loading…</div>
             </div>
           ) : judgeData && !judgeData.adminApproved ? (
-            <div className="bg-white rounded-lg shadow-md p-8 text-center">
-              <div className="mb-4">
-                <svg
-                  className="mx-auto h-12 w-12 text-yellow-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Awaiting Admin Approval
+            <div className="bg-white rounded-lg shadow-md p-6 sm:p-8 text-center">
+              <h2 className="text-xl font-bold text-gray-900 mb-3">
+                Awaiting admin approval
               </h2>
-              <p className="text-gray-600 mb-6">
-                Your judge application is pending review by the Fair Director. 
-                You will receive an email notification once your application has been approved.
-              </p>
-              <p className="text-sm text-gray-500">
-                Please check back later or contact support if you have any questions.
+              <p className="text-gray-600 text-sm sm:text-base">
+                Your judge application is pending review. You will receive an email when you are
+                approved.
               </p>
             </div>
-          ) : (
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-gray-600">
-                Judge dashboard functionality will be available closer to the event date.
+          ) : user ? (
+            <div className="space-y-6">
+              <p className="text-sm text-gray-600">
+                View your assigned projects, open each student&apos;s research paper, enter rubric
+                scores, private notes, and ranks. Tap a student to expand the scoring form.
               </p>
+              <div className="flex rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setPhaseTab("category")}
+                  className={`flex-1 py-3 px-2 rounded-md text-sm font-medium transition-colors min-h-[44px] ${
+                    phaseTab === "category"
+                      ? "bg-amber-100 text-amber-900"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  Category judging
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPhaseTab("final")}
+                  className={`flex-1 py-3 px-2 rounded-md text-sm font-medium transition-colors min-h-[44px] ${
+                    phaseTab === "final"
+                      ? "bg-indigo-100 text-indigo-900"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  Final round
+                </button>
+              </div>
+              <JudgeScoringPanel judgeId={user.uid} phase={phaseTab} />
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </ProtectedRoute>

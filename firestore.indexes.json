@@ -1,4 +1,29 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "judgingAssignments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "judgeId", "order": "ASCENDING" },
+        { "fieldPath": "phase", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "judgeScores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "judgeId", "order": "ASCENDING" },
+        { "fieldPath": "phase", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "judgeScores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "phase", "order": "ASCENDING" },
+        { "fieldPath": "studentId", "order": "ASCENDING" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }

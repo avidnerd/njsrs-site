@@ -103,7 +103,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
             </div>
             <div className="ml-3">
               <p className="text-sm text-yellow-700">
-                <strong>Editing Deadline Passed:</strong> The deadline for editing materials was March 23, 2026. You can still view your submitted materials, but editing is no longer available.
+                <strong>Editing Deadline Passed:</strong> The deadline for editing materials was March 28, 2026. You can still view your submitted materials, but editing is no longer available.
               </p>
             </div>
           </div>
