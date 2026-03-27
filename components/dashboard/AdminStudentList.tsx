@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { getAllStudents, getCategories, updateStudentCategory } from "@/lib/firebase/database";
 import type { Student, Category } from "@/lib/firebase/database";
 import { Timestamp } from "firebase/firestore";
+import { useAuth } from "@/contexts/AuthContext";
 
 
 function formatDate(dateValue: Date | Timestamp | undefined | null): string {
@@ -27,12 +28,16 @@ function formatDate(dateValue: Date | Timestamp | undefined | null): string {
 }
 
 export default function AdminStudentList() {
+  const { user } = useAuth();
   const [students, setStudents] = useState<Student[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMessage, setResetMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     loadStudents();
@@ -712,6 +717,57 @@ export default function AdminStudentList() {
           </div>
         </div>
       )}
+
+      {/* Reset stuck student account */}
+      <div className="mt-8 bg-red-50 border border-red-200 rounded-lg p-6">
+        <h3 className="text-base font-semibold text-red-800 mb-1">Reset Student Account</h3>
+        <p className="text-sm text-red-700 mb-4">
+          Use this if a student registered but sees &quot;Student data not found&quot; when they log in.
+          This deletes their Firebase Auth account and Firestore data so they can re-register from scratch.
+        </p>
+        <div className="flex gap-3 items-start">
+          <input
+            type="email"
+            placeholder="Student email address"
+            value={resetEmail}
+            onChange={(e) => setResetEmail(e.target.value)}
+            className="flex-1 max-w-sm px-3 py-2 border border-red-300 rounded-md text-sm text-gray-900"
+          />
+          <button
+            disabled={resetLoading || !resetEmail.trim()}
+            onClick={async () => {
+              if (!user) return;
+              if (!confirm(`Delete account for ${resetEmail}? They will need to re-register.`)) return;
+              setResetLoading(true);
+              setResetMessage(null);
+              try {
+                const idToken = await user.getIdToken(true);
+                const res = await fetch("/api/admin/reset-student", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ adminIdToken: idToken, email: resetEmail }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Failed");
+                setResetMessage({ type: "success", text: data.message });
+                setResetEmail("");
+              } catch (err: any) {
+                setResetMessage({ type: "error", text: err.message || "Failed to reset account" });
+              } finally {
+                setResetLoading(false);
+              }
+            }}
+            className="px-4 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50 whitespace-nowrap"
+          >
+            {resetLoading ? "Resetting…" : "Reset Account"}
+          </button>
+        </div>
+        {resetMessage && (
+          <p className={`mt-3 text-sm font-medium ${resetMessage.type === "success" ? "text-green-700" : "text-red-700"}`}>
+            {resetMessage.text}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
