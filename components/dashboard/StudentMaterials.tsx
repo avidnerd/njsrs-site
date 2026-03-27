@@ -108,7 +108,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
                 {isSlidesSOADisabled ? (
                   <><strong>All Deadlines Passed:</strong> The deadline for all competition materials was April 13, 2026. You can still view your submitted materials, but editing is no longer available.</>
                 ) : (
-                  <><strong>Partial Deadline Passed:</strong> The deadline for the research report and abstract was April 1, 2026. You may still edit your slideshow until April 13th and Statement of Outside Assistance until April 6th, 2026.</>
+                  <><strong>Partial Deadline Passed:</strong> The deadline for the research report and abstract was March 27th, 2026. You may still edit your slideshow until April 13th and Statement of Outside Assistance until April 6th, 2026.</>
                 )}
               </p>
             </div>
