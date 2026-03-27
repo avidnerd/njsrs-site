@@ -87,7 +87,7 @@ export default function StudentDashboardPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
           <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
             <p className="text-sm text-blue-800">
-              <strong>Deadline Reminder:</strong> The last day to submit research reports and abstracts will be <strong>March 28th, 2026</strong>. The last day to submit the Statement of Outside Assistance and presentation slides is April 13th, 2026. No submissions will be accepted after this date.
+              <strong>Deadline Reminder:</strong> The last day to submit research reports and abstracts will be <strong>March 28th, 2026</strong>. The last day to submit the Statement of Outside Assistance is April 6th the deadline for the presentation slides is April 6th, 2026. No submissions will be accepted after this date.
             </p>
           </div>
         </div>

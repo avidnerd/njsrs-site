@@ -15,7 +15,7 @@ interface StudentMaterialsProps {
 
 
 const REPORT_ABSTRACT_DEADLINE = new Date("2026-04-01T00:00:00");
-const SLIDES_SOA_DEADLINE = new Date("2026-04-13T00:00:00");
+const SLIDES_SOA_DEADLINE = new Date("2026-04-07T00:00:00");
 
 export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps) {
   const { user } = useAuth();
@@ -108,7 +108,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
                 {isSlidesSOADisabled ? (
                   <><strong>All Deadlines Passed:</strong> The deadline for all competition materials was April 13, 2026. You can still view your submitted materials, but editing is no longer available.</>
                 ) : (
-                  <><strong>Partial Deadline Passed:</strong> The deadline for the research report and abstract was April 1, 2026. You may still edit your slideshow and Statement of Outside Assistance until April 13, 2026.</>
+                  <><strong>Partial Deadline Passed:</strong> The deadline for the research report and abstract was April 1, 2026. You may still edit your slideshow until April 13th and Statement of Outside Assistance until April 6th, 2026.</>
                 )}
               </p>
             </div>
