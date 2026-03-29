@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   keywords: ['NJSRS about', 'New Jersey Science Research Symposium committee', 'NJSRS team', 'science fair organizers'],
   openGraph: {
     title: 'About Us | NJSRS',
-    description: 'Learn about the NJSRS committee and our mission.',
+    description: 'Learn about the NJSRS founders and our mission.',
     url: 'https://njsrs.org/about',
   },
   alternates: {
@@ -20,7 +20,7 @@ export default function AboutPage() {
     {
       name: 'Subhi Stephan',
       role: 'Tech Committee Chair, Administrative Manager, Logistics Co-Chair',
-      description: 'Developer of the website and portal, and lead of technology management',
+      description: 'Developer of the website and portal, and lead of technology management and administrative tasks.',
       image: '/subhi_stephan.jpg',
     },
     {
@@ -31,7 +31,7 @@ export default function AboutPage() {
     },
     {
       name: 'Daniel Han',
-      role: 'Logistics Co-Chair, Social Media Co-Chair, Proposal Development Chair',
+      role: 'Logistics Co-Chair, Social Media Co-Chair, Fundraising Co-Chair, Proposal Development Chair',
       description: 'Led proposal development and coordinates event logistics, social media marketing, and operations',
       image: '/daniel_han.jpg',
     },
@@ -70,7 +70,7 @@ export default function AboutPage() {
 
         <section>
           <h2 className="text-3xl font-bold text-primary-blue mb-8 text-center">
-            Committee Chairs
+            Founders and Committee Chairs
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
             {committeeMembers.map((member, index) => (
