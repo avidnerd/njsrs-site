@@ -223,7 +223,7 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
             </div>
             <div className="ml-3">
               <p className="text-sm text-yellow-700">
-                <strong>Editing Disabled:</strong> The deadline for editing materials was March 7, 2026. You can still view your form, but editing is no longer available.
+                <strong>Editing Disabled:</strong> The deadline for editing the Statement of Outside Assistance was April 10, 2026. You can still view your form, but editing is no longer available.
               </p>
             </div>
           </div>

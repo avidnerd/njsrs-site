@@ -13,6 +13,7 @@ export default function VerifyPage() {
   const [changingEmail, setChangingEmail] = useState(false);
   const [changeEmailError, setChangeEmailError] = useState("");
   const [changeEmailSuccess, setChangeEmailSuccess] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
 
   const getDashboardPath = () => {
     if (!userProfile) return "/";
@@ -38,6 +39,14 @@ export default function VerifyPage() {
       router.push("/login");
     }
   }, [user, userProfile, router]);
+
+  useEffect(() => {
+    const code = sessionStorage.getItem("verificationCode");
+    if (code) {
+      setVerificationCode(code);
+      sessionStorage.removeItem("verificationCode");
+    }
+  }, []);
 
   const handleChangeEmail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,6 +86,10 @@ export default function VerifyPage() {
         throw new Error(data.error || "Failed to change email");
       }
 
+      if (data.verificationCode) {
+        sessionStorage.setItem("verificationCode", data.verificationCode);
+        setVerificationCode(data.verificationCode);
+      }
       setChangeEmailSuccess(true);
       setNewEmail("");
       setShowChangeEmail(false);
@@ -103,9 +116,18 @@ export default function VerifyPage() {
             Verify Your Email
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            We sent a verification code to {user.email}. Check your spam folder if you don't see it in your inbox! Refresh your page after entering the code.
+            We sent a verification code to {user.email}. Check your spam folder if you don&apos;t see it in your inbox.
           </p>
         </div>
+
+        {verificationCode && (
+          <div className="p-4 bg-green-50 border border-green-300 rounded-lg text-center">
+            <p className="text-sm text-gray-600 mb-1">Your verification code is:</p>
+            <p className="text-4xl font-bold tracking-widest text-green-700 font-mono">{verificationCode}</p>
+            <p className="text-xs text-gray-500 mt-2">This code was also sent to your email.</p>
+          </div>
+        )}
+
         <EmailVerification />
         
         <div className="mt-8 pt-6 border-t border-gray-200">

@@ -7,21 +7,29 @@ if (sendGridApiKey) {
   sgMail.setApiKey(sendGridApiKey);
 }
 
-if (!admin.apps.length) {
-  try {
-    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
-    if (serviceAccount) {
-      const serviceAccountJson = JSON.parse(serviceAccount);
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccountJson),
-      });
+function getAdminServices() {
+  if (!admin.apps.length) {
+    try {
+      const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+      if (serviceAccount) {
+        const serviceAccountJson = JSON.parse(serviceAccount);
+        admin.initializeApp({ credential: admin.credential.cert(serviceAccountJson) });
+      }
+    } catch (error) {
+      console.error("Error initializing Firebase Admin:", error);
     }
-  } catch (error) {
-    console.error("Error initializing Firebase Admin:", error);
   }
+  if (!admin.apps.length) return null;
+  return { db: admin.firestore(), auth: admin.auth() };
 }
 
 export async function POST(request: NextRequest) {
+  const services = getAdminServices();
+  if (!services) {
+    return NextResponse.json({ error: "Server configuration error" }, { status: 503 });
+  }
+  const { db, auth } = services;
+
   try {
     if (!sendGridApiKey) {
       console.error("SENDGRID_API_KEY not configured");
@@ -49,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     
-    const userDoc = await admin.firestore().collection("users").doc(userId).get();
+    const userDoc = await db.collection("users").doc(userId).get();
     
     if (!userDoc.exists) {
       return NextResponse.json(
@@ -68,7 +76,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      await admin.auth().updateUser(userId, {
+      await auth.updateUser(userId, {
         email: newEmail,
       });
     } catch (error: any) {
@@ -83,30 +91,30 @@ export async function POST(request: NextRequest) {
     const verificationCodeExpiry = new Date();
     verificationCodeExpiry.setHours(verificationCodeExpiry.getHours() + 24);
 
-    await admin.firestore().collection("users").doc(userId).update({
+    await db.collection("users").doc(userId).update({
       email: newEmail,
       verificationCode,
       verificationCodeExpiry: admin.firestore.Timestamp.fromDate(verificationCodeExpiry),
       emailVerified: false,
     });
     if (userData.role === "sra") {
-      const sraDoc = await admin.firestore().collection("sras").doc(userId).get();
+      const sraDoc = await db.collection("sras").doc(userId).get();
       if (sraDoc.exists) {
-        await admin.firestore().collection("sras").doc(userId).update({
+        await db.collection("sras").doc(userId).update({
           email: newEmail,
         });
       }
     } else if (userData.role === "student") {
-      const studentDoc = await admin.firestore().collection("students").doc(userId).get();
+      const studentDoc = await db.collection("students").doc(userId).get();
       if (studentDoc.exists) {
-        await admin.firestore().collection("students").doc(userId).update({
+        await db.collection("students").doc(userId).update({
           email: newEmail,
         });
       }
     } else if (userData.role === "judge") {
-      const judgeDoc = await admin.firestore().collection("judges").doc(userId).get();
+      const judgeDoc = await db.collection("judges").doc(userId).get();
       if (judgeDoc.exists) {
-        await admin.firestore().collection("judges").doc(userId).update({
+        await db.collection("judges").doc(userId).update({
           email: newEmail,
         });
       }
@@ -116,19 +124,19 @@ export async function POST(request: NextRequest) {
     let userDetails: any = null;
 
     if (userData.role === "sra") {
-      const sraDoc = await admin.firestore().collection("sras").doc(userId).get();
+      const sraDoc = await db.collection("sras").doc(userId).get();
       if (sraDoc.exists) {
         userDetails = sraDoc.data();
         userName = `${userDetails?.firstName || ""} ${userDetails?.lastName || ""}`.trim();
       }
     } else if (userData.role === "student") {
-      const studentDoc = await admin.firestore().collection("students").doc(userId).get();
+      const studentDoc = await db.collection("students").doc(userId).get();
       if (studentDoc.exists) {
         userDetails = studentDoc.data();
         userName = `${userDetails?.firstName || ""} ${userDetails?.lastName || ""}`.trim();
       }
     } else if (userData.role === "judge") {
-      const judgeDoc = await admin.firestore().collection("judges").doc(userId).get();
+      const judgeDoc = await db.collection("judges").doc(userId).get();
       if (judgeDoc.exists) {
         userDetails = judgeDoc.data();
         userName = `${userDetails?.firstName || ""} ${userDetails?.lastName || ""}`.trim();
@@ -151,9 +159,10 @@ export async function POST(request: NextRequest) {
       `,
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      message: "Email updated and verification code sent to new email address" 
+    return NextResponse.json({
+      success: true,
+      message: "Email updated and verification code sent to new email address",
+      verificationCode,
     });
   } catch (error: any) {
     console.error("Error changing email:", error);

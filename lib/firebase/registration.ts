@@ -137,7 +137,7 @@ export async function registerJudge(
   email: string,
   password: string,
   judgeData: Omit<Judge, "id" | "email" | "createdAt" | "qualifications" | "affiliation" | "expertise" | "adminApproved">
-): Promise<{ verificationCode: string }> {
+): Promise<{ verificationCode: string; uid: string }> {
   const { userCredential, verificationCode } = await registerUser(email, password, "judge");
 
   await createJudge(userCredential.user.uid, {
@@ -145,5 +145,5 @@ export async function registerJudge(
     email,
   });
 
-  return { verificationCode };
+  return { verificationCode, uid: userCredential.user.uid };
 }

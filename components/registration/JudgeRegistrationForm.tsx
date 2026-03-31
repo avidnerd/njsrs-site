@@ -164,7 +164,7 @@ export default function JudgeRegistrationForm() {
     setError("");
 
     try {
-      const { verificationCode } = await registerJudge(formData.email, formData.password, {
+      const { verificationCode, uid } = await registerJudge(formData.email, formData.password, {
         firstName: formData.firstName,
         lastName: formData.lastName,
         address: formData.address,
@@ -191,6 +191,12 @@ export default function JudgeRegistrationForm() {
 
       
       sessionStorage.setItem("verificationCode", verificationCode);
+      // Send verification email via Next.js API (doesn't rely on Cloud Functions)
+      fetch("/api/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: uid }),
+      }).catch(() => {});
       router.push("/verify");
     } catch (err: any) {
       setError(err.message || "Registration failed");

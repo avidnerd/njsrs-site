@@ -63,7 +63,27 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
 
     try {
       const token = `${user.uid}_photorelease_${isTeamMember ? 'teammember' : 'primary'}_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-      
+
+      const updatedFormData: PhotoRelease = {
+        ...formData,
+      };
+
+      if (isTeamMember) {
+        updatedFormData.teamMemberParentEmail = email;
+        updatedFormData.teamMemberParentInviteSent = true;
+        updatedFormData.teamMemberParentInviteToken = token;
+      } else {
+        updatedFormData.parentEmail = email;
+        updatedFormData.parentInviteSent = true;
+        updatedFormData.parentInviteToken = token;
+      }
+
+      // Save token to Firestore BEFORE sending the email so the form is
+      // always findable when the parent clicks the link.
+      await updateStudentMaterials(user.uid, {
+        photoRelease: updatedFormData,
+      });
+
       const response = await fetch("/api/send-photo-release-invitation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,24 +100,6 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || "Failed to send invitation email");
       }
-
-      const updatedFormData: PhotoRelease = {
-        ...formData,
-      };
-      
-      if (isTeamMember) {
-        updatedFormData.teamMemberParentEmail = email;
-        updatedFormData.teamMemberParentInviteSent = true;
-        updatedFormData.teamMemberParentInviteToken = token;
-      } else {
-        updatedFormData.parentEmail = email;
-        updatedFormData.parentInviteSent = true;
-        updatedFormData.parentInviteToken = token;
-      }
-
-      await updateStudentMaterials(user.uid, {
-        photoRelease: updatedFormData,
-      });
 
       setFormData(updatedFormData);
       setSuccess(`Invitation sent to ${email} successfully!`);
