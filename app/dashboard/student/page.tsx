@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { logoutUser } from "@/lib/firebase/auth";
-import { getStudent } from "@/lib/firebase/database";
+import { getStudent, getCategories } from "@/lib/firebase/database";
 import StudentStatus from "@/components/dashboard/StudentStatus";
 import StudentMaterials from "@/components/dashboard/StudentMaterials";
 import PhotoRelease from "@/components/dashboard/PhotoRelease";
@@ -15,6 +15,7 @@ export default function StudentDashboardPage() {
   const { user, userProfile } = useAuth();
   const router = useRouter();
   const [student, setStudent] = useState<Student | null>(null);
+  const [categoryName, setCategoryName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,11 +27,18 @@ export default function StudentDashboardPage() {
   const loadStudent = async () => {
     if (!user) return;
     try {
-      const studentData = await getStudent(user.uid);
+      const [studentData, categories] = await Promise.all([
+        getStudent(user.uid),
+        getCategories(),
+      ]);
       if (!studentData) {
         console.error("Student data not found for user:", user.uid);
       }
       setStudent(studentData);
+      if (studentData?.categoryId) {
+        const match = categories.find((c) => c.id === studentData.categoryId);
+        setCategoryName(match?.name ?? null);
+      }
     } catch (error) {
       console.error("Error loading student data:", error);
     } finally {
@@ -84,12 +92,19 @@ export default function StudentDashboardPage() {
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-3">
           <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
             <p className="text-sm text-blue-800">
               <strong>Deadline Reminder:</strong> The last day to submit research reports, abstracts, and the Statement of Outside Assistance is <strong>April 10, 2026</strong>. The last day to submit presentation slides and the photo release form is <strong>April 13, 2026</strong>. No submissions will be accepted after these dates.
             </p>
           </div>
+          {categoryName && (
+            <div className="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded">
+              <p className="text-sm text-indigo-800">
+                <strong>Your Category:</strong> {categoryName}
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
