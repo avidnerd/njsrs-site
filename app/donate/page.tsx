@@ -34,39 +34,39 @@ export default function DonatePage() {
           <h2 className="text-2xl font-semibold text-primary-blue mb-4">
             Our Sponsors
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            {/* MEF — Diamond */}
-            <div className="bg-gradient-to-b from-indigo-50 via-purple-50 to-indigo-100 rounded-xl border-2 border-indigo-400 ring-2 ring-indigo-300/50 flex flex-col items-center justify-center gap-2 p-4 shadow-md min-h-[9.5rem]">
-              <span className="text-xs font-bold uppercase tracking-wide text-indigo-800">
-                Diamond Sponsor
-              </span>
-              <img
-                src="/mef_logo.png"
-                alt="Millburn Education Foundation"
-                className="max-h-20 max-w-full object-contain border border-indigo-200 rounded p-1"
-              />
+          {/* Sponsor logo grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-indigo-300 bg-gradient-to-b from-indigo-50 to-white p-4 shadow-sm min-h-[9rem]">
+              <span className="text-xs font-bold uppercase tracking-wide text-indigo-600">Diamond</span>
+              <img src="/mef_logo.png" alt="Millburn Education Foundation" className="max-h-16 w-full object-contain border border-indigo-100 rounded p-1" />
             </div>
-            {/* Beyond Young — Gold */}
-            <div className="bg-gradient-to-b from-amber-50 to-amber-100/80 min-h-[9.5rem] rounded-xl border-2 border-amber-300 ring-2 ring-amber-200/50 flex flex-col items-center justify-center gap-2 p-4 shadow-md">
-              <span className="text-xs font-bold uppercase tracking-wide text-amber-900">
-                Gold Sponsor
-              </span>
-              <img
-                src="/beyond_young.jpeg"
-                alt="Beyond Young"
-                className="max-h-20 w-full object-contain border border-amber-200 rounded p-1"
-              />
+            <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-amber-300 bg-gradient-to-b from-amber-50 to-white p-4 shadow-sm min-h-[9rem]">
+              <span className="text-xs font-bold uppercase tracking-wide text-amber-700">Gold</span>
+              <img src="/beyond_young.jpeg" alt="Beyond Young Academy" className="max-h-16 w-full object-contain border border-amber-100 rounded p-1" />
             </div>
-            {/* AoPS — Silver */}
-            <div className="bg-gradient-to-b from-gray-50 to-gray-100 min-h-[9.5rem] rounded-xl border-2 border-gray-300 flex flex-col items-center justify-center gap-2 p-4 shadow-md">
-              <span className="text-xs font-bold uppercase tracking-wide text-gray-700">
-                Silver Sponsor
-              </span>
-              <img
-                src="/aops.png"
-                alt="Art of Problem Solving"
-                className="max-h-20 w-full object-contain border border-gray-200 rounded p-1"
-              />
+            <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-gray-300 bg-gradient-to-b from-gray-50 to-white p-4 shadow-sm min-h-[9rem]">
+              <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Silver</span>
+              <img src="/aops.png" alt="Art of Problem Solving" className="max-h-16 w-full object-contain border border-gray-200 rounded p-1" />
+            </div>
+            <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-gray-300 bg-gradient-to-b from-gray-50 to-white p-4 shadow-sm min-h-[9rem]">
+              <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Silver</span>
+              <img src="/clemenzas.avif" alt="Clemenza's Brick Oven Pizza" className="max-h-16 w-full object-contain border border-gray-200 rounded p-1" />
+            </div>
+          </div>
+
+          {/* Special Awards Donors */}
+          <div className="border-t border-gray-200 pt-6 mb-6">
+            <h3 className="text-lg font-bold text-gray-800 text-center mb-4">Special Awards Donors</h3>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-1 max-w-lg mx-auto text-center">
+              {[
+                "Millburn Ed Foundation", "The Kapur Family",
+                "The Farashuddin Family", "The Illango Mahjan Family",
+                "The Lu Family", "The Cook Family",
+                "The Ravi Family", "The Kolodkin Family",
+                "The Li Family", "Allison Ruggles",
+              ].map((name) => (
+                <p key={name} className="text-gray-700 py-0.5 text-sm">{name}</p>
+              ))}
             </div>
           </div>
           <p className="text-gray-700 mb-4">

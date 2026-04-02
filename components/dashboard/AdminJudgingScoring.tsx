@@ -41,6 +41,61 @@ export default function AdminJudgingScoring() {
     [judges]
   );
 
+  // Judges eligible for each category (based on categoryIds they checked during registration)
+  const judgesForCategory = useCallback(
+    (catId: string) => approvedJudges.filter((j) => j.categoryIds?.includes(catId)),
+    [approvedJudges]
+  );
+
+  // Judge IDs already used in the category round
+  const categoryAssignedJudgeIds = useMemo(
+    () => new Set(assignments.filter((a) => a.phase === "category").map((a) => a.judgeId)),
+    [assignments]
+  );
+
+  // Final round eligible: approved + available in-person all day + NOT already in category round
+  const finalRoundEligibleJudges = useMemo(
+    () =>
+      approvedJudges.filter(
+        (j) =>
+          j.availabilityApril18 === "in_person_full_day" &&
+          !categoryAssignedJudgeIds.has(j.id!)
+      ),
+    [approvedJudges, categoryAssignedJudgeIds]
+  );
+
+  const isFinalJudge = useCallback(
+    (judgeId: string) => assignments.some((a) => a.phase === "final" && a.judgeId === judgeId),
+    [assignments]
+  );
+
+  const [finalBusyId, setFinalBusyId] = useState<string | null>(null);
+
+  const toggleFinalJudge = async (judge: Judge, on: boolean) => {
+    setFinalBusyId(judge.id!);
+    setError(null);
+    try {
+      if (on) {
+        // Assign this judge to every student for the final round
+        await Promise.all(
+          students.map((s) => setJudgingAssignment(judge.id!, s.id!, "final", null))
+        );
+      } else {
+        // Remove all final-round assignments for this judge
+        await Promise.all(
+          students
+            .filter((s) => isAssigned("final", judge.id!, s.id!))
+            .map((s) => removeJudgingAssignment("final", judge.id!, s.id!))
+        );
+      }
+      await loadAll();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Update failed");
+    } finally {
+      setFinalBusyId(null);
+    }
+  };
+
   const loadAll = useCallback(async () => {
     setError(null);
     try {
@@ -184,83 +239,90 @@ export default function AdminJudgingScoring() {
           </div>
           <p className="text-sm text-gray-600">
             {assignPhase === "category"
-              ? "Assign which judges score which students within each category. Judges only see students you assign here."
-              : "Final round: assign judges to students (e.g. finalists). categoryId is not used for final phase."}
+              ? "Assign which judges score which students within each category. Only judges who marked the category as one they can judge are shown."
+              : "Select which judges will participate in the final round. Only judges available in-person all day and not already in the category round are shown."}
           </p>
 
           {assignPhase === "category" && (
             <div className="space-y-8">
               {categories.map((cat) => {
                 const catStudents = categoryMap.get(cat.id!) ?? [];
+                const eligibleJudges = judgesForCategory(cat.id!);
                 if (catStudents.length === 0) return null;
                 return (
                   <div key={cat.id} className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
                     <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
                       <h3 className="font-semibold text-gray-900">{cat.name}</h3>
                       <p className="text-xs text-gray-500">
-                        {catStudents.length} student(s) — check each judge who should score this student.
+                        {catStudents.length} student(s) · {eligibleJudges.length} eligible judge(s) — only judges who marked this category on their application are shown.
                       </p>
                     </div>
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full text-sm">
-                        <thead>
-                          <tr className="border-b border-gray-200 bg-white">
-                            <th className="text-left p-3 font-medium text-gray-700 sticky left-0 bg-white z-10 min-w-[140px]">
-                              Student
-                            </th>
-                            {approvedJudges.map((j) => (
-                              <th
-                                key={j.id}
-                                className="p-2 text-center font-medium text-gray-600 whitespace-nowrap min-w-[100px]"
-                                title={j.email}
-                              >
-                                <span className="block truncate max-w-[96px]">
-                                  {j.firstName} {j.lastName?.[0]}.
-                                </span>
+                    {eligibleJudges.length === 0 ? (
+                      <p className="px-4 py-4 text-sm text-amber-800">
+                        No approved judges have marked this category as one they can judge. Assign categories to judges under the Judges tab first.
+                      </p>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-gray-200 bg-white">
+                              <th className="text-left p-3 font-medium text-gray-700 sticky left-0 bg-white z-10 min-w-[140px]">
+                                Student
                               </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {catStudents.map((s) => (
-                            <tr key={s.id} className="border-b border-gray-100 hover:bg-gray-50/80">
-                              <td className="p-3 sticky left-0 bg-white">
-                                <div className="font-medium text-gray-900">
-                                  {s.firstName} {s.lastName}
-                                </div>
-                                <div className="text-xs text-gray-500 truncate max-w-[200px]">
-                                  {s.projectTitle || "—"}
-                                </div>
-                              </td>
-                              {approvedJudges.map((j) => {
-                                const key = `category-${j.id}-${s.id}`;
-                                const on = isAssigned("category", j.id!, s.id!);
-                                return (
-                                  <td key={j.id} className="p-2 text-center">
-                                    <input
-                                      type="checkbox"
-                                      checked={on}
-                                      disabled={busyKey === key}
-                                      onChange={(e) =>
-                                        toggleAssign(
-                                          "category",
-                                          j.id!,
-                                          s.id!,
-                                          cat.id!,
-                                          e.target.checked
-                                        )
-                                      }
-                                      className="h-4 w-4 rounded border-gray-300 text-primary-blue"
-                                      aria-label={`Assign ${j.firstName} to ${s.firstName}`}
-                                    />
-                                  </td>
-                                );
-                              })}
+                              {eligibleJudges.map((j) => (
+                                <th
+                                  key={j.id}
+                                  className="p-2 text-center font-medium text-gray-600 whitespace-nowrap min-w-[100px]"
+                                  title={j.email}
+                                >
+                                  <span className="block truncate max-w-[96px]">
+                                    {j.firstName} {j.lastName?.[0]}.
+                                  </span>
+                                </th>
+                              ))}
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                          </thead>
+                          <tbody>
+                            {catStudents.map((s) => (
+                              <tr key={s.id} className="border-b border-gray-100 hover:bg-gray-50/80">
+                                <td className="p-3 sticky left-0 bg-white">
+                                  <div className="font-medium text-gray-900">
+                                    {s.firstName} {s.lastName}
+                                  </div>
+                                  <div className="text-xs text-gray-500 truncate max-w-[200px]">
+                                    {s.projectTitle || "—"}
+                                  </div>
+                                </td>
+                                {eligibleJudges.map((j) => {
+                                  const key = `category-${j.id}-${s.id}`;
+                                  const on = isAssigned("category", j.id!, s.id!);
+                                  return (
+                                    <td key={j.id} className="p-2 text-center">
+                                      <input
+                                        type="checkbox"
+                                        checked={on}
+                                        disabled={busyKey === key}
+                                        onChange={(e) =>
+                                          toggleAssign(
+                                            "category",
+                                            j.id!,
+                                            s.id!,
+                                            cat.id!,
+                                            e.target.checked
+                                          )
+                                        }
+                                        className="h-4 w-4 rounded border-gray-300 text-primary-blue"
+                                        aria-label={`Assign ${j.firstName} to ${s.firstName}`}
+                                      />
+                                    </td>
+                                  );
+                                })}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -274,57 +336,56 @@ export default function AdminJudgingScoring() {
           )}
 
           {assignPhase === "final" && (
-            <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200 bg-gray-50">
-                      <th className="text-left p-3 font-medium text-gray-700 sticky left-0 bg-gray-50 z-10">
-                        Student
-                      </th>
-                      {approvedJudges.map((j) => (
-                        <th
-                          key={j.id}
-                          className="p-2 text-center font-medium text-gray-600 whitespace-nowrap min-w-[100px]"
-                        >
-                          <span className="block truncate max-w-[96px]">
-                            {j.firstName} {j.lastName?.[0]}.
-                          </span>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {students.map((s) => (
-                      <tr key={s.id} className="border-b border-gray-100">
-                        <td className="p-3 sticky left-0 bg-white">
-                          <div className="font-medium text-gray-900">
-                            {s.firstName} {s.lastName}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {categories.find((c) => c.id === s.categoryId)?.name || "No category"}
-                          </div>
-                        </td>
-                        {approvedJudges.map((j) => {
-                          const on = isAssigned("final", j.id!, s.id!);
-                          return (
-                            <td key={j.id} className="p-2 text-center">
-                              <input
-                                type="checkbox"
-                                checked={on}
-                                onChange={(e) =>
-                                  toggleAssign("final", j.id!, s.id!, null, e.target.checked)
-                                }
-                                className="h-4 w-4 rounded border-gray-300 text-primary-blue"
-                              />
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Eligible final-round judges must be available <strong>in-person all day</strong> and must not already be assigned to the category round. Selecting a judge assigns them to score all students.
+              </p>
+              {finalRoundEligibleJudges.length === 0 ? (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-900">
+                  No eligible final-round judges found. Judges must have selected &quot;In-person, full day&quot; availability during registration and must not already be assigned to the category round.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {finalRoundEligibleJudges.map((j) => {
+                    const selected = isFinalJudge(j.id!);
+                    const busy = finalBusyId === j.id;
+                    return (
+                      <label
+                        key={j.id}
+                        className={`flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer transition-colors ${
+                          selected
+                            ? "border-indigo-400 bg-indigo-50"
+                            : "border-gray-200 bg-white hover:border-gray-300"
+                        } ${busy ? "opacity-60 pointer-events-none" : ""}`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          disabled={busy}
+                          onChange={(e) => toggleFinalJudge(j, e.target.checked)}
+                          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-indigo-600"
+                        />
+                        <div className="min-w-0">
+                          <p className="font-semibold text-gray-900 truncate">
+                            {j.firstName} {j.lastName}
+                          </p>
+                          {j.institution && (
+                            <p className="text-xs text-gray-500 truncate">{j.institution}</p>
+                          )}
+                          {j.areaOfExpertise && (
+                            <p className="text-xs text-gray-500 truncate">{j.areaOfExpertise}</p>
+                          )}
+                          {selected && (
+                            <span className="mt-1 inline-block text-xs font-medium text-indigo-700">
+                              ✓ Final round judge
+                            </span>
+                          )}
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -206,6 +206,53 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Sponsors */}
+      <section className="py-14 bg-gray-50 border-t border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-primary-blue mb-8 text-center">Our Sponsors</h2>
+
+          {/* Logo grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            {/* Diamond */}
+            <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-indigo-300 bg-gradient-to-b from-indigo-50 to-white p-4 shadow-sm">
+              <span className="text-xs font-bold uppercase tracking-wide text-indigo-600">Diamond</span>
+              <img src="/mef_logo.png" alt="Millburn Education Foundation" className="max-h-16 w-full object-contain border border-indigo-100 rounded p-1" />
+            </div>
+            {/* Gold */}
+            <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-amber-300 bg-gradient-to-b from-amber-50 to-white p-4 shadow-sm">
+              <span className="text-xs font-bold uppercase tracking-wide text-amber-700">Gold</span>
+              <img src="/beyond_young.jpeg" alt="Beyond Young Academy" className="max-h-16 w-full object-contain border border-amber-100 rounded p-1" />
+            </div>
+            {/* Silver — AoPS */}
+            <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-gray-300 bg-gradient-to-b from-gray-50 to-white p-4 shadow-sm">
+              <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Silver</span>
+              <img src="/aops.png" alt="Art of Problem Solving" className="max-h-16 w-full object-contain border border-gray-200 rounded p-1" />
+            </div>
+            {/* Silver — Clemenza's */}
+            <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-gray-300 bg-gradient-to-b from-gray-50 to-white p-4 shadow-sm">
+              <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Silver</span>
+              <img src="/clemenzas.avif" alt="Clemenza's Brick Oven Pizza" className="max-h-16 w-full object-contain border border-gray-200 rounded p-1" />
+            </div>
+          </div>
+
+          {/* Special Awards Donors */}
+          <div className="border-t border-gray-200 pt-8">
+            <h3 className="text-xl font-bold text-gray-800 text-center mb-6">Special Awards Donors</h3>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-2 max-w-xl mx-auto text-center">
+              {[
+                "Millburn Ed Foundation", "The Kapur Family",
+                "The Farashuddin Family", "The Illango Mahjan Family",
+                "The Lu Family", "The Cook Family",
+                "The Ravi Family", "The Kolodkin Family",
+                "The Li Family", "Allison Ruggles",
+              ].map((name) => (
+                <p key={name} className="text-gray-700 py-1">{name}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-primary-blue mb-6 text-center">
