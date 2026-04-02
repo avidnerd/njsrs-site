@@ -216,22 +216,26 @@ export default function HomePage() {
             {/* Diamond */}
             <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-indigo-300 bg-gradient-to-b from-indigo-50 to-white p-4 shadow-sm">
               <span className="text-xs font-bold uppercase tracking-wide text-indigo-600">Diamond</span>
-              <img src="/mef_logo.png" alt="Millburn Education Foundation" className="max-h-16 w-full object-contain border border-indigo-100 rounded p-1" />
+              <img src="/mef_logo.png" alt="Millburn Education Foundation" className="max-h-24 w-full object-contain border border-indigo-100 rounded p-1" />
+              <span className="text-xs text-center text-gray-700 font-medium">Millburn Education Foundation</span>
             </div>
             {/* Gold */}
             <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-amber-300 bg-gradient-to-b from-amber-50 to-white p-4 shadow-sm">
               <span className="text-xs font-bold uppercase tracking-wide text-amber-700">Gold</span>
-              <img src="/beyond_young.jpeg" alt="Beyond Young Academy" className="max-h-16 w-full object-contain border border-amber-100 rounded p-1" />
+              <img src="/beyond_young.jpeg" alt="Beyond Young Academy" className="max-h-24 w-full object-contain border border-amber-100 rounded p-1" />
+              <span className="text-xs text-center text-gray-700 font-medium">Beyond Young Academy</span>
             </div>
             {/* Silver — AoPS */}
             <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-gray-300 bg-gradient-to-b from-gray-50 to-white p-4 shadow-sm">
               <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Silver</span>
-              <img src="/aops.png" alt="Art of Problem Solving" className="max-h-16 w-full object-contain border border-gray-200 rounded p-1" />
+              <img src="/aops.png" alt="Art of Problem Solving" className="max-h-24 w-full object-contain border border-gray-200 rounded p-1" />
+              <span className="text-xs text-center text-gray-700 font-medium">Art of Problem Solving</span>
             </div>
             {/* Silver — Clemenza's */}
             <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-gray-300 bg-gradient-to-b from-gray-50 to-white p-4 shadow-sm">
               <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Silver</span>
-              <img src="/clemenzas.avif" alt="Clemenza's Brick Oven Pizza" className="max-h-16 w-full object-contain border border-gray-200 rounded p-1" />
+              <img src="/clemenzas.avif" alt="Clemenza's Brick Oven Pizza" className="max-h-24 w-full object-contain border border-gray-200 rounded p-1" />
+              <span className="text-xs text-center text-gray-700 font-medium">Clemenza&apos;s Brick Oven Pizza</span>
             </div>
           </div>
 
