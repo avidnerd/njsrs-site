@@ -96,6 +96,14 @@ export interface Student {
   statementOfOutsideAssistance?: StatementOfOutsideAssistance;
   photoRelease?: PhotoRelease;
   categoryId?: string;
+  guests?: Guest[];
+}
+
+export interface Guest {
+  name: string;
+  email: string;
+  ticketSent: boolean;
+  sentAt?: Date | Timestamp;
 }
 
 export interface SRCQuestions {
@@ -585,6 +593,11 @@ export async function updateStudentMaterials(
   const dbInstance = ensureDb();
   const studentRef = doc(dbInstance, "students", studentId);
   await updateDoc(studentRef, updates);
+}
+
+export async function updateStudentGuests(studentId: string, guests: Guest[]): Promise<void> {
+  const dbInstance = ensureDb();
+  await updateDoc(doc(dbInstance, "students", studentId), { guests });
 }
 
 export async function requestSRCApproval(studentId: string): Promise<void> {

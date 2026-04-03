@@ -9,6 +9,7 @@ import { getStudent, getCategories } from "@/lib/firebase/database";
 import StudentStatus from "@/components/dashboard/StudentStatus";
 import StudentMaterials from "@/components/dashboard/StudentMaterials";
 import PhotoRelease from "@/components/dashboard/PhotoRelease";
+import GuestRegistration from "@/components/dashboard/GuestRegistration";
 import type { Student } from "@/lib/firebase/database";
 
 export default function StudentDashboardPage() {
@@ -117,6 +118,7 @@ export default function StudentDashboardPage() {
               <StudentStatus student={student} onUpdate={loadStudent} />
               <StudentMaterials onFormUpdate={loadStudent} />
               <PhotoRelease onFormUpdate={loadStudent} />
+              <GuestRegistration />
             </div>
           ) : (
             <div className="text-center py-12 space-y-4">
