@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   getAllStudents,
   getAllJudges,
@@ -14,6 +15,7 @@ import {
   removeJudgingAssignment,
   getAllAssignments,
   getAllJudgeScores,
+  clearAllJudgeScores,
   aggregateCategoryResults,
   aggregateFinalResults,
   exportScoresToCsv,
@@ -25,6 +27,7 @@ import {
 type SubTab = "assign" | "category" | "final";
 
 export default function AdminJudgingScoring() {
+  const { user } = useAuth();
   const [subTab, setSubTab] = useState<SubTab>("assign");
   const [assignPhase, setAssignPhase] = useState<JudgingPhase>("category");
   const [students, setStudents] = useState<Student[]>([]);
@@ -35,6 +38,14 @@ export default function AdminJudgingScoring() {
   const [loading, setLoading] = useState(true);
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Clear scores
+  const [clearingScores, setClearingScores] = useState(false);
+  const [clearConfirm, setClearConfirm] = useState(false);
+
+  // Mock judge
+  const [creatingMock, setCreatingMock] = useState(false);
+  const [mockResult, setMockResult] = useState<{ email: string; password: string } | null>(null);
 
   const approvedJudges = useMemo(
     () => judges.filter((j) => j.adminApproved && j.id),
@@ -122,6 +133,46 @@ export default function AdminJudgingScoring() {
     loadAll();
   }, [loadAll]);
 
+  const handleClearScores = async () => {
+    if (!clearConfirm) { setClearConfirm(true); return; }
+    setClearingScores(true);
+    setError(null);
+    try {
+      const count = await clearAllJudgeScores();
+      await loadAll();
+      setClearConfirm(false);
+      setError(null);
+      alert(`Cleared ${count} score document(s).`);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to clear scores");
+    } finally {
+      setClearingScores(false);
+    }
+  };
+
+  const handleCreateMockJudge = async () => {
+    if (!user) return;
+    setCreatingMock(true);
+    setError(null);
+    setMockResult(null);
+    try {
+      const idToken = await user.getIdToken();
+      const res = await fetch("/api/admin/create-mock-judge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminIdToken: idToken }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create mock judge");
+      setMockResult({ email: data.email, password: data.password });
+      await loadAll();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to create mock judge");
+    } finally {
+      setCreatingMock(false);
+    }
+  };
+
   const isAssigned = (phase: JudgingPhase, judgeId: string, studentId: string) =>
     assignments.some(
       (a) => a.phase === phase && a.judgeId === judgeId && a.studentId === studentId
@@ -186,6 +237,50 @@ export default function AdminJudgingScoring() {
           {error}
         </div>
       )}
+
+      {/* Dev / testing tools */}
+      <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-4 space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Testing tools</p>
+        <div className="flex flex-wrap gap-3 items-center">
+          <button
+            type="button"
+            onClick={handleCreateMockJudge}
+            disabled={creatingMock}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-60"
+          >
+            {creatingMock ? "Creating…" : "Create mock judge"}
+          </button>
+          <button
+            type="button"
+            onClick={handleClearScores}
+            disabled={clearingScores}
+            className={`px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60 ${
+              clearConfirm
+                ? "bg-red-600 text-white hover:bg-red-700"
+                : "bg-white border border-red-300 text-red-700 hover:bg-red-50"
+            }`}
+          >
+            {clearingScores ? "Clearing…" : clearConfirm ? "Confirm — delete all scores" : "Clear all scores"}
+          </button>
+          {clearConfirm && (
+            <button
+              type="button"
+              onClick={() => setClearConfirm(false)}
+              className="text-sm text-gray-500 hover:text-gray-700 underline"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+        {mockResult && (
+          <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm space-y-1">
+            <p className="font-semibold text-green-800">Mock judge created (or recreated):</p>
+            <p className="font-mono text-green-900">Email: {mockResult.email}</p>
+            <p className="font-mono text-green-900">Password: {mockResult.password}</p>
+            <p className="text-xs text-green-700 mt-1">Assign this judge to categories and students, then log in with these credentials to test scoring.</p>
+          </div>
+        )}
+      </div>
 
       <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
         {(

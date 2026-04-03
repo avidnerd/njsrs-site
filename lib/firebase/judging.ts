@@ -423,6 +423,13 @@ export function exportScoresToCsv(
   return lines.join("\n");
 }
 
+export async function clearAllJudgeScores(): Promise<number> {
+  const dbi = ensureDb();
+  const snap = await getDocs(collection(dbi, "judgeScores"));
+  await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+  return snap.docs.length;
+}
+
 export function exportDetailScoresToCsv(
   scores: (JudgeScoreDoc & { id: string })[],
   students: Student[],
