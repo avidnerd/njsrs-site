@@ -558,6 +558,38 @@ export async function getAllSpecialAwardScores(): Promise<
   return snap.docs.map((d) => ({ id: d.id, ...(d.data() as SpecialAwardScore) }));
 }
 
+// ─── Candidate management ─────────────────────────────────────────────────────
+
+export async function setSpecialAwardCandidates(
+  awardId: string,
+  studentIds: string[]
+): Promise<void> {
+  const dbi = ensureDb();
+  await setDoc(doc(dbi, "specialAwardCandidates", awardId), { awardId, studentIds });
+}
+
+export async function getSpecialAwardCandidates(
+  awardId: string
+): Promise<string[]> {
+  const dbi = ensureDb();
+  const snap = await getDocs(
+    query(collection(dbi, "specialAwardCandidates"), where("awardId", "==", awardId))
+  );
+  if (snap.empty) return [];
+  return (snap.docs[0].data().studentIds as string[]) ?? [];
+}
+
+export async function getAllSpecialAwardCandidates(): Promise<Record<string, string[]>> {
+  const dbi = ensureDb();
+  const snap = await getDocs(collection(dbi, "specialAwardCandidates"));
+  const result: Record<string, string[]> = {};
+  for (const d of snap.docs) {
+    const data = d.data();
+    result[data.awardId as string] = (data.studentIds as string[]) ?? [];
+  }
+  return result;
+}
+
 export async function clearAllSpecialAwardScores(): Promise<number> {
   const dbi = ensureDb();
   const snap = await getDocs(collection(dbi, "specialAwardScores"));

@@ -7,6 +7,7 @@ import {
   SPECIAL_AWARDS,
   getSpecialAwardAssignmentsForJudge,
   getSpecialAwardScoresForJudge,
+  getSpecialAwardCandidates,
   saveSpecialAwardScore,
   emptySpecialRubric,
   computeSpecialAwardTotal,
@@ -19,7 +20,8 @@ interface SpecialAwardScoringPanelProps {
 
 export default function SpecialAwardScoringPanel({ judgeId }: SpecialAwardScoringPanelProps) {
   const [assignedAwards, setAssignedAwards] = useState<SpecialAward[]>([]);
-  const [students, setStudents] = useState<Student[]>([]);
+  // candidateMap[awardId] = filtered student list for that award
+  const [candidateMap, setCandidateMap] = useState<Record<string, Student[]>>({});
   const [activeAwardId, setActiveAwardId] = useState<string | null>(null);
   // rubrics[awardId][studentId] = rubric
   const [rubrics, setRubrics] = useState<Record<string, Record<string, Record<string, number>>>>({});
@@ -42,16 +44,24 @@ export default function SpecialAwardScoringPanel({ judgeId }: SpecialAwardScorin
         .map((a) => SPECIAL_AWARDS.find((aw) => aw.id === a.awardId))
         .filter(Boolean) as SpecialAward[];
       setAssignedAwards(awards);
-      setStudents(allStudents.filter((s) => s.id));
 
       if (awards.length > 0 && !activeAwardId) {
         setActiveAwardId(awards[0].id);
       }
 
-      // Load existing scores for each award
+      // For each award, fetch candidate IDs and filter students
+      const newCandidateMap: Record<string, Student[]> = {};
       const newRubrics: Record<string, Record<string, Record<string, number>>> = {};
       const newNotes: Record<string, Record<string, string>> = {};
+
       for (const award of awards) {
+        const candidateIds = await getSpecialAwardCandidates(award.id);
+        // If no candidates shortlisted yet, show all students; otherwise filter
+        const awardStudents = candidateIds.length > 0
+          ? allStudents.filter((s) => s.id && candidateIds.includes(s.id))
+          : allStudents.filter((s) => s.id);
+        newCandidateMap[award.id] = awardStudents;
+
         const scores = await getSpecialAwardScoresForJudge(judgeId, award.id);
         newRubrics[award.id] = {};
         newNotes[award.id] = {};
@@ -59,17 +69,14 @@ export default function SpecialAwardScoringPanel({ judgeId }: SpecialAwardScorin
           newRubrics[award.id][sc.studentId] = { ...emptySpecialRubric(award.criteria), ...sc.rubric };
           newNotes[award.id][sc.studentId] = sc.notes || "";
         }
-        // Fill in empty rubrics for students not yet scored
-        for (const s of allStudents) {
+        for (const s of awardStudents) {
           if (!s.id) continue;
-          if (!newRubrics[award.id][s.id]) {
-            newRubrics[award.id][s.id] = emptySpecialRubric(award.criteria);
-          }
-          if (!newNotes[award.id][s.id]) {
-            newNotes[award.id][s.id] = "";
-          }
+          if (!newRubrics[award.id][s.id]) newRubrics[award.id][s.id] = emptySpecialRubric(award.criteria);
+          if (!newNotes[award.id][s.id]) newNotes[award.id][s.id] = "";
         }
       }
+
+      setCandidateMap(newCandidateMap);
       setRubrics(newRubrics);
       setNotesMap(newNotes);
     } catch (e: unknown) {
@@ -137,9 +144,10 @@ export default function SpecialAwardScoringPanel({ judgeId }: SpecialAwardScorin
 
   const activeAward = assignedAwards.find((a) => a.id === activeAwardId) ?? assignedAwards[0];
   const maxTotal = activeAward.criteria.reduce((s, c) => s + c.maxPoints, 0);
+  const awardStudents = candidateMap[activeAward.id] ?? [];
 
-  // Sort students by score descending so judge can see who's leading
-  const scoredStudents = [...students].sort((a, b) => {
+  // Sort by score descending so judge can see who's leading
+  const scoredStudents = [...awardStudents].sort((a, b) => {
     const ta = computeSpecialAwardTotal(activeAward.criteria, rubrics[activeAward.id]?.[a.id!] ?? {});
     const tb = computeSpecialAwardTotal(activeAward.criteria, rubrics[activeAward.id]?.[b.id!] ?? {});
     return tb - ta;
@@ -183,7 +191,9 @@ export default function SpecialAwardScoringPanel({ judgeId }: SpecialAwardScorin
       <div className="rounded-xl bg-indigo-50 border border-indigo-200 px-5 py-4">
         <h2 className="text-lg font-bold text-indigo-900">{activeAward.name}</h2>
         <p className="text-sm text-indigo-700 mt-1">
-          Score each student below using the award-specific rubric. The student with the highest total score will be recommended for this award. You can score as many or as few students as you like — only score those whose work is relevant to this award.
+          {scoredStudents.length > 0
+            ? `Score each shortlisted candidate below using the award-specific rubric. The student with the highest total score will be recommended for this award.`
+            : `No candidates have been shortlisted for this award yet. The fair director will add candidates from the admin dashboard.`}
         </p>
         <p className="text-xs text-indigo-600 mt-2 font-medium">
           Rubric criteria: {activeAward.criteria.map((c) => `${c.label} (${c.maxPoints} pts)`).join(" · ")}

@@ -28,6 +28,8 @@ import {
   getAllSpecialAwardAssignments,
   setSpecialAwardAssignment,
   removeSpecialAwardAssignment,
+  getAllSpecialAwardCandidates,
+  setSpecialAwardCandidates,
   type SpecialAwardAssignment,
 } from "@/lib/firebase/specialAwards";
 
@@ -43,6 +45,8 @@ export default function AdminJudgingScoring() {
   const [assignments, setAssignments] = useState<JudgingAssignment[]>([]);
   const [scores, setScores] = useState<Awaited<ReturnType<typeof getAllJudgeScores>>>([]);
   const [specialAssignments, setSpecialAssignments] = useState<(SpecialAwardAssignment & { id: string })[]>([]);
+  const [specialCandidates, setSpecialCandidates] = useState<Record<string, string[]>>({});
+  const [savingCandidatesId, setSavingCandidatesId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [specialBusyKey, setSpecialBusyKey] = useState<string | null>(null);
@@ -55,6 +59,10 @@ export default function AdminJudgingScoring() {
   // Mock judge
   const [creatingMock, setCreatingMock] = useState(false);
   const [mockResult, setMockResult] = useState<{ email: string; password: string } | null>(null);
+
+  // Mock student
+  const [creatingMockStudent, setCreatingMockStudent] = useState(false);
+  const [mockStudentResult, setMockStudentResult] = useState<{ email: string; password: string } | null>(null);
 
   const approvedJudges = useMemo(
     () => judges.filter((j) => j.adminApproved && j.id),
@@ -155,13 +163,14 @@ export default function AdminJudgingScoring() {
   const loadAll = useCallback(async () => {
     setError(null);
     try {
-      const [stu, jud, cat, asg, sc, spAsg] = await Promise.all([
+      const [stu, jud, cat, asg, sc, spAsg, spCand] = await Promise.all([
         getAllStudents(),
         getAllJudges(),
         getCategories(),
         getAllAssignments(),
         getAllJudgeScores(),
         getAllSpecialAwardAssignments(),
+        getAllSpecialAwardCandidates(),
       ]);
       setStudents(stu);
       setJudges(jud);
@@ -169,6 +178,7 @@ export default function AdminJudgingScoring() {
       setAssignments(asg);
       setScores(sc);
       setSpecialAssignments(spAsg);
+      setSpecialCandidates(spCand);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to load judging data");
     } finally {
@@ -220,6 +230,29 @@ export default function AdminJudgingScoring() {
     }
   };
 
+  const handleCreateMockStudent = async () => {
+    if (!user) return;
+    setCreatingMockStudent(true);
+    setError(null);
+    setMockStudentResult(null);
+    try {
+      const idToken = await user.getIdToken();
+      const res = await fetch("/api/admin/create-mock-student", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminIdToken: idToken }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create mock student");
+      setMockStudentResult({ email: data.email, password: data.password });
+      await loadAll();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to create mock student");
+    } finally {
+      setCreatingMockStudent(false);
+    }
+  };
+
   // Judges eligible for special awards: in-person full day + not in final round
   // (category judges ARE allowed to also judge special awards)
   const specialEligibleJudges = useMemo(
@@ -250,6 +283,28 @@ export default function AdminJudgingScoring() {
       setError(e instanceof Error ? e.message : "Update failed");
     } finally {
       setSpecialBusyKey(null);
+    }
+  };
+
+  const toggleCandidate = (awardId: string, studentId: string) => {
+    setSpecialCandidates((prev) => {
+      const current = prev[awardId] ?? [];
+      const next = current.includes(studentId)
+        ? current.filter((id) => id !== studentId)
+        : [...current, studentId];
+      return { ...prev, [awardId]: next };
+    });
+  };
+
+  const saveCandidates = async (awardId: string) => {
+    setSavingCandidatesId(awardId);
+    setError(null);
+    try {
+      await setSpecialAwardCandidates(awardId, specialCandidates[awardId] ?? []);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to save candidates");
+    } finally {
+      setSavingCandidatesId(null);
     }
   };
 
@@ -332,6 +387,14 @@ export default function AdminJudgingScoring() {
           </button>
           <button
             type="button"
+            onClick={handleCreateMockStudent}
+            disabled={creatingMockStudent}
+            className="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700 disabled:opacity-60"
+          >
+            {creatingMockStudent ? "Creating…" : "Create mock student"}
+          </button>
+          <button
+            type="button"
             onClick={handleClearScores}
             disabled={clearingScores}
             className={`px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60 ${
@@ -358,6 +421,14 @@ export default function AdminJudgingScoring() {
             <p className="font-mono text-green-900">Email: {mockResult.email}</p>
             <p className="font-mono text-green-900">Password: {mockResult.password}</p>
             <p className="text-xs text-green-700 mt-1">Assign this judge to categories and students, then log in with these credentials to test scoring.</p>
+          </div>
+        )}
+        {mockStudentResult && (
+          <div className="rounded-lg bg-teal-50 border border-teal-200 px-4 py-3 text-sm space-y-1">
+            <p className="font-semibold text-teal-800">Mock student created (or recreated):</p>
+            <p className="font-mono text-teal-900">Email: {mockStudentResult.email}</p>
+            <p className="font-mono text-teal-900">Password: {mockStudentResult.password}</p>
+            <p className="text-xs text-teal-700 mt-1">Log in as this student to test the student dashboard, uploads, guest registration, etc.</p>
           </div>
         )}
       </div>
@@ -592,7 +663,7 @@ export default function AdminJudgingScoring() {
                       Rubric: {award.criteria.map((c) => `${c.label} (${c.maxPoints} pts)`).join(" · ")}
                     </p>
                   </div>
-                  <div className="px-4 py-3 space-y-3">
+                  <div className="px-4 py-4 space-y-5">
                     {/* Assigned judges */}
                     {assignedJudges.length > 0 && (
                       <div className="flex flex-wrap gap-2">
@@ -636,6 +707,57 @@ export default function AdminJudgingScoring() {
                         )}
                       </div>
                     )}
+
+                    {/* Candidate student picker */}
+                    <div className="border-t border-gray-100 pt-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          Shortlisted candidates ({(specialCandidates[award.id] ?? []).length} selected)
+                        </p>
+                        <button
+                          type="button"
+                          disabled={savingCandidatesId === award.id}
+                          onClick={() => saveCandidates(award.id)}
+                          className="text-xs px-3 py-1.5 rounded-lg bg-primary-blue text-white hover:opacity-90 disabled:opacity-50"
+                        >
+                          {savingCandidatesId === award.id ? "Saving…" : "Save candidates"}
+                        </button>
+                      </div>
+                      {students.length === 0 ? (
+                        <p className="text-sm text-gray-500 italic">No students registered yet.</p>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-56 overflow-y-auto pr-1">
+                          {students.map((s) => {
+                            const checked = (specialCandidates[award.id] ?? []).includes(s.id!);
+                            return (
+                              <label
+                                key={s.id}
+                                className={`flex items-start gap-2 rounded-lg border px-3 py-2 cursor-pointer transition-colors ${
+                                  checked
+                                    ? "border-primary-blue bg-blue-50"
+                                    : "border-gray-200 bg-white hover:border-gray-300"
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={checked}
+                                  onChange={() => toggleCandidate(award.id, s.id!)}
+                                  className="mt-0.5 h-3.5 w-3.5 rounded border-gray-300 text-primary-blue shrink-0"
+                                />
+                                <div className="min-w-0">
+                                  <p className="text-xs font-medium text-gray-900 truncate">
+                                    {s.firstName} {s.lastName}
+                                  </p>
+                                  {s.projectTitle && (
+                                    <p className="text-xs text-gray-500 truncate">{s.projectTitle}</p>
+                                  )}
+                                </div>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               );

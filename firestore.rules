@@ -109,6 +109,11 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    match /specialAwardCandidates/{awardId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
     match /specialAwardAssignments/{assignmentId} {
       allow read: if isAdmin() ||
         (isAuthenticated() && resource.data.judgeId == request.auth.uid);
