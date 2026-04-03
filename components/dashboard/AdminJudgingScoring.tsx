@@ -52,10 +52,33 @@ export default function AdminJudgingScoring() {
     [judges]
   );
 
-  // Judges eligible for each category (based on categoryIds they checked during registration)
+  // Map of judgeId -> Set of categoryIds they are already assigned to in the category round
+  const judgeCategoryAssignments = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const a of assignments) {
+      if (a.phase !== "category" || !a.categoryId) continue;
+      if (!map.has(a.judgeId)) map.set(a.judgeId, new Set());
+      map.get(a.judgeId)!.add(a.categoryId);
+    }
+    return map;
+  }, [assignments]);
+
+  // Judges eligible for a given category:
+  // - opted into this category (categoryIds includes catId)
+  // - not already assigned to a DIFFERENT category
   const judgesForCategory = useCallback(
-    (catId: string) => approvedJudges.filter((j) => j.categoryIds?.includes(catId)),
-    [approvedJudges]
+    (catId: string) =>
+      approvedJudges.filter((j) => {
+        if (!j.categoryIds?.includes(catId)) return false;
+        const assignedCats = judgeCategoryAssignments.get(j.id!);
+        if (!assignedCats) return true; // no assignments yet
+        // Allow if their only assignments are within this same category
+        for (const c of assignedCats) {
+          if (c !== catId) return false;
+        }
+        return true;
+      }),
+    [approvedJudges, judgeCategoryAssignments]
   );
 
   // Judge IDs already used in the category round
