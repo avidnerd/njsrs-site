@@ -579,9 +579,8 @@ export default function AdminJudgingScoring() {
           )}
           <div className="space-y-4">
             {SPECIAL_AWARDS.map((award) => {
-              const assignedJudge = specialEligibleJudges.find((j) =>
-                isSpecialAssigned(award.id, j.id!)
-              ) ?? approvedJudges.find((j) => isSpecialAssigned(award.id, j.id!));
+              const assignedJudges = approvedJudges.filter((j) => isSpecialAssigned(award.id, j.id!));
+              const atMax = assignedJudges.length >= 2;
               return (
                 <div
                   key={award.id}
@@ -593,48 +592,46 @@ export default function AdminJudgingScoring() {
                       Rubric: {award.criteria.map((c) => `${c.label} (${c.maxPoints} pts)`).join(" · ")}
                     </p>
                   </div>
-                  <div className="px-4 py-3">
-                    {assignedJudge ? (
-                      <div className="flex flex-wrap items-center gap-3">
-                        <span className="text-sm text-green-800 font-medium bg-green-50 border border-green-200 rounded-lg px-3 py-1.5">
-                          ✓ {assignedJudge.firstName} {assignedJudge.lastName}
-                          {assignedJudge.institution ? ` — ${assignedJudge.institution}` : ""}
-                        </span>
-                        <button
-                          type="button"
-                          disabled={specialBusyKey === `${award.id}_${assignedJudge.id}`}
-                          onClick={() => toggleSpecialAssign(award.id, assignedJudge, false)}
-                          className="text-xs text-red-600 hover:text-red-800 underline disabled:opacity-50"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ) : (
+                  <div className="px-4 py-3 space-y-3">
+                    {/* Assigned judges */}
+                    {assignedJudges.length > 0 && (
                       <div className="flex flex-wrap gap-2">
-                        {specialEligibleJudges.map((j) => {
-                          const busy = specialBusyKey === `${award.id}_${j.id}`;
-                          const alreadyOnOtherAward = specialAssignments.some(
-                            (a) => a.judgeId === j.id! && a.awardId !== award.id
-                          );
-                          return (
+                        {assignedJudges.map((j) => (
+                          <div key={j.id} className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-1.5">
+                            <span className="text-sm text-green-800 font-medium">
+                              ✓ {j.firstName} {j.lastName}
+                              {j.institution ? ` — ${j.institution}` : ""}
+                            </span>
+                            <button
+                              type="button"
+                              disabled={specialBusyKey === `${award.id}_${j.id}`}
+                              onClick={() => toggleSpecialAssign(award.id, j, false)}
+                              className="text-xs text-red-500 hover:text-red-700 underline disabled:opacity-50"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {/* Picker — hidden when at max (2) */}
+                    {!atMax && (
+                      <div className="flex flex-wrap gap-2">
+                        {specialEligibleJudges
+                          .filter((j) => !isSpecialAssigned(award.id, j.id!))
+                          .map((j) => (
                             <button
                               key={j.id}
                               type="button"
-                              disabled={busy || alreadyOnOtherAward}
+                              disabled={specialBusyKey === `${award.id}_${j.id}`}
                               onClick={() => toggleSpecialAssign(award.id, j, true)}
-                              title={alreadyOnOtherAward ? "Already assigned to another special award" : `Assign ${j.firstName} ${j.lastName}`}
-                              className={`text-sm px-3 py-1.5 rounded-lg border transition-colors disabled:opacity-40 ${
-                                alreadyOnOtherAward
-                                  ? "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
-                                  : "border-gray-300 bg-white hover:border-primary-blue hover:text-primary-blue"
-                              }`}
+                              className="text-sm px-3 py-1.5 rounded-lg border border-gray-300 bg-white hover:border-primary-blue hover:text-primary-blue transition-colors disabled:opacity-40"
                             >
                               {j.firstName} {j.lastName}
                               {j.institution ? ` (${j.institution})` : ""}
                             </button>
-                          );
-                        })}
-                        {specialEligibleJudges.length === 0 && (
+                          ))}
+                        {specialEligibleJudges.filter((j) => !isSpecialAssigned(award.id, j.id!)).length === 0 && (
                           <p className="text-sm text-gray-500 italic">No eligible judges available.</p>
                         )}
                       </div>
