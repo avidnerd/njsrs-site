@@ -96,15 +96,28 @@ export default function AdminJudgingScoring() {
     [assignments]
   );
 
-  // Final round eligible: approved + available in-person all day + NOT already in category round
+  // Judge IDs assigned to any special award
+  const specialAssignedJudgeIds = useMemo(
+    () => new Set(specialAssignments.map((a) => a.judgeId)),
+    [specialAssignments]
+  );
+
+  // Judge IDs assigned to the final round
+  const finalAssignedJudgeIds = useMemo(
+    () => new Set(assignments.filter((a) => a.phase === "final").map((a) => a.judgeId)),
+    [assignments]
+  );
+
+  // Final round eligible: approved + in-person full day + NOT in category round + NOT in special awards
   const finalRoundEligibleJudges = useMemo(
     () =>
       approvedJudges.filter(
         (j) =>
           j.availabilityApril18 === "in_person_full_day" &&
-          !categoryAssignedJudgeIds.has(j.id!)
+          !categoryAssignedJudgeIds.has(j.id!) &&
+          !specialAssignedJudgeIds.has(j.id!)
       ),
-    [approvedJudges, categoryAssignedJudgeIds]
+    [approvedJudges, categoryAssignedJudgeIds, specialAssignedJudgeIds]
   );
 
   const isFinalJudge = useCallback(
@@ -207,15 +220,16 @@ export default function AdminJudgingScoring() {
     }
   };
 
-  // Judges eligible for special awards: in-person full day + not already in category round
+  // Judges eligible for special awards: in-person full day + not in final round
+  // (category judges ARE allowed to also judge special awards)
   const specialEligibleJudges = useMemo(
     () =>
       approvedJudges.filter(
         (j) =>
           j.availabilityApril18 === "in_person_full_day" &&
-          !categoryAssignedJudgeIds.has(j.id!)
+          !finalAssignedJudgeIds.has(j.id!)
       ),
-    [approvedJudges, categoryAssignedJudgeIds]
+    [approvedJudges, finalAssignedJudgeIds]
   );
 
   const isSpecialAssigned = (awardId: string, judgeId: string) =>
