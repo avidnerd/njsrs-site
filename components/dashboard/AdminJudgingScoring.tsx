@@ -23,8 +23,15 @@ import {
   type JudgingPhase,
   type JudgingAssignment,
 } from "@/lib/firebase/judging";
+import {
+  SPECIAL_AWARDS,
+  getAllSpecialAwardAssignments,
+  setSpecialAwardAssignment,
+  removeSpecialAwardAssignment,
+  type SpecialAwardAssignment,
+} from "@/lib/firebase/specialAwards";
 
-type SubTab = "assign" | "category" | "final";
+type SubTab = "assign" | "special" | "category" | "final";
 
 export default function AdminJudgingScoring() {
   const { user } = useAuth();
@@ -35,8 +42,10 @@ export default function AdminJudgingScoring() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [assignments, setAssignments] = useState<JudgingAssignment[]>([]);
   const [scores, setScores] = useState<Awaited<ReturnType<typeof getAllJudgeScores>>>([]);
+  const [specialAssignments, setSpecialAssignments] = useState<(SpecialAwardAssignment & { id: string })[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyKey, setBusyKey] = useState<string | null>(null);
+  const [specialBusyKey, setSpecialBusyKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Clear scores
@@ -133,18 +142,20 @@ export default function AdminJudgingScoring() {
   const loadAll = useCallback(async () => {
     setError(null);
     try {
-      const [stu, jud, cat, asg, sc] = await Promise.all([
+      const [stu, jud, cat, asg, sc, spAsg] = await Promise.all([
         getAllStudents(),
         getAllJudges(),
         getCategories(),
         getAllAssignments(),
         getAllJudgeScores(),
+        getAllSpecialAwardAssignments(),
       ]);
       setStudents(stu);
       setJudges(jud);
       setCategories(cat.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)));
       setAssignments(asg);
       setScores(sc);
+      setSpecialAssignments(spAsg);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to load judging data");
     } finally {
@@ -193,6 +204,38 @@ export default function AdminJudgingScoring() {
       setError(e instanceof Error ? e.message : "Failed to create mock judge");
     } finally {
       setCreatingMock(false);
+    }
+  };
+
+  // Judges eligible for special awards: in-person full day + not already in category round
+  const specialEligibleJudges = useMemo(
+    () =>
+      approvedJudges.filter(
+        (j) =>
+          j.availabilityApril18 === "in_person_full_day" &&
+          !categoryAssignedJudgeIds.has(j.id!)
+      ),
+    [approvedJudges, categoryAssignedJudgeIds]
+  );
+
+  const isSpecialAssigned = (awardId: string, judgeId: string) =>
+    specialAssignments.some((a) => a.awardId === awardId && a.judgeId === judgeId);
+
+  const toggleSpecialAssign = async (awardId: string, judge: Judge, on: boolean) => {
+    const key = `${awardId}_${judge.id}`;
+    setSpecialBusyKey(key);
+    setError(null);
+    try {
+      if (on) {
+        await setSpecialAwardAssignment(awardId, judge.id!);
+      } else {
+        await removeSpecialAwardAssignment(awardId, judge.id!);
+      }
+      await loadAll();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Update failed");
+    } finally {
+      setSpecialBusyKey(null);
     }
   };
 
@@ -309,6 +352,7 @@ export default function AdminJudgingScoring() {
         {(
           [
             ["assign", "Assign judges"],
+            ["special", "Special awards"],
             ["category", "Category results"],
             ["final", "Final round results"],
           ] as const
@@ -506,6 +550,86 @@ export default function AdminJudgingScoring() {
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {subTab === "special" && (
+        <div className="space-y-6">
+          <p className="text-sm text-gray-600">
+            Assign one judge per special award. Only judges who selected <strong>in-person, full day</strong> and are not already assigned to the category round are shown. The assigned judge will score all students using the award-specific rubric and select the winner.
+          </p>
+          {specialEligibleJudges.length === 0 && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              No eligible judges found. Judges must have selected &quot;In-person, full day&quot; availability and must not already be assigned to the category round.
+            </div>
+          )}
+          <div className="space-y-4">
+            {SPECIAL_AWARDS.map((award) => {
+              const assignedJudge = specialEligibleJudges.find((j) =>
+                isSpecialAssigned(award.id, j.id!)
+              ) ?? approvedJudges.find((j) => isSpecialAssigned(award.id, j.id!));
+              return (
+                <div
+                  key={award.id}
+                  className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+                >
+                  <div className="bg-gray-50 border-b border-gray-200 px-4 py-3">
+                    <h3 className="font-semibold text-gray-900 text-sm">{award.name}</h3>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Rubric: {award.criteria.map((c) => `${c.label} (${c.maxPoints} pts)`).join(" · ")}
+                    </p>
+                  </div>
+                  <div className="px-4 py-3">
+                    {assignedJudge ? (
+                      <div className="flex flex-wrap items-center gap-3">
+                        <span className="text-sm text-green-800 font-medium bg-green-50 border border-green-200 rounded-lg px-3 py-1.5">
+                          ✓ {assignedJudge.firstName} {assignedJudge.lastName}
+                          {assignedJudge.institution ? ` — ${assignedJudge.institution}` : ""}
+                        </span>
+                        <button
+                          type="button"
+                          disabled={specialBusyKey === `${award.id}_${assignedJudge.id}`}
+                          onClick={() => toggleSpecialAssign(award.id, assignedJudge, false)}
+                          className="text-xs text-red-600 hover:text-red-800 underline disabled:opacity-50"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {specialEligibleJudges.map((j) => {
+                          const busy = specialBusyKey === `${award.id}_${j.id}`;
+                          const alreadyOnOtherAward = specialAssignments.some(
+                            (a) => a.judgeId === j.id! && a.awardId !== award.id
+                          );
+                          return (
+                            <button
+                              key={j.id}
+                              type="button"
+                              disabled={busy || alreadyOnOtherAward}
+                              onClick={() => toggleSpecialAssign(award.id, j, true)}
+                              title={alreadyOnOtherAward ? "Already assigned to another special award" : `Assign ${j.firstName} ${j.lastName}`}
+                              className={`text-sm px-3 py-1.5 rounded-lg border transition-colors disabled:opacity-40 ${
+                                alreadyOnOtherAward
+                                  ? "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                                  : "border-gray-300 bg-white hover:border-primary-blue hover:text-primary-blue"
+                              }`}
+                            >
+                              {j.firstName} {j.lastName}
+                              {j.institution ? ` (${j.institution})` : ""}
+                            </button>
+                          );
+                        })}
+                        {specialEligibleJudges.length === 0 && (
+                          <p className="text-sm text-gray-500 italic">No eligible judges available.</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 

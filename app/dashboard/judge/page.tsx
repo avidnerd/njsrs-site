@@ -8,8 +8,9 @@ import { logoutUser } from "@/lib/firebase/auth";
 import { getJudge } from "@/lib/firebase/database";
 import type { Judge } from "@/lib/firebase/database";
 import JudgeScoringPanel from "@/components/judging/JudgeScoringPanel";
+import SpecialAwardScoringPanel from "@/components/judging/SpecialAwardScoringPanel";
 
-type PhaseTab = "category" | "final";
+type PhaseTab = "category" | "final" | "special";
 
 export default function JudgeDashboardPage() {
   const { user, userProfile } = useAuth();
@@ -116,8 +117,23 @@ export default function JudgeDashboardPage() {
                 >
                   Final round
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setPhaseTab("special")}
+                  className={`flex-1 py-3 px-2 rounded-md text-sm font-medium transition-colors min-h-[44px] ${
+                    phaseTab === "special"
+                      ? "bg-purple-100 text-purple-900"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  Special awards
+                </button>
               </div>
-              <JudgeScoringPanel judgeId={user.uid} phase={phaseTab} />
+              {phaseTab === "special" ? (
+                <SpecialAwardScoringPanel judgeId={user.uid} />
+              ) : (
+                <JudgeScoringPanel judgeId={user.uid} phase={phaseTab as "category" | "final"} />
+              )}
             </div>
           ) : null}
         </div>
