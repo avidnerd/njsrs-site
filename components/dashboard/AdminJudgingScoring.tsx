@@ -286,21 +286,25 @@ export default function AdminJudgingScoring() {
     }
   };
 
-  const toggleCandidate = (awardId: string, studentId: string) => {
+  const candidatesKey = (awardId: string, judgeId: string) => `${awardId}_${judgeId}`;
+
+  const toggleCandidate = (awardId: string, judgeId: string, studentId: string) => {
+    const key = candidatesKey(awardId, judgeId);
     setSpecialCandidates((prev) => {
-      const current = prev[awardId] ?? [];
+      const current = prev[key] ?? [];
       const next = current.includes(studentId)
         ? current.filter((id) => id !== studentId)
         : [...current, studentId];
-      return { ...prev, [awardId]: next };
+      return { ...prev, [key]: next };
     });
   };
 
-  const saveCandidates = async (awardId: string) => {
-    setSavingCandidatesId(awardId);
+  const saveCandidates = async (awardId: string, judgeId: string) => {
+    const key = candidatesKey(awardId, judgeId);
+    setSavingCandidatesId(key);
     setError(null);
     try {
-      await setSpecialAwardCandidates(awardId, specialCandidates[awardId] ?? []);
+      await setSpecialAwardCandidates(awardId, judgeId, specialCandidates[key] ?? []);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to save candidates");
     } finally {
@@ -664,28 +668,78 @@ export default function AdminJudgingScoring() {
                     </p>
                   </div>
                   <div className="px-4 py-4 space-y-5">
-                    {/* Assigned judges */}
+                    {/* Assigned judges — each with their own candidate picker */}
                     {assignedJudges.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {assignedJudges.map((j) => (
-                          <div key={j.id} className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-1.5">
-                            <span className="text-sm text-green-800 font-medium">
-                              ✓ {j.firstName} {j.lastName}
-                              {j.institution ? ` — ${j.institution}` : ""}
-                            </span>
-                            <button
-                              type="button"
-                              disabled={specialBusyKey === `${award.id}_${j.id}`}
-                              onClick={() => toggleSpecialAssign(award.id, j, false)}
-                              className="text-xs text-red-500 hover:text-red-700 underline disabled:opacity-50"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        ))}
+                      <div className="space-y-4">
+                        {assignedJudges.map((j) => {
+                          const key = candidatesKey(award.id, j.id!);
+                          const selected = specialCandidates[key] ?? [];
+                          return (
+                            <div key={j.id} className="rounded-lg border border-gray-200 p-3 space-y-3">
+                              <div className="flex flex-wrap items-center justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-green-800 font-medium">
+                                    ✓ {j.firstName} {j.lastName}
+                                    {j.institution ? ` — ${j.institution}` : ""}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    disabled={specialBusyKey === `${award.id}_${j.id}`}
+                                    onClick={() => toggleSpecialAssign(award.id, j, false)}
+                                    className="text-xs text-red-500 hover:text-red-700 underline disabled:opacity-50"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                                <button
+                                  type="button"
+                                  disabled={savingCandidatesId === key}
+                                  onClick={() => saveCandidates(award.id, j.id!)}
+                                  className="text-xs px-3 py-1.5 rounded-lg bg-primary-blue text-white hover:opacity-90 disabled:opacity-50 shrink-0"
+                                >
+                                  {savingCandidatesId === key ? "Saving…" : `Save shortlist (${selected.length})`}
+                                </button>
+                              </div>
+                              {students.length === 0 ? (
+                                <p className="text-xs text-gray-500 italic">No students registered yet.</p>
+                              ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-52 overflow-y-auto pr-1">
+                                  {students.map((s) => {
+                                    const checked = selected.includes(s.id!);
+                                    return (
+                                      <label
+                                        key={s.id}
+                                        className={`flex items-start gap-2 rounded-lg border px-3 py-2 cursor-pointer transition-colors ${
+                                          checked
+                                            ? "border-primary-blue bg-blue-50"
+                                            : "border-gray-200 bg-white hover:border-gray-300"
+                                        }`}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          checked={checked}
+                                          onChange={() => toggleCandidate(award.id, j.id!, s.id!)}
+                                          className="mt-0.5 h-3.5 w-3.5 rounded border-gray-300 text-primary-blue shrink-0"
+                                        />
+                                        <div className="min-w-0">
+                                          <p className="text-xs font-medium text-gray-900 truncate">
+                                            {s.firstName} {s.lastName}
+                                          </p>
+                                          {s.projectTitle && (
+                                            <p className="text-xs text-gray-500 truncate">{s.projectTitle}</p>
+                                          )}
+                                        </div>
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
-                    {/* Picker — hidden when at max (2) */}
+                    {/* Picker for adding new judges — hidden when at max (2) */}
                     {!atMax && (
                       <div className="flex flex-wrap gap-2">
                         {specialEligibleJudges
@@ -702,62 +756,11 @@ export default function AdminJudgingScoring() {
                               {j.institution ? ` (${j.institution})` : ""}
                             </button>
                           ))}
-                        {specialEligibleJudges.filter((j) => !isSpecialAssigned(award.id, j.id!)).length === 0 && (
+                        {specialEligibleJudges.filter((j) => !isSpecialAssigned(award.id, j.id!)).length === 0 && assignedJudges.length === 0 && (
                           <p className="text-sm text-gray-500 italic">No eligible judges available.</p>
                         )}
                       </div>
                     )}
-
-                    {/* Candidate student picker */}
-                    <div className="border-t border-gray-100 pt-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                          Shortlisted candidates ({(specialCandidates[award.id] ?? []).length} selected)
-                        </p>
-                        <button
-                          type="button"
-                          disabled={savingCandidatesId === award.id}
-                          onClick={() => saveCandidates(award.id)}
-                          className="text-xs px-3 py-1.5 rounded-lg bg-primary-blue text-white hover:opacity-90 disabled:opacity-50"
-                        >
-                          {savingCandidatesId === award.id ? "Saving…" : "Save candidates"}
-                        </button>
-                      </div>
-                      {students.length === 0 ? (
-                        <p className="text-sm text-gray-500 italic">No students registered yet.</p>
-                      ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-56 overflow-y-auto pr-1">
-                          {students.map((s) => {
-                            const checked = (specialCandidates[award.id] ?? []).includes(s.id!);
-                            return (
-                              <label
-                                key={s.id}
-                                className={`flex items-start gap-2 rounded-lg border px-3 py-2 cursor-pointer transition-colors ${
-                                  checked
-                                    ? "border-primary-blue bg-blue-50"
-                                    : "border-gray-200 bg-white hover:border-gray-300"
-                                }`}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={checked}
-                                  onChange={() => toggleCandidate(award.id, s.id!)}
-                                  className="mt-0.5 h-3.5 w-3.5 rounded border-gray-300 text-primary-blue shrink-0"
-                                />
-                                <div className="min-w-0">
-                                  <p className="text-xs font-medium text-gray-900 truncate">
-                                    {s.firstName} {s.lastName}
-                                  </p>
-                                  {s.projectTitle && (
-                                    <p className="text-xs text-gray-500 truncate">{s.projectTitle}</p>
-                                  )}
-                                </div>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
                   </div>
                 </div>
               );

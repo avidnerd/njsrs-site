@@ -55,7 +55,7 @@ export default function SpecialAwardScoringPanel({ judgeId }: SpecialAwardScorin
       const newNotes: Record<string, Record<string, string>> = {};
 
       for (const award of awards) {
-        const candidateIds = await getSpecialAwardCandidates(award.id);
+        const candidateIds = await getSpecialAwardCandidates(award.id, judgeId);
         // If no candidates shortlisted yet, show all students; otherwise filter
         const awardStudents = candidateIds.length > 0
           ? allStudents.filter((s) => s.id && candidateIds.includes(s.id))
