@@ -176,8 +176,8 @@ export default function JudgeDashboardPage() {
                 </div>
               )}
 
-              {/* Special award judge notice */}
-              {specialAwardNames.length > 0 && (
+              {/* Special award judge notice — omitted when also a category judge (role banner already covers it) */}
+              {specialAwardNames.length > 0 && !isCategoryJudge && (
                 <div className="rounded-xl bg-purple-50 border border-purple-300 px-5 py-4">
                   <p className="text-sm font-bold text-purple-900 mb-1">
                     You have been selected as a Special Award Judge
