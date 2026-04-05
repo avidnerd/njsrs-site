@@ -73,7 +73,8 @@ service cloud.firestore {
                      isTeamMember() ||
                      isSRA() ||
                      isAdmin() ||
-                     hasJudgingAssignmentToStudent(studentId);
+                     hasJudgingAssignmentToStudent(studentId) ||
+                     getUserRole() == 'judge';
       allow create: if isAuthenticated() && request.auth.uid == studentId;
       allow update: if isOwner(studentId) ||
                         isTeamMember() ||
@@ -94,14 +95,18 @@ service cloud.firestore {
     }
 
     match /judgingAssignments/{assignmentId} {
-      allow read: if isAdmin() ||
+      allow get: if isAdmin() ||
         (isAuthenticated() && resource.data.judgeId == request.auth.uid);
+      allow list: if isAdmin() ||
+        (isAuthenticated() && getUserRole() == 'judge');
       allow create, update, delete: if isAdmin();
     }
 
     match /judgeScores/{scoreId} {
-      allow read: if isAdmin() ||
+      allow get: if isAdmin() ||
         (isAuthenticated() && resource.data.judgeId == request.auth.uid);
+      allow list: if isAdmin() ||
+        (isAuthenticated() && getUserRole() == 'judge');
       allow create: if isAuthenticated() &&
         request.resource.data.judgeId == request.auth.uid;
       allow update: if isAuthenticated() &&
@@ -125,7 +130,8 @@ service cloud.firestore {
     match /specialAwardScores/{scoreId} {
       allow read: if isAdmin() ||
         (isAuthenticated() && resource.data.judgeId == request.auth.uid);
-      allow list: if isAdmin();
+      allow list: if isAdmin() ||
+        (isAuthenticated() && getUserRole() == 'judge');
       allow create: if isAuthenticated() &&
         request.resource.data.judgeId == request.auth.uid;
       allow update: if isAuthenticated() &&

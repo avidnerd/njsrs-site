@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
@@ -37,13 +37,20 @@ export default function JudgeDashboardPage() {
         getAssignmentsForJudge(user.uid, "category"),
         getSpecialAwardAssignmentsForJudge(user.uid),
       ]);
+      const names = specialAssignments
+        .map((a) => SPECIAL_AWARDS.find((aw) => aw.id === a.awardId)?.name)
+        .filter(Boolean) as string[];
       setJudgeData(judge);
       setIsCategoryJudge(categoryAssignments.length > 0);
-      setSpecialAwardNames(
-        specialAssignments
-          .map((a) => SPECIAL_AWARDS.find((aw) => aw.id === a.awardId)?.name)
-          .filter(Boolean) as string[]
-      );
+      setSpecialAwardNames(names);
+      // Default to the first tab they actually have access to
+      if (categoryAssignments.length > 0) {
+        setPhaseTab("category");
+      } else if (judge?.finalRoundJudge) {
+        setPhaseTab("final");
+      } else if (names.length > 0) {
+        setPhaseTab("special");
+      }
     } catch (error) {
       console.error("Error loading judge data:", error);
     } finally {
@@ -190,46 +197,38 @@ export default function JudgeDashboardPage() {
                 View your assigned projects, open each student&apos;s research paper, enter rubric
                 scores, private notes, and ranks. Tap a student to expand the scoring form.
               </p>
-              <div className="flex rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
-                <button
-                  type="button"
-                  onClick={() => setPhaseTab("category")}
-                  className={`flex-1 py-3 px-2 rounded-md text-sm font-medium transition-colors min-h-[44px] ${
-                    phaseTab === "category"
-                      ? "bg-amber-100 text-amber-900"
-                      : "text-gray-600 hover:bg-gray-50"
-                  }`}
-                >
-                  Category judging
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPhaseTab("final")}
-                  className={`flex-1 py-3 px-2 rounded-md text-sm font-medium transition-colors min-h-[44px] ${
-                    phaseTab === "final"
-                      ? "bg-indigo-100 text-indigo-900"
-                      : "text-gray-600 hover:bg-gray-50"
-                  }`}
-                >
-                  Final round
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPhaseTab("special")}
-                  className={`flex-1 py-3 px-2 rounded-md text-sm font-medium transition-colors min-h-[44px] ${
-                    phaseTab === "special"
-                      ? "bg-purple-100 text-purple-900"
-                      : "text-gray-600 hover:bg-gray-50"
-                  }`}
-                >
-                  Special awards
-                </button>
-              </div>
-              {phaseTab === "special" ? (
-                <SpecialAwardScoringPanel judgeId={user.uid} />
-              ) : (
-                <JudgeScoringPanel judgeId={user.uid} phase={phaseTab as "category" | "final"} />
-              )}
+              {(() => {
+                const tabs: { id: PhaseTab; label: string; activeClass: string }[] = [];
+                if (isCategoryJudge) tabs.push({ id: "category", label: "Category judging", activeClass: "bg-amber-100 text-amber-900" });
+                if (judgeData?.finalRoundJudge) tabs.push({ id: "final", label: "Final round", activeClass: "bg-indigo-100 text-indigo-900" });
+                if (specialAwardNames.length > 0) tabs.push({ id: "special", label: "Special awards", activeClass: "bg-purple-100 text-purple-900" });
+                if (tabs.length === 0) return null;
+                return (
+                  <>
+                    {tabs.length > 1 && (
+                      <div className="flex rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
+                        {tabs.map((tab) => (
+                          <button
+                            key={tab.id}
+                            type="button"
+                            onClick={() => setPhaseTab(tab.id)}
+                            className={`flex-1 py-3 px-2 rounded-md text-sm font-medium transition-colors min-h-[44px] ${
+                              phaseTab === tab.id ? tab.activeClass : "text-gray-600 hover:bg-gray-50"
+                            }`}
+                          >
+                            {tab.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {phaseTab === "special" ? (
+                      <SpecialAwardScoringPanel judgeId={user.uid} />
+                    ) : (
+                      <JudgeScoringPanel judgeId={user.uid} phase={phaseTab as "category" | "final"} />
+                    )}
+                  </>
+                );
+              })()}
             </div>
           ) : null}
         </div>
