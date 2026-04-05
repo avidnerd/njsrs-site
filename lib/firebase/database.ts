@@ -97,6 +97,7 @@ export interface Student {
   photoRelease?: PhotoRelease;
   categoryId?: string;
   guests?: Guest[];
+  projectId?: string;
 }
 
 export interface Guest {
@@ -593,6 +594,54 @@ export async function updateStudentMaterials(
   const dbInstance = ensureDb();
   const studentRef = doc(dbInstance, "students", studentId);
   await updateDoc(studentRef, updates);
+}
+
+/** Derive a two-letter prefix from a category name (e.g. "Computational Biology" → "CB"). */
+function categoryPrefix(name: string): string {
+  const cleaned = name.replace(/\(.*?\)/g, "").trim();
+  const words = cleaned.split(/[\s,]+/).filter((w) => /^[A-Za-z]/.test(w));
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
+/**
+ * Assigns a projectId (e.g. "CB1", "CB2") to every student that has a category.
+ * Students within each category are sorted alphabetically by last name then first name.
+ * Returns the number of students updated.
+ */
+export async function batchAssignProjectIds(
+  students: Student[],
+  categories: Category[]
+): Promise<number> {
+  const dbInstance = ensureDb();
+  const catMap = new Map(categories.filter((c) => c.id).map((c) => [c.id!, c]));
+
+  // Group by categoryId
+  const byCat = new Map<string, Student[]>();
+  for (const s of students) {
+    if (!s.categoryId || !s.id) continue;
+    if (!byCat.has(s.categoryId)) byCat.set(s.categoryId, []);
+    byCat.get(s.categoryId)!.push(s);
+  }
+
+  const updates: Promise<void>[] = [];
+  for (const [catId, group] of byCat) {
+    const cat = catMap.get(catId);
+    if (!cat) continue;
+    const prefix = categoryPrefix(cat.name);
+    // Sort alphabetically within category
+    const sorted = [...group].sort((a, b) => {
+      const last = (a.lastName ?? "").localeCompare(b.lastName ?? "");
+      return last !== 0 ? last : (a.firstName ?? "").localeCompare(b.firstName ?? "");
+    });
+    sorted.forEach((s, idx) => {
+      updates.push(
+        updateDoc(doc(dbInstance, "students", s.id!), { projectId: `${prefix}${idx + 1}` })
+      );
+    });
+  }
+  await Promise.all(updates);
+  return updates.length;
 }
 
 export async function updateStudentGuests(studentId: string, guests: Guest[]): Promise<void> {

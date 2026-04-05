@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAllStudents, getCategories, updateStudentCategory } from "@/lib/firebase/database";
+import { getAllStudents, getCategories, updateStudentCategory, batchAssignProjectIds } from "@/lib/firebase/database";
 import type { Student, Category } from "@/lib/firebase/database";
 import { Timestamp } from "firebase/firestore";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,6 +38,8 @@ export default function AdminStudentList() {
   const [resetEmail, setResetEmail] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
   const [resetMessage, setResetMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [assigningIds, setAssigningIds] = useState(false);
+  const [assignMessage, setAssignMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     loadStudents();
@@ -69,6 +71,20 @@ export default function AdminStudentList() {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAssignProjectIds = async () => {
+    setAssigningIds(true);
+    setAssignMessage(null);
+    try {
+      const count = await batchAssignProjectIds(students, categories);
+      await loadStudents();
+      setAssignMessage({ type: "success", text: `Assigned project IDs to ${count} student(s).` });
+    } catch (e: unknown) {
+      setAssignMessage({ type: "error", text: e instanceof Error ? e.message : "Failed to assign IDs." });
+    } finally {
+      setAssigningIds(false);
     }
   };
 
@@ -105,6 +121,7 @@ export default function AdminStudentList() {
       "Shirt Size",
       "Status",
       "Category",
+      "Project ID",
     ];
 
     const rows = students.map((student) => {
@@ -129,6 +146,7 @@ export default function AdminStudentList() {
         student.shirtSize || "",
         student.status || "pending",
         (categories.find((c) => c.id === student.categoryId)?.name) || "",
+        student.projectId || "",
       ];
     });
 
@@ -183,13 +201,27 @@ export default function AdminStudentList() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="flex-1 max-w-md px-4 py-2 border border-gray-300 rounded-md text-gray-900"
         />
-        <button
-          onClick={exportToCSV}
-          className="ml-4 bg-primary-green text-white px-6 py-2 rounded-md hover:bg-primary-darkGreen font-semibold whitespace-nowrap"
-        >
-          Export Project Classifications
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleAssignProjectIds}
+            disabled={assigningIds}
+            className="bg-indigo-600 text-white px-5 py-2 rounded-md hover:bg-indigo-700 font-semibold whitespace-nowrap disabled:opacity-50"
+          >
+            {assigningIds ? "Assigning…" : "Assign Project IDs"}
+          </button>
+          <button
+            onClick={exportToCSV}
+            className="bg-primary-green text-white px-6 py-2 rounded-md hover:bg-primary-darkGreen font-semibold whitespace-nowrap"
+          >
+            Export Project Classifications
+          </button>
+        </div>
       </div>
+      {assignMessage && (
+        <p className={`text-sm font-medium ${assignMessage.type === "success" ? "text-green-700" : "text-red-700"}`}>
+          {assignMessage.text}
+        </p>
+      )}
 
       {}
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -213,6 +245,9 @@ export default function AdminStudentList() {
                   Category
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Project ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Materials
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -223,7 +258,7 @@ export default function AdminStudentList() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredStudents.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan={8} className="px-6 py-4 text-center text-gray-500">
                     No students found
                   </td>
                 </tr>
@@ -257,6 +292,15 @@ export default function AdminStudentList() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {categories.find((c) => c.id === student.categoryId)?.name ?? "—"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {student.projectId ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-indigo-100 text-indigo-800">
+                          {student.projectId}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">—</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="space-y-1">
