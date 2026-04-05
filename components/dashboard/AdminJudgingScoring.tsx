@@ -6,6 +6,7 @@ import {
   getAllStudents,
   getAllJudges,
   getCategories,
+  updateJudgeFinalRoundStatus,
   type Student,
   type Judge,
   type Category,
@@ -18,6 +19,7 @@ import {
   clearAllJudgeScores,
   aggregateCategoryResults,
   aggregateFinalResults,
+  promoteFirstPlaceToFinal,
   exportScoresToCsv,
   exportDetailScoresToCsv,
   type JudgingPhase,
@@ -110,10 +112,10 @@ export default function AdminJudgingScoring() {
     [specialAssignments]
   );
 
-  // Judge IDs assigned to the final round
+  // Judge IDs designated as final round judges (flag on judge doc)
   const finalAssignedJudgeIds = useMemo(
-    () => new Set(assignments.filter((a) => a.phase === "final").map((a) => a.judgeId)),
-    [assignments]
+    () => new Set(judges.filter((j) => j.finalRoundJudge && j.id).map((j) => j.id!)),
+    [judges]
   );
 
   // Final round eligible: approved + in-person full day + NOT in category round + NOT in special awards
@@ -129,34 +131,40 @@ export default function AdminJudgingScoring() {
   );
 
   const isFinalJudge = useCallback(
-    (judgeId: string) => assignments.some((a) => a.phase === "final" && a.judgeId === judgeId),
-    [assignments]
+    (judgeId: string) => judges.some((j) => j.id === judgeId && j.finalRoundJudge === true),
+    [judges]
   );
 
   const [finalBusyId, setFinalBusyId] = useState<string | null>(null);
+  const [promotingFinalists, setPromotingFinalists] = useState(false);
+  const [promoteResult, setPromoteResult] = useState<string | null>(null);
 
   const toggleFinalJudge = async (judge: Judge, on: boolean) => {
     setFinalBusyId(judge.id!);
     setError(null);
     try {
-      if (on) {
-        // Assign this judge to every student for the final round
-        await Promise.all(
-          students.map((s) => setJudgingAssignment(judge.id!, s.id!, "final", null))
-        );
-      } else {
-        // Remove all final-round assignments for this judge
-        await Promise.all(
-          students
-            .filter((s) => isAssigned("final", judge.id!, s.id!))
-            .map((s) => removeJudgingAssignment("final", judge.id!, s.id!))
-        );
-      }
+      await updateJudgeFinalRoundStatus(judge.id!, on);
       await loadAll();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Update failed");
     } finally {
       setFinalBusyId(null);
+    }
+  };
+
+  const handlePromoteFirstPlace = async () => {
+    setPromotingFinalists(true);
+    setPromoteResult(null);
+    setError(null);
+    try {
+      const finalJudgeIds = judges.filter((j) => j.finalRoundJudge && j.id).map((j) => j.id!);
+      const count = await promoteFirstPlaceToFinal(categories, students, scores, finalJudgeIds);
+      await loadAll();
+      setPromoteResult(`${count} first-place winner(s) assigned to ${finalJudgeIds.length} final round judge(s).`);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Promotion failed");
+    } finally {
+      setPromotingFinalists(false);
     }
   };
 
@@ -635,6 +643,28 @@ export default function AdminJudgingScoring() {
                       </label>
                     );
                   })}
+                </div>
+              )}
+              {/* Promote first-place winners */}
+              {finalAssignedJudgeIds.size > 0 && (
+                <div className="mt-4 rounded-xl border border-indigo-200 bg-indigo-50 p-4 space-y-3">
+                  <div>
+                    <p className="text-sm font-semibold text-indigo-900">Assign first-place winners to final round</p>
+                    <p className="text-xs text-indigo-700 mt-0.5">
+                      Once category judging is complete, click below to automatically assign the #1-ranked student from each category as a finalist. All designated final round judges will be assigned to score them.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={promotingFinalists}
+                    onClick={handlePromoteFirstPlace}
+                    className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50"
+                  >
+                    {promotingFinalists ? "Assigning…" : "Promote first-place winners to final round"}
+                  </button>
+                  {promoteResult && (
+                    <p className="text-sm text-green-700 font-medium">✓ {promoteResult}</p>
+                  )}
                 </div>
               )}
             </div>

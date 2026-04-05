@@ -423,6 +423,34 @@ export function exportScoresToCsv(
   return lines.join("\n");
 }
 
+/**
+ * For each category, finds the student with the best aggregate ranking (rank=1 avg, then score)
+ * and creates final-phase judging assignments for each of the given final round judges.
+ * Existing final-phase assignments are not removed — call this once when promoting.
+ */
+export async function promoteFirstPlaceToFinal(
+  categories: import("./database").Category[],
+  students: Student[],
+  scores: (JudgeScoreDoc & { id: string })[],
+  finalJudgeIds: string[]
+): Promise<number> {
+  const firstPlaceIds: string[] = [];
+  for (const cat of categories) {
+    if (!cat.id) continue;
+    const rows = aggregateCategoryResults(students, scores, cat.id);
+    if (rows.length > 0) firstPlaceIds.push(rows[0].studentId);
+  }
+  if (firstPlaceIds.length === 0 || finalJudgeIds.length === 0) return 0;
+  await Promise.all(
+    firstPlaceIds.flatMap((studentId) =>
+      finalJudgeIds.map((judgeId) =>
+        setJudgingAssignment(judgeId, studentId, "final", null)
+      )
+    )
+  );
+  return firstPlaceIds.length;
+}
+
 export async function clearAllJudgeScores(): Promise<number> {
   const dbi = ensureDb();
   const snap = await getDocs(collection(dbi, "judgeScores"));

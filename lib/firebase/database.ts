@@ -257,6 +257,7 @@ export interface Judge {
   createdAt: Date | Timestamp;
   adminApproved?: boolean;
   categoryIds?: string[];
+  finalRoundJudge?: boolean;
 }
 
 export interface Category {
@@ -815,4 +816,9 @@ export async function updateJudgeCategories(judgeId: string, categoryIds: string
   const dbInstance = ensureDb();
   const judgeRef = doc(dbInstance, "judges", judgeId);
   await updateDoc(judgeRef, { categoryIds });
+}
+
+export async function updateJudgeFinalRoundStatus(judgeId: string, isFinalRoundJudge: boolean): Promise<void> {
+  const dbInstance = ensureDb();
+  await updateDoc(doc(dbInstance, "judges", judgeId), { finalRoundJudge: isFinalRoundJudge });
 }

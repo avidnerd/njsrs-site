@@ -90,6 +90,16 @@ export default function JudgeDashboardPage() {
             </div>
           ) : user ? (
             <div className="space-y-6">
+              {judgeData?.finalRoundJudge && (
+                <div className="rounded-xl bg-indigo-50 border border-indigo-300 px-5 py-4">
+                  <p className="text-sm font-bold text-indigo-900 mb-1">
+                    You have been selected as a Final Round Judge
+                  </p>
+                  <p className="text-sm text-indigo-700">
+                    After category judging is complete, the first-place winner from each category will advance to the final round. You will judge these finalists using the same rubric and select the overall top projects.
+                  </p>
+                </div>
+              )}
               <p className="text-sm text-gray-600">
                 View your assigned projects, open each student&apos;s research paper, enter rubric
                 scores, private notes, and ranks. Tap a student to expand the scoring form.
