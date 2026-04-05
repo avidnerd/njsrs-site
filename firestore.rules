@@ -104,7 +104,7 @@ service cloud.firestore {
 
     match /judgeScores/{scoreId} {
       allow get: if isAdmin() ||
-        (isAuthenticated() && resource.data.judgeId == request.auth.uid);
+        (isAuthenticated() && getUserRole() == 'judge');
       allow list: if isAdmin() ||
         (isAuthenticated() && getUserRole() == 'judge');
       allow create: if isAuthenticated() &&
@@ -128,8 +128,8 @@ service cloud.firestore {
     }
 
     match /specialAwardScores/{scoreId} {
-      allow read: if isAdmin() ||
-        (isAuthenticated() && resource.data.judgeId == request.auth.uid);
+      allow get: if isAdmin() ||
+        (isAuthenticated() && getUserRole() == 'judge');
       allow list: if isAdmin() ||
         (isAuthenticated() && getUserRole() == 'judge');
       allow create: if isAuthenticated() &&
