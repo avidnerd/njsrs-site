@@ -7,6 +7,8 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { logoutUser } from "@/lib/firebase/auth";
 import { getJudge } from "@/lib/firebase/database";
 import type { Judge } from "@/lib/firebase/database";
+import { getAssignmentsForJudge } from "@/lib/firebase/judging";
+import { getSpecialAwardAssignmentsForJudge, SPECIAL_AWARDS } from "@/lib/firebase/specialAwards";
 import JudgeScoringPanel from "@/components/judging/JudgeScoringPanel";
 import SpecialAwardScoringPanel from "@/components/judging/SpecialAwardScoringPanel";
 
@@ -16,6 +18,8 @@ export default function JudgeDashboardPage() {
   const { user, userProfile } = useAuth();
   const router = useRouter();
   const [judgeData, setJudgeData] = useState<Judge | null>(null);
+  const [isCategoryJudge, setIsCategoryJudge] = useState(false);
+  const [specialAwardNames, setSpecialAwardNames] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [phaseTab, setPhaseTab] = useState<PhaseTab>("category");
 
@@ -27,10 +31,19 @@ export default function JudgeDashboardPage() {
 
   const loadJudgeData = async () => {
     if (!user) return;
-
     try {
-      const judge = await getJudge(user.uid);
+      const [judge, categoryAssignments, specialAssignments] = await Promise.all([
+        getJudge(user.uid),
+        getAssignmentsForJudge(user.uid, "category"),
+        getSpecialAwardAssignmentsForJudge(user.uid),
+      ]);
       setJudgeData(judge);
+      setIsCategoryJudge(categoryAssignments.length > 0);
+      setSpecialAwardNames(
+        specialAssignments
+          .map((a) => SPECIAL_AWARDS.find((aw) => aw.id === a.awardId)?.name)
+          .filter(Boolean) as string[]
+      );
     } catch (error) {
       console.error("Error loading judge data:", error);
     } finally {
@@ -90,16 +103,89 @@ export default function JudgeDashboardPage() {
             </div>
           ) : user ? (
             <div className="space-y-6">
+              {/* Reporting time + role summary */}
+              {(() => {
+                const isFinal = judgeData?.finalRoundJudge === true;
+                const isSpecial = specialAwardNames.length > 0;
+                const roles: string[] = [];
+                if (isCategoryJudge) roles.push("Category Judge");
+                if (isFinal) roles.push("Final Round Judge");
+                if (isSpecial) roles.push("Special Award Judge");
+                if (roles.length === 0) return null;
+
+                // Build a plain-English schedule line
+                let scheduleLine: React.ReactNode;
+                if (isCategoryJudge && (isFinal || isSpecial)) {
+                  const afternoon = [
+                    isFinal && "final round",
+                    isSpecial && "special award",
+                  ].filter(Boolean).join(" and ");
+                  scheduleLine = (
+                    <>
+                      <strong>Report at 8:00 AM</strong> for category judging, and <strong>remain available at 12:00 PM</strong> for {afternoon} judging.
+                    </>
+                  );
+                } else {
+                  const reportTime = isCategoryJudge ? "8:00 AM" : "12:00 PM";
+                  scheduleLine = <><strong>Please report at {reportTime}</strong> on April 18, 2026 at Millburn High School.</>;
+                }
+
+                return (
+                  <div className="rounded-xl bg-blue-50 border border-blue-300 px-5 py-4 space-y-1">
+                    <p className="text-sm font-bold text-blue-900">
+                      Your role{roles.length > 1 ? "s" : ""}: {roles.join(" · ")}
+                    </p>
+                    <p className="text-sm text-blue-800">{scheduleLine}</p>
+                    {isCategoryJudge && (isFinal || isSpecial) && (
+                      <p className="text-xs text-blue-700 mt-0.5">
+                        All judging takes place on April 18, 2026 at Millburn High School.
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Don't score early notice — not shown to final-only judges */}
+              {(isCategoryJudge || specialAwardNames.length > 0) && (
+                <div className="rounded-xl bg-amber-50 border border-amber-300 px-5 py-4">
+                  <p className="text-sm font-bold text-amber-900 mb-1">
+                    Please do not enter scores before the day of the fair
+                  </p>
+                  <p className="text-sm text-amber-800">
+                    You are welcome to review the research reports in advance to get an initial sense of the projects, but please hold off on submitting any scores until April 18, 2026.
+                  </p>
+                </div>
+              )}
+
+              {/* Final round judge notice */}
               {judgeData?.finalRoundJudge && (
                 <div className="rounded-xl bg-indigo-50 border border-indigo-300 px-5 py-4">
                   <p className="text-sm font-bold text-indigo-900 mb-1">
                     You have been selected as a Final Round Judge
                   </p>
                   <p className="text-sm text-indigo-700">
-                    After category judging is complete, the first-place winner from each category will advance to the final round. You will judge these finalists using the same rubric and select the overall top projects.
+                    After category judging is complete, the first-place winner from each category will advance to the final round. You will judge these finalists and select the overall top projects. Your projects will be assigned on the morning of the fair — report at 12:00 PM.
                   </p>
                 </div>
               )}
+
+              {/* Special award judge notice */}
+              {specialAwardNames.length > 0 && (
+                <div className="rounded-xl bg-purple-50 border border-purple-300 px-5 py-4">
+                  <p className="text-sm font-bold text-purple-900 mb-1">
+                    You have been selected as a Special Award Judge
+                  </p>
+                  <p className="text-sm text-purple-800 mb-2">
+                    You will judge the following award{specialAwardNames.length > 1 ? "s" : ""} using a custom rubric. Report at 12:00 PM on April 18, 2026.
+                  </p>
+                  <ul className="list-disc list-inside space-y-0.5">
+                    {specialAwardNames.map((name) => (
+                      <li key={name} className="text-sm text-purple-900 font-medium">{name}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <p className="text-sm text-gray-600">
                 View your assigned projects, open each student&apos;s research paper, enter rubric
                 scores, private notes, and ranks. Tap a student to expand the scoring form.
