@@ -226,13 +226,10 @@ export default function SpecialAwardScoringPanel({ judgeId }: SpecialAwardScorin
                     {total > 0 && <span className="ml-2 text-indigo-600">· Scored</span>}
                   </span>
                   <h3 className="text-lg font-semibold text-gray-900 mt-0.5">
-                    {s.firstName} {s.lastName}
+                    {s.projectId || s.id}
                   </h3>
                   {s.projectTitle && (
                     <p className="text-sm text-gray-600 mt-0.5">{s.projectTitle}</p>
-                  )}
-                  {s.schoolName && (
-                    <p className="text-xs text-gray-500">{s.schoolName}</p>
                   )}
                 </div>
                 <div className="text-right shrink-0">

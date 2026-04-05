@@ -103,6 +103,14 @@ export default function StudentDashboardPage() {
             <div className="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded">
               <p className="text-sm text-indigo-800">
                 <strong>Your Category:</strong> {categoryName}
+                {student?.projectId && (
+                  <span className="ml-3">
+                    <strong>Project ID:</strong>{" "}
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-indigo-200 text-indigo-900">
+                      {student.projectId}
+                    </span>
+                  </span>
+                )}
               </p>
             </div>
           )}

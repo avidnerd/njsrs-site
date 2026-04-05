@@ -249,7 +249,7 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
                         Student {idx + 1} of {groupIds.length}
                       </span>
                       <h3 className="text-lg font-semibold text-gray-900 mt-0.5">
-                        {s ? `${s.firstName} ${s.lastName}` : a.studentId}
+                        {s?.projectId || a.studentId}
                       </h3>
                       {s?.projectTitle && (
                         <p className="text-sm text-gray-600 mt-0.5">{s.projectTitle}</p>
@@ -368,7 +368,7 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
                     >
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-gray-900 truncate">
-                          {s ? `${s.firstName} ${s.lastName}` : a.studentId}
+                          {s?.projectId || a.studentId}
                         </p>
                         {s?.projectTitle && (
                           <p className="text-xs text-gray-500 truncate">{s.projectTitle}</p>
