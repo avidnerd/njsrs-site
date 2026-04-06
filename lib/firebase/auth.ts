@@ -2,6 +2,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  sendPasswordResetEmail,
   User,
   UserCredential,
 } from "firebase/auth";
@@ -126,6 +127,11 @@ export async function loginUser(
   const result = await signInWithEmailAndPassword(authInstance, email, password);
   console.log("Login successful, User UID:", result.user.uid);
   return result;
+}
+
+export async function sendPasswordReset(email: string): Promise<void> {
+  const authInstance = ensureAuth();
+  await sendPasswordResetEmail(authInstance, email);
 }
 
 export async function logoutUser(): Promise<void> {
