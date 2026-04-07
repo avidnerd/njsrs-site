@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { getCategories, createCategory, deleteCategory } from "@/lib/firebase/database";
+import { useState, useEffect, useRef } from "react";
+import { getCategories, createCategory, updateCategory, deleteCategory } from "@/lib/firebase/database";
 import type { Category } from "@/lib/firebase/database";
 
 export default function AdminCategories() {
@@ -9,10 +9,18 @@ export default function AdminCategories() {
   const [loading, setLoading] = useState(true);
   const [newName, setNewName] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState("");
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const editInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadCategories();
   }, []);
+
+  useEffect(() => {
+    if (editingId) editInputRef.current?.focus();
+  }, [editingId]);
 
   const loadCategories = async () => {
     try {
@@ -39,6 +47,32 @@ export default function AdminCategories() {
       alert("Failed to create category.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const startEdit = (c: Category) => {
+    setEditingId(c.id!);
+    setEditingName(c.name);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditingName("");
+  };
+
+  const handleSaveEdit = async (id: string) => {
+    const name = editingName.trim();
+    if (!name) return;
+    setSavingId(id);
+    try {
+      await updateCategory(id, name);
+      setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, name } : c)));
+      setEditingId(null);
+    } catch (e) {
+      console.error(e);
+      alert("Failed to update category.");
+    } finally {
+      setSavingId(null);
     }
   };
 
@@ -93,16 +127,56 @@ export default function AdminCategories() {
             {categories.map((c) => (
               <li
                 key={c.id}
-                className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
+                className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0"
               >
-                <span className="text-gray-900 font-medium">{c.name}</span>
-                <button
-                  type="button"
-                  onClick={() => c.id && handleDelete(c.id, c.name)}
-                  className="text-red-600 hover:text-red-800 text-sm font-medium"
-                >
-                  Delete
-                </button>
+                {editingId === c.id ? (
+                  <>
+                    <input
+                      ref={editInputRef}
+                      type="text"
+                      value={editingName}
+                      onChange={(e) => setEditingName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSaveEdit(c.id!);
+                        if (e.key === "Escape") cancelEdit();
+                      }}
+                      className="flex-1 rounded-md border border-primary-blue px-3 py-1 text-gray-900 text-sm focus:ring-2 focus:ring-primary-blue focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      disabled={savingId === c.id || !editingName.trim()}
+                      onClick={() => handleSaveEdit(c.id!)}
+                      className="text-primary-green hover:text-primary-darkGreen text-sm font-medium disabled:opacity-50"
+                    >
+                      {savingId === c.id ? "Saving…" : "Save"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={cancelEdit}
+                      className="text-gray-500 hover:text-gray-700 text-sm font-medium"
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span className="flex-1 text-gray-900 font-medium">{c.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => startEdit(c)}
+                      className="text-primary-blue hover:text-primary-darkBlue text-sm font-medium"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => c.id && handleDelete(c.id, c.name)}
+                      className="text-red-600 hover:text-red-800 text-sm font-medium"
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
               </li>
             ))}
           </ul>

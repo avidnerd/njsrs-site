@@ -800,6 +800,11 @@ export async function createCategory(name: string): Promise<string> {
   return newRef.id;
 }
 
+export async function updateCategory(categoryId: string, name: string): Promise<void> {
+  const dbInstance = ensureDb();
+  await updateDoc(doc(dbInstance, "categories", categoryId), { name });
+}
+
 export async function deleteCategory(categoryId: string): Promise<void> {
   const dbInstance = ensureDb();
   const categoryRef = doc(dbInstance, "categories", categoryId);
