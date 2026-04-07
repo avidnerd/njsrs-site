@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   setDoc,
   deleteDoc,
@@ -583,15 +584,9 @@ export async function getSpecialAwardCandidates(
   judgeId: string
 ): Promise<string[]> {
   const dbi = ensureDb();
-  const snap = await getDocs(
-    query(
-      collection(dbi, "specialAwardCandidates"),
-      where("awardId", "==", awardId),
-      where("judgeId", "==", judgeId)
-    )
-  );
-  if (snap.empty) return [];
-  return (snap.docs[0].data().studentIds as string[]) ?? [];
+  const snap = await getDoc(doc(dbi, "specialAwardCandidates", candidatesDocId(awardId, judgeId)));
+  if (!snap.exists()) return [];
+  return (snap.data().studentIds as string[]) ?? [];
 }
 
 // Returns { `${awardId}_${judgeId}`: studentIds[] }

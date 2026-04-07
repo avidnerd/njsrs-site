@@ -297,9 +297,11 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
                               max={c.maxPoints}
                               step={1}
                               value={rubric[c.key]}
-                              onChange={(e) =>
-                                updateRubric(a.studentId, c.key, Number(e.target.value) || 0)
-                              }
+                              onChange={(e) => {
+                                const raw = Number(e.target.value);
+                                const clamped = Number.isNaN(raw) ? 0 : Math.min(c.maxPoints, Math.max(0, raw));
+                                updateRubric(a.studentId, c.key, clamped);
+                              }}
                               className="w-full max-w-[110px] px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-base"
                             />
                           </div>

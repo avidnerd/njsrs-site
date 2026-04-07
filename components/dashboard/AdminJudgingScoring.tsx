@@ -28,14 +28,16 @@ import {
 import {
   SPECIAL_AWARDS,
   getAllSpecialAwardAssignments,
+  getAllSpecialAwardScores,
   setSpecialAwardAssignment,
   removeSpecialAwardAssignment,
   getAllSpecialAwardCandidates,
   setSpecialAwardCandidates,
   type SpecialAwardAssignment,
+  type SpecialAwardScore,
 } from "@/lib/firebase/specialAwards";
 
-type SubTab = "assign" | "special" | "category" | "final";
+type SubTab = "assign" | "special" | "category" | "final" | "specialResults";
 
 export default function AdminJudgingScoring() {
   const { user } = useAuth();
@@ -48,6 +50,7 @@ export default function AdminJudgingScoring() {
   const [scores, setScores] = useState<Awaited<ReturnType<typeof getAllJudgeScores>>>([]);
   const [specialAssignments, setSpecialAssignments] = useState<(SpecialAwardAssignment & { id: string })[]>([]);
   const [specialCandidates, setSpecialCandidates] = useState<Record<string, string[]>>({});
+  const [specialScores, setSpecialScores] = useState<(SpecialAwardScore & { id: string })[]>([]);
   const [savingCandidatesId, setSavingCandidatesId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busyKey, setBusyKey] = useState<string | null>(null);
@@ -171,7 +174,7 @@ export default function AdminJudgingScoring() {
   const loadAll = useCallback(async () => {
     setError(null);
     try {
-      const [stu, jud, cat, asg, sc, spAsg, spCand] = await Promise.all([
+      const [stu, jud, cat, asg, sc, spAsg, spCand, spSc] = await Promise.all([
         getAllStudents(),
         getAllJudges(),
         getCategories(),
@@ -179,6 +182,7 @@ export default function AdminJudgingScoring() {
         getAllJudgeScores(),
         getAllSpecialAwardAssignments(),
         getAllSpecialAwardCandidates(),
+        getAllSpecialAwardScores(),
       ]);
       setStudents(stu);
       setJudges(jud);
@@ -187,6 +191,7 @@ export default function AdminJudgingScoring() {
       setScores(sc);
       setSpecialAssignments(spAsg);
       setSpecialCandidates(spCand);
+      setSpecialScores(spSc);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to load judging data");
     } finally {
@@ -453,6 +458,7 @@ export default function AdminJudgingScoring() {
             ["special", "Special awards"],
             ["category", "Category results"],
             ["final", "Final round results"],
+            ["specialResults", "Special award results"],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -996,6 +1002,119 @@ export default function AdminJudgingScoring() {
               </table>
             </div>
           </div>
+        </div>
+      )}
+
+      {subTab === "specialResults" && (
+        <div className="space-y-6">
+          <button
+            type="button"
+            onClick={() => {
+              const lines: string[] = ["Award,Project ID,Student,Project Title,Avg Score,Judge Count"];
+              const stuMap = new Map(students.filter((s) => s.id).map((s) => [s.id!, s]));
+              for (const award of SPECIAL_AWARDS) {
+                const awardScores = specialScores.filter((sc) => sc.awardId === award.id);
+                const byStudent = new Map<string, number[]>();
+                for (const sc of awardScores) {
+                  if (!byStudent.has(sc.studentId)) byStudent.set(sc.studentId, []);
+                  byStudent.get(sc.studentId)!.push(sc.totalScore);
+                }
+                const rows = Array.from(byStudent.entries())
+                  .map(([sid, totals]) => {
+                    const s = stuMap.get(sid);
+                    return {
+                      sid,
+                      avg: totals.reduce((a, b) => a + b, 0) / totals.length,
+                      count: totals.length,
+                      name: s ? `${s.firstName} ${s.lastName}` : sid,
+                      projectId: s?.projectId || sid,
+                      title: s?.projectTitle || "",
+                    };
+                  })
+                  .sort((a, b) => b.avg - a.avg);
+                for (const r of rows) {
+                  lines.push(`"${award.name.replace(/"/g, '""')}","${r.projectId}","${r.name.replace(/"/g, '""')}","${r.title.replace(/"/g, '""')}",${r.avg.toFixed(2)},${r.count}`);
+                }
+              }
+              downloadCsv(`njsrs_special_award_results_${new Date().toISOString().slice(0, 10)}.csv`, lines.join("\n"));
+            }}
+            className="bg-primary-green text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-darkGreen"
+          >
+            Export all special award results (CSV)
+          </button>
+
+          {SPECIAL_AWARDS.map((award) => {
+            const awardScores = specialScores.filter((sc) => sc.awardId === award.id);
+            const stuMap = new Map(students.filter((s) => s.id).map((s) => [s.id!, s]));
+            const byStudent = new Map<string, number[]>();
+            for (const sc of awardScores) {
+              if (!byStudent.has(sc.studentId)) byStudent.set(sc.studentId, []);
+              byStudent.get(sc.studentId)!.push(sc.totalScore);
+            }
+            const rows = Array.from(byStudent.entries())
+              .map(([sid, totals]) => {
+                const s = stuMap.get(sid);
+                return {
+                  sid,
+                  avg: totals.reduce((a, b) => a + b, 0) / totals.length,
+                  count: totals.length,
+                  projectId: s?.projectId || sid,
+                  studentName: s ? `${s.firstName} ${s.lastName}` : sid,
+                  projectTitle: s?.projectTitle || "",
+                };
+              })
+              .sort((a, b) => b.avg - a.avg);
+
+            const maxTotal = award.criteria.reduce((s, c) => s + c.maxPoints, 0);
+            const assignedJudgeNames = specialAssignments
+              .filter((a) => a.awardId === award.id)
+              .map((a) => {
+                const j = judges.find((jj) => jj.id === a.judgeId);
+                return j ? `${j.firstName} ${j.lastName}` : a.judgeId;
+              });
+
+            return (
+              <div key={award.id} className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+                <div className="px-4 py-3 bg-purple-50 border-b border-purple-200">
+                  <h3 className="font-semibold text-purple-900">{award.name}</h3>
+                  <p className="text-xs text-purple-700 mt-0.5">
+                    Max score: {maxTotal} pts
+                    {assignedJudgeNames.length > 0 && ` · Judge${assignedJudgeNames.length > 1 ? "s" : ""}: ${assignedJudgeNames.join(", ")}`}
+                  </p>
+                </div>
+                {rows.length === 0 ? (
+                  <p className="px-4 py-3 text-sm text-gray-500 italic">No scores submitted yet.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-200 text-left text-gray-600">
+                          <th className="p-3 w-10">#</th>
+                          <th className="p-3">Project ID</th>
+                          <th className="p-3">Student</th>
+                          <th className="p-3">Project</th>
+                          <th className="p-3">Avg score</th>
+                          <th className="p-3">Judges</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.map((r, idx) => (
+                          <tr key={r.sid} className={`border-b border-gray-100 hover:bg-gray-50 ${idx === 0 ? "bg-yellow-50" : ""}`}>
+                            <td className="p-3 font-bold text-gray-500">{idx === 0 ? "🏆" : idx + 1}</td>
+                            <td className="p-3 font-semibold text-indigo-700">{r.projectId}</td>
+                            <td className="p-3 font-medium text-gray-900">{r.studentName}</td>
+                            <td className="p-3 text-gray-700 max-w-xs truncate">{r.projectTitle || "—"}</td>
+                            <td className="p-3 tabular-nums font-semibold">{r.avg.toFixed(2)} <span className="font-normal text-gray-400">/ {maxTotal}</span></td>
+                            <td className="p-3 text-gray-600">{r.count}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
