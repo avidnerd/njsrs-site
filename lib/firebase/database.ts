@@ -807,8 +807,12 @@ export async function updateCategory(categoryId: string, name: string): Promise<
 
 export async function deleteCategory(categoryId: string): Promise<void> {
   const dbInstance = ensureDb();
-  const categoryRef = doc(dbInstance, "categories", categoryId);
-  await deleteDoc(categoryRef);
+  // Remove all judging assignments tied to this category so judges aren't stuck
+  const assignmentsSnap = await getDocs(
+    query(collection(dbInstance, "judgingAssignments"), where("categoryId", "==", categoryId))
+  );
+  await Promise.all(assignmentsSnap.docs.map((d) => deleteDoc(d.ref)));
+  await deleteDoc(doc(dbInstance, "categories", categoryId));
 }
 
 export async function updateStudentCategory(studentId: string, categoryId: string | null): Promise<void> {

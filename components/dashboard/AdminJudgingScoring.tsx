@@ -261,16 +261,17 @@ export default function AdminJudgingScoring() {
     }
   };
 
-  // Judges eligible for special awards: in-person full day + not in final round
+  // Judges eligible for special awards: in-person full day + not in final round + not already assigned to another special award
   // (category judges ARE allowed to also judge special awards)
   const specialEligibleJudges = useMemo(
     () =>
       approvedJudges.filter(
         (j) =>
           j.availabilityApril18 === "in_person_full_day" &&
-          !finalAssignedJudgeIds.has(j.id!)
+          !finalAssignedJudgeIds.has(j.id!) &&
+          !specialAssignedJudgeIds.has(j.id!)
       ),
-    [approvedJudges, finalAssignedJudgeIds]
+    [approvedJudges, finalAssignedJudgeIds, specialAssignedJudgeIds]
   );
 
   const isSpecialAssigned = (awardId: string, judgeId: string) =>
@@ -780,7 +781,7 @@ export default function AdminJudgingScoring() {
                               type="button"
                               disabled={specialBusyKey === `${award.id}_${j.id}`}
                               onClick={() => toggleSpecialAssign(award.id, j, true)}
-                              className="text-sm px-3 py-1.5 rounded-lg border border-gray-300 bg-white hover:border-primary-blue hover:text-primary-blue transition-colors disabled:opacity-40"
+                              className="text-sm px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-gray-800 hover:border-primary-blue hover:text-primary-blue transition-colors disabled:opacity-40"
                             >
                               {j.firstName} {j.lastName}
                               {j.institution ? ` (${j.institution})` : ""}
