@@ -291,6 +291,92 @@ export default function CompetitionPage() {
           </div>
         </section>
 
+        <section id="special-awards" className="mb-12">
+          <h2 className="text-2xl font-semibold text-primary-darkGreen mb-2">
+            Special Awards
+          </h2>
+          <p className="text-gray-700 mb-6">
+            In addition to category and grand prizes, NJSRS offers the following sponsored special awards. These cash prizes are awarded to research projects that best align with each award&apos;s focus area, as evaluated during the afternoon poster session.
+          </p>
+          <div className="space-y-4">
+            {[
+              {
+                name: "AI-Biomedical Convergence Award",
+                prize: "$250",
+                description:
+                  "Recognizes outstanding research that integrates artificial intelligence with biomedical science to advance human health. Honors projects that combine computational methods—such as machine learning, data science, or algorithm design—with biological, medical, or clinical applications to generate new insights, improve diagnostics, or enhance therapeutic strategies. Eligible projects may include AI-driven disease detection, biomedical image analysis, genomics and omics modeling, drug discovery, personalized medicine, or intelligent medical devices.",
+              },
+              {
+                name: "Award for Excellence in Statistics",
+                prize: "$250",
+                description:
+                  "Recognizes outstanding use of statistical thinking, analysis, and methodology in scientific research. Honors projects that demonstrate a deep understanding of how to design studies, analyze data, and draw valid, evidence-based conclusions using appropriate statistical techniques. Eligible projects may come from any scientific discipline but must showcase rigorous data collection, thoughtful experimental or observational design, and the effective use of statistical tools such as hypothesis testing, regression, probability modeling, or advanced analytics.",
+              },
+              {
+                name: "August & Olga Kucheruk Cancer Research Innovation Award",
+                prize: "$100",
+                description:
+                  "Recognizes outstanding research that advances the understanding, detection, or treatment of cancer through innovative scientific approaches. Honors projects that address critical challenges in oncology, including tumor biology, drug resistance, early diagnosis, targeted therapy, and personalized medicine. Eligible projects may explore molecular and cellular mechanisms of cancer, develop new therapeutic strategies, improve drug delivery systems, or apply computational methods to uncover novel insights in cancer research.",
+              },
+              {
+                name: "Translational Medicine & Therapeutics Award",
+                prize: "$250",
+                description:
+                  "Recognizes outstanding research that bridges the gap between fundamental biological discovery and real-world medical application. Honors projects that advance the development of new therapies, improve existing treatments, or deepen understanding of disease mechanisms in ways that could directly impact patient care. Eligible projects may include drug discovery, targeted therapies, gene and cell-based treatments, biomaterials for drug delivery, and studies of disease pathways that inform therapeutic strategies.",
+              },
+              {
+                name: "Intelligent Systems for Real-World Impact Award",
+                prize: "$250",
+                description:
+                  "For outstanding projects that leverage artificial intelligence, machine learning, or advanced computational systems to solve meaningful real-world problems. Honors students who design intelligent systems that move beyond theory to deliver practical, scalable, and impactful solutions across domains such as healthcare, environmental sustainability, infrastructure, education, and public policy. Particular emphasis is placed on solutions that demonstrate measurable improvements, usability, and the potential for deployment in real-world settings.",
+              },
+              {
+                name: "Behavioral Insights & Human Decision-Making Award",
+                prize: "$150",
+                description:
+                  "Recognizes outstanding research that advances understanding of how people think, make decisions, and behave in real-world contexts. Honors projects that investigate cognitive processes, social influences, or environmental factors that shape human behavior, with an emphasis on practical applications that can improve individual or societal outcomes. Eligible projects may include studies in psychology, behavioral economics, education, public health, or human–technology interaction.",
+              },
+              {
+                name: "Horace and Marion Cook Prize for Innovation in Engineering",
+                prize: "$250",
+                description:
+                  "Celebrates the spirit of practical innovation, resourcefulness, and hands-on problem-solving. Recognizes engineering projects that embody \"Yankee ingenuity\"—the ability to create effective, clever solutions using limited resources, simple materials, or unconventional approaches. Eligible projects may include mechanical, electrical, or integrated systems that address real-world challenges in a cost-effective and efficient way. Strong candidates emphasize functionality, simplicity, and thoughtful design.",
+              },
+              {
+                name: "Assistive Technology Award",
+                prize: "$250",
+                description:
+                  "Recognizes outstanding projects that develop technologies to enhance human abilities, improve accessibility, or restore lost function. Honors students who design innovative devices, systems, or interfaces that support individuals with disabilities, injuries, or physical limitations, as well as those that extend human capabilities beyond typical performance. Eligible projects may include prosthetics, wearable devices, rehabilitation technologies, brain–computer interfaces, adaptive tools, or human–machine interaction systems.",
+              },
+              {
+                name: "Molecular & Cellular Mechanisms Award",
+                prize: "$250",
+                description:
+                  "Recognizes outstanding research that advances understanding of biological processes at the molecular and cellular level. Honors projects that investigate how genes, proteins, and cellular pathways interact to regulate normal function or contribute to disease. Eligible projects may explore topics such as gene expression, signaling pathways, protein structure and function, cellular dynamics, or molecular responses to environmental or therapeutic stimuli.",
+              },
+              {
+                name: "Environmental Sustainability & Public Health Award",
+                prize: "$100",
+                description:
+                  "Recognizes outstanding research that advances the protection of the environment while improving human health and well-being. Honors projects that investigate environmental challenges—such as pollution, climate change, resource use, or ecosystem health—and their direct or indirect impacts on communities. Eligible projects may include studies on air and water quality, waste reduction, renewable resources, environmental remediation, sustainable materials, or the health effects of environmental exposures.",
+              },
+            ].map((award) => (
+              <div
+                key={award.name}
+                className="bg-white rounded-lg border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                  <h3 className="text-lg font-semibold text-primary-blue">{award.name}</h3>
+                  <span className="shrink-0 inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-primary-green/10 text-primary-darkGreen border border-primary-green/20">
+                    {award.prize} cash prize
+                  </span>
+                </div>
+                <p className="text-gray-700 text-sm leading-relaxed">{award.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section>
           <h2 className="text-2xl font-semibold text-primary-darkGreen mb-4">
             Venue

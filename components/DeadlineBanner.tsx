@@ -28,7 +28,8 @@ export default function DeadlineBanner() {
   return (
     <div className="bg-amber-500 text-amber-950 px-4 py-2.5 flex items-center justify-center gap-4 text-center text-sm font-medium shadow">
       <span>
-        <strong>REGISTRATION FOR THE 2026 NJSRS HAS ENDED. See you next year!</strong>
+        <strong>The special awards for the 2026 NJSRS have been announced!</strong>{" "}
+        <a href="/competition#special-awards" className="underline hover:text-amber-900">View them on the Competition page →</a>
       </span>
       <button
         type="button"
