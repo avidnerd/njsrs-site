@@ -69,6 +69,10 @@ export default function AdminJudgingScoring() {
   const [creatingMockStudent, setCreatingMockStudent] = useState(false);
   const [mockStudentResult, setMockStudentResult] = useState<{ email: string; password: string } | null>(null);
 
+  // Bulk mock judges
+  const [creatingBulkMock, setCreatingBulkMock] = useState(false);
+  const [bulkMockResult, setBulkMockResult] = useState<{ judges: { email: string; password: string }[] } | null>(null);
+
   const approvedJudges = useMemo(
     () => judges.filter((j) => j.adminApproved && j.id),
     [judges]
@@ -243,6 +247,29 @@ export default function AdminJudgingScoring() {
     }
   };
 
+  const handleCreateBulkMockJudges = async () => {
+    if (!user) return;
+    setCreatingBulkMock(true);
+    setError(null);
+    setBulkMockResult(null);
+    try {
+      const idToken = await user.getIdToken();
+      const res = await fetch("/api/admin/create-mock-judges-bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminIdToken: idToken }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create bulk mock judges");
+      setBulkMockResult({ judges: data.judges });
+      await loadAll();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to create bulk mock judges");
+    } finally {
+      setCreatingBulkMock(false);
+    }
+  };
+
   const handleCreateMockStudent = async () => {
     if (!user) return;
     setCreatingMockStudent(true);
@@ -405,6 +432,14 @@ export default function AdminJudgingScoring() {
           </button>
           <button
             type="button"
+            onClick={handleCreateBulkMockJudges}
+            disabled={creatingBulkMock}
+            className="bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-60"
+          >
+            {creatingBulkMock ? "Creating…" : "Create 20 mock judges"}
+          </button>
+          <button
+            type="button"
             onClick={handleCreateMockStudent}
             disabled={creatingMockStudent}
             className="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700 disabled:opacity-60"
@@ -447,6 +482,17 @@ export default function AdminJudgingScoring() {
             <p className="font-mono text-teal-900">Email: {mockStudentResult.email}</p>
             <p className="font-mono text-teal-900">Password: {mockStudentResult.password}</p>
             <p className="text-xs text-teal-700 mt-1">Log in as this student to test the student dashboard, uploads, guest registration, etc.</p>
+          </div>
+        )}
+        {bulkMockResult && (
+          <div className="rounded-lg bg-violet-50 border border-violet-200 px-4 py-3 text-sm space-y-2">
+            <p className="font-semibold text-violet-800">20 mock judges created — all use password: <span className="font-mono">MockJudge123!</span></p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-0.5">
+              {bulkMockResult.judges.map((j) => (
+                <p key={j.email} className="font-mono text-violet-900 text-xs">{j.email}</p>
+              ))}
+            </div>
+            <p className="text-xs text-violet-700">Assign these judges to categories, then share the credentials with your class.</p>
           </div>
         )}
       </div>
