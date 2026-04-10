@@ -184,7 +184,8 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
                 onChange={(e) => {
                   setTeamMemberParentEmail(e.target.value);
                   if (formData.teamMemberParentEmail !== e.target.value) {
-                    setFormData({ ...formData, teamMemberParentInviteSent: false, teamMemberParentInviteToken: undefined });
+                    const { teamMemberParentInviteToken: _removed, ...rest } = formData;
+                    setFormData({ ...rest, teamMemberParentInviteSent: false });
                   }
                 }}
                 placeholder="teammemberparent@email.com"

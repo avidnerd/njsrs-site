@@ -17,6 +17,7 @@ import {
   getAllAssignments,
   getAllJudgeScores,
   clearAllJudgeScores,
+  clearFinalRoundPromotions,
   aggregateCategoryResults,
   aggregateFinalResults,
   promoteFirstPlaceToFinal,
@@ -61,6 +62,10 @@ export default function AdminJudgingScoring() {
   const [clearingScores, setClearingScores] = useState(false);
   const [clearConfirm, setClearConfirm] = useState(false);
 
+  // Clear final round promotions
+  const [clearingFinal, setClearingFinal] = useState(false);
+  const [clearFinalConfirm, setClearFinalConfirm] = useState(false);
+
   // Mock judge
   const [creatingMock, setCreatingMock] = useState(false);
   const [mockResult, setMockResult] = useState<{ email: string; password: string } | null>(null);
@@ -71,7 +76,7 @@ export default function AdminJudgingScoring() {
 
   // Bulk mock judges
   const [creatingBulkMock, setCreatingBulkMock] = useState(false);
-  const [bulkMockResult, setBulkMockResult] = useState<{ judges: { email: string; password: string }[] } | null>(null);
+  const [bulkMockResult, setBulkMockResult] = useState<{ judges: { email: string; password: string }[]; failures: { email: string; error: string }[] } | null>(null);
 
   const approvedJudges = useMemo(
     () => judges.filter((j) => j.adminApproved && j.id),
@@ -207,6 +212,22 @@ export default function AdminJudgingScoring() {
     loadAll();
   }, [loadAll]);
 
+  const handleClearFinalPromotions = async () => {
+    if (!clearFinalConfirm) { setClearFinalConfirm(true); return; }
+    setClearingFinal(true);
+    setError(null);
+    try {
+      const count = await clearFinalRoundPromotions();
+      await loadAll();
+      setClearFinalConfirm(false);
+      alert(`Cleared ${count} final round assignment(s).`);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to clear final round promotions");
+    } finally {
+      setClearingFinal(false);
+    }
+  };
+
   const handleClearScores = async () => {
     if (!clearConfirm) { setClearConfirm(true); return; }
     setClearingScores(true);
@@ -261,7 +282,7 @@ export default function AdminJudgingScoring() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to create bulk mock judges");
-      setBulkMockResult({ judges: data.judges });
+      setBulkMockResult({ judges: data.judges, failures: data.failures ?? [] });
       await loadAll();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to create bulk mock judges");
@@ -448,6 +469,27 @@ export default function AdminJudgingScoring() {
           </button>
           <button
             type="button"
+            onClick={handleClearFinalPromotions}
+            disabled={clearingFinal}
+            className={`px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60 ${
+              clearFinalConfirm
+                ? "bg-orange-600 text-white hover:bg-orange-700"
+                : "bg-white border border-orange-300 text-orange-700 hover:bg-orange-50"
+            }`}
+          >
+            {clearingFinal ? "Clearing…" : clearFinalConfirm ? "Confirm — clear final promotions" : "Clear final round promotions"}
+          </button>
+          {clearFinalConfirm && (
+            <button
+              type="button"
+              onClick={() => setClearFinalConfirm(false)}
+              className="text-sm text-gray-500 hover:text-gray-700 underline"
+            >
+              Cancel
+            </button>
+          )}
+          <button
+            type="button"
             onClick={handleClearScores}
             disabled={clearingScores}
             className={`px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60 ${
@@ -493,6 +535,14 @@ export default function AdminJudgingScoring() {
               ))}
             </div>
             <p className="text-xs text-violet-700">Assign these judges to categories, then share the credentials with your class.</p>
+            {bulkMockResult.failures.length > 0 && (
+              <div className="mt-2 rounded bg-red-50 border border-red-200 px-3 py-2">
+                <p className="text-xs font-semibold text-red-700 mb-1">Failed ({bulkMockResult.failures.length}) — click &quot;Create 20 mock judges&quot; again to retry:</p>
+                {bulkMockResult.failures.map((f) => (
+                  <p key={f.email} className="font-mono text-xs text-red-800">{f.email}: {f.error}</p>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -49,55 +49,67 @@ export async function POST(request: NextRequest) {
 
     const now = admin.firestore.Timestamp.now();
     const results: { email: string; password: string }[] = [];
+    const failures: { email: string; error: string }[] = [];
 
     for (let n = 1; n <= COUNT; n++) {
       const email = mockEmail(n);
-
-      // Delete existing account if present
       try {
-        const existing = await auth.getUserByEmail(email);
-        await auth.deleteUser(existing.uid);
-        try { await db.collection("users").doc(existing.uid).delete(); } catch {}
-        try { await db.collection("judges").doc(existing.uid).delete(); } catch {}
-      } catch {
-        // No existing account — fine
+        let uid: string;
+
+        // Try to get existing account and update it, otherwise create fresh
+        try {
+          const existing = await auth.getUserByEmail(email);
+          uid = existing.uid;
+          await auth.updateUser(uid, {
+            password: MOCK_PASSWORD,
+            displayName: `Mock Judge ${n}`,
+            emailVerified: true,
+          });
+        } catch {
+          // Account doesn't exist — create it
+          const userRecord = await auth.createUser({
+            email,
+            password: MOCK_PASSWORD,
+            displayName: `Mock Judge ${n}`,
+            emailVerified: true,
+          });
+          uid = userRecord.uid;
+        }
+
+        await db.collection("users").doc(uid).set({
+          email,
+          role: "judge",
+          createdAt: now,
+          emailVerified: true,
+        });
+
+        await db.collection("judges").doc(uid).set({
+          firstName: "Mock",
+          lastName: `Judge ${n}`,
+          email,
+          institution: "Test Institution",
+          areaOfExpertise: "General Science",
+          availabilityApril18: "in_person_full_day",
+          adminApproved: true,
+          categoryIds: [],
+          createdAt: now,
+        });
+
+        results.push({ email, password: MOCK_PASSWORD });
+      } catch (err: any) {
+        console.error(`Failed to create mock judge ${n}:`, err);
+        failures.push({ email, error: err.message || "Unknown error" });
       }
-
-      // Create Auth account
-      const userRecord = await auth.createUser({
-        email,
-        password: MOCK_PASSWORD,
-        displayName: `Mock Judge ${n}`,
-        emailVerified: true,
-      });
-
-      const uid = userRecord.uid;
-
-      await db.collection("users").doc(uid).set({
-        email,
-        role: "judge",
-        createdAt: now,
-        emailVerified: true,
-      });
-
-      await db.collection("judges").doc(uid).set({
-        firstName: "Mock",
-        lastName: `Judge ${n}`,
-        email,
-        institution: "Test Institution",
-        areaOfExpertise: "General Science",
-        availabilityApril18: "in_person_full_day",
-        adminApproved: true,
-        categoryIds: [],
-        createdAt: now,
-      });
-
-      results.push({ email, password: MOCK_PASSWORD });
     }
 
-    return NextResponse.json({ success: true, judges: results, password: MOCK_PASSWORD });
+    return NextResponse.json({
+      success: true,
+      judges: results,
+      failures,
+      password: MOCK_PASSWORD,
+    });
   } catch (error: any) {
-    console.error("Error creating bulk mock judges:", error);
+    console.error("Error in bulk mock judge creation:", error);
     return NextResponse.json({ error: error.message || "Failed to create mock judges" }, { status: 500 });
   }
 }

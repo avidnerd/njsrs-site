@@ -451,6 +451,15 @@ export async function promoteFirstPlaceToFinal(
   return firstPlaceIds.length;
 }
 
+export async function clearFinalRoundPromotions(): Promise<number> {
+  const dbi = ensureDb();
+  const snap = await getDocs(
+    query(collection(dbi, "judgingAssignments"), where("phase", "==", "final"))
+  );
+  await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+  return snap.docs.length;
+}
+
 export async function clearAllJudgeScores(): Promise<number> {
   const dbi = ensureDb();
   const snap = await getDocs(collection(dbi, "judgeScores"));
