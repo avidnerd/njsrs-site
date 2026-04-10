@@ -500,6 +500,34 @@ export default function AdminStudentList() {
                     )}
                   </div>
 
+                  {/* Student Questions */}
+                  {[
+                    "Please describe the part you played in the development of your project idea. Explain. Be specific about what YOU did versus what OTHERS did.",
+                    "Describe the steps that led you to create your research question (or design problem).",
+                    "Where did you do the work in your research project (home, school, an outside institution)? If it's an institution, please list the name of the institution.",
+                    "Describe the help you received throughout your project and from whom.",
+                    "If you conducted your research at an institution, describe your role in the research group. Be specific about the work YOU did versus the work OTHERS did.",
+                    "Describe the origin of any data used in your research that you did not generate.",
+                    "Explain why you used data that you obtained from somewhere else instead of generating it yourself.",
+                    "Is this a continuation of prior research (from 2025 or earlier)? If so, how have you expanded on your prior research?",
+                    "If this is a continuation of a prior research project, please attach the abstract from your prior research project.",
+                    "Have you complied with NJSRS's AI usage policy? If not, please explain.",
+                    "Describe the methods and materials you used in your research. Be specific about what YOU did versus what OTHERS did.",
+                    "If your work involved human participants, vertebrates, or potentially hazardous materials, explain the steps you took to adhere to safety and ethics standards.",
+                    "Did a professional scientist or engineer oversee your work? If so, who? Explain their role.",
+                    "Was an Institutional Review Board (IRB) created to oversee your research? If so, who was on it and what were their findings?",
+                  ].map((question, idx) => {
+                    const fieldName = `question${idx + 1}` as keyof typeof selectedStudent.statementOfOutsideAssistance;
+                    const answer = selectedStudent.statementOfOutsideAssistance![fieldName] as string | undefined;
+                    if (!answer) return null;
+                    return (
+                      <div key={idx} className="mt-3 p-3 bg-gray-50 border border-gray-200 rounded-md text-sm">
+                        <p className="font-medium text-gray-700 mb-1">Q{idx + 1}: {question}</p>
+                        <p className="text-gray-800 whitespace-pre-wrap">{answer}</p>
+                      </div>
+                    );
+                  })}
+
                   {}
                   {(selectedStudent.statementOfOutsideAssistance.teacherCompleted ||
                     selectedStudent.statementOfOutsideAssistance.teacherSignature ||
@@ -600,19 +628,19 @@ export default function AdminStudentList() {
                                 {selectedStudent.statementOfOutsideAssistance.mentorInstitutionSignature}
                               </div>
                             )}
-                            {selectedStudent.statementOfOutsideAssistance.teacherMentorComments && (
+                            {(selectedStudent.statementOfOutsideAssistance.mentorComments || selectedStudent.statementOfOutsideAssistance.teacherMentorComments) && (
                               <div>
                                 <strong>Comments:</strong>
                                 <p className="mt-1 text-gray-700 whitespace-pre-wrap">
-                                  {selectedStudent.statementOfOutsideAssistance.teacherMentorComments}
+                                  {selectedStudent.statementOfOutsideAssistance.mentorComments ?? selectedStudent.statementOfOutsideAssistance.teacherMentorComments}
                                 </p>
                               </div>
                             )}
-                            {selectedStudent.statementOfOutsideAssistance.teacherMentorSafetyStatement && (
+                            {(selectedStudent.statementOfOutsideAssistance.mentorSafetyStatement || selectedStudent.statementOfOutsideAssistance.teacherMentorSafetyStatement) && (
                               <div>
                                 <strong>Safety Statement:</strong>
                                 <p className="mt-1 text-gray-700 whitespace-pre-wrap">
-                                  {selectedStudent.statementOfOutsideAssistance.teacherMentorSafetyStatement}
+                                  {selectedStudent.statementOfOutsideAssistance.mentorSafetyStatement ?? selectedStudent.statementOfOutsideAssistance.teacherMentorSafetyStatement}
                                 </p>
                               </div>
                             )}

@@ -175,6 +175,8 @@ export interface StatementOfOutsideAssistance {
   
   teacherMentorComments?: string;
   teacherMentorSafetyStatement?: string;
+  mentorComments?: string;
+  mentorSafetyStatement?: string;
   
   studentSignature?: string;
   studentSignatureDate?: Date | Timestamp;

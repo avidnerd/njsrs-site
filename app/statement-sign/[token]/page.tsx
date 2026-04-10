@@ -65,12 +65,20 @@ export default function StatementSignPage() {
         setIsCompleted(true);
         setSuccess("Form submitted successfully! Thank you for completing your section.");
       } else {
-        
-        if (data.formData.teacherMentorComments) {
-          setComments(data.formData.teacherMentorComments);
-        }
-        if (data.formData.teacherMentorSafetyStatement) {
-          setSafetyStatement(data.formData.teacherMentorSafetyStatement);
+        if (data.signerType === "mentor") {
+          if (data.formData.mentorComments) {
+            setComments(data.formData.mentorComments);
+          }
+          if (data.formData.mentorSafetyStatement) {
+            setSafetyStatement(data.formData.mentorSafetyStatement);
+          }
+        } else {
+          if (data.formData.teacherMentorComments) {
+            setComments(data.formData.teacherMentorComments);
+          }
+          if (data.formData.teacherMentorSafetyStatement) {
+            setSafetyStatement(data.formData.teacherMentorSafetyStatement);
+          }
         }
       }
     } catch (error: any) {
@@ -114,8 +122,8 @@ export default function StatementSignPage() {
         updatedFormData.mentorName = `${formData.mentorFirstName || ""} ${formData.mentorLastName || ""}`.trim();
         updatedFormData.mentorTitle = updatedFormData.mentorTitle || "";
         updatedFormData.mentorInstitutionSignature = updatedFormData.mentorInstitution || "";
-        updatedFormData.teacherMentorComments = comments;
-        updatedFormData.teacherMentorSafetyStatement = safetyStatement;
+        updatedFormData.mentorComments = comments;
+        updatedFormData.mentorSafetyStatement = safetyStatement;
         updatedFormData.mentorCompleted = true;
       } else if (signerType === "parent") {
         updatedFormData.parentSignature = signature;
