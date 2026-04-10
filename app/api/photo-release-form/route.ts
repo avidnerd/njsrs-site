@@ -94,6 +94,8 @@ export async function GET(request: NextRequest) {
         id: studentId,
         firstName: studentData.firstName,
         lastName: studentData.lastName,
+        teamMemberFirstName: studentData.teamMemberFirstName,
+        teamMemberLastName: studentData.teamMemberLastName,
       },
       formData: photoRelease,
     });

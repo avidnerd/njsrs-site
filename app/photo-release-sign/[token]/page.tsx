@@ -9,6 +9,8 @@ interface StudentInfo {
   id: string;
   firstName: string;
   lastName: string;
+  teamMemberFirstName?: string;
+  teamMemberLastName?: string;
 }
 
 export default function PhotoReleaseSignPage() {
@@ -203,7 +205,12 @@ export default function PhotoReleaseSignPage() {
               Authorization and Release
             </h2>
             <p className="text-gray-600 mb-6">
-              Student: <strong>{student?.firstName} {student?.lastName}</strong>
+              Student:{" "}
+              <strong>
+                {token.includes("_teammember_") && student?.teamMemberFirstName
+                  ? `${student.teamMemberFirstName} ${student.teamMemberLastName}`
+                  : `${student?.firstName} ${student?.lastName}`}
+              </strong>
             </p>
 
             {error && (
