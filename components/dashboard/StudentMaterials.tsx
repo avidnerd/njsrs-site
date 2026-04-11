@@ -14,7 +14,8 @@ interface StudentMaterialsProps {
 }
 
 
-const REPORT_ABSTRACT_SOA_DEADLINE = new Date("2026-04-10T23:59:59");
+const REPORT_ABSTRACT_DEADLINE = new Date("2026-04-10T23:59:59");
+const SOA_DEADLINE = new Date("2026-04-13T23:59:59");
 const SLIDES_DEADLINE = new Date("2026-04-13T23:59:59");
 
 export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps) {
@@ -25,7 +26,8 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
   const [activeSection, setActiveSection] = useState<"research" | "slideshow" | "statement">("research");
 
   const now = new Date();
-  const isReportAbstractSOADisabled = now >= REPORT_ABSTRACT_SOA_DEADLINE;
+  const isReportAbstractDisabled = now >= REPORT_ABSTRACT_DEADLINE;
+  const isSOADisabled = now >= SOA_DEADLINE;
   const isSlidesDisabled = now >= SLIDES_DEADLINE;
 
   useEffect(() => {
@@ -95,7 +97,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-2xl font-bold text-primary-blue mb-6">Submit Competition Materials</h2>
       
-      {(isReportAbstractSOADisabled || isSlidesDisabled) && (
+      {(isReportAbstractDisabled || isSOADisabled || isSlidesDisabled) && (
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
           <div className="flex">
             <div className="flex-shrink-0">
@@ -108,7 +110,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
                 {isSlidesDisabled ? (
                   <><strong>All Deadlines Passed:</strong> The deadline for all competition materials was April 13, 2026. You can still view your submitted materials, but editing is no longer available.</>
                 ) : (
-                  <><strong>Partial Deadline Passed:</strong> The deadline for the research report, abstract, and Statement of Outside Assistance was April 10, 2026. You may still upload your slideshow until April 13, 2026.</>
+                  <><strong>Partial Deadline Passed:</strong> The deadline for the research report and abstract was April 10, 2026. The Statement of Outside Assistance and slideshow may still be submitted until April 13, 2026.</>
                 )}
               </p>
             </div>
@@ -167,7 +169,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
               onUpload={handleResearchReportUpload}
               currentFile={student.researchReportUrl}
               maxSizeMB={15}
-              disabled={isReportAbstractSOADisabled}
+              disabled={isReportAbstractDisabled}
             />
           </div>
 
@@ -191,7 +193,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
               onUpload={handleAbstractUpload}
               currentFile={student.abstractUrl}
               maxSizeMB={5}
-              disabled={isReportAbstractSOADisabled}
+              disabled={isReportAbstractDisabled}
             />
           </div>
         </div>
@@ -224,7 +226,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
 
       {}
       {activeSection === "statement" && (
-        <StatementOfOutsideAssistance onFormUpdate={onFormUpdate} disabled={isReportAbstractSOADisabled} />
+        <StatementOfOutsideAssistance onFormUpdate={onFormUpdate} disabled={isSOADisabled} />
       )}
     </div>
   );
