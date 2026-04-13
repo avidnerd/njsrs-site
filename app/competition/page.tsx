@@ -314,7 +314,7 @@ export default function CompetitionPage() {
               },
               {
                 name: "August & Olga Kucheruk Cancer Research Innovation Award",
-                prize: "$100",
+                prize: "$250",
                 description:
                   "Recognizes outstanding research that advances the understanding, detection, or treatment of cancer through innovative scientific approaches. Honors projects that address critical challenges in oncology, including tumor biology, drug resistance, early diagnosis, targeted therapy, and personalized medicine. Eligible projects may explore molecular and cellular mechanisms of cancer, develop new therapeutic strategies, improve drug delivery systems, or apply computational methods to uncover novel insights in cancer research.",
               },

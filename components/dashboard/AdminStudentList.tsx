@@ -785,6 +785,26 @@ export default function AdminStudentList() {
                   </div>
                 </div>
               )}
+
+              {/* Guests */}
+              {selectedStudent.guests && selectedStudent.guests.length > 0 && (
+                <div className="border-b pb-4">
+                  <h4 className="font-semibold mb-2">Guests ({selectedStudent.guests.length})</h4>
+                  <div className="space-y-2 text-sm">
+                    {selectedStudent.guests.map((guest, idx) => (
+                      <div key={idx} className="flex items-center gap-3 p-2 bg-gray-50 rounded-md">
+                        <span className="font-medium text-gray-800">{guest.name}</span>
+                        <span className="text-gray-500">{guest.email}</span>
+                        {guest.ticketSent ? (
+                          <span className="text-green-600 text-xs">✓ Ticket sent{guest.sentAt ? ` (${formatDate(guest.sentAt)})` : ""}</span>
+                        ) : (
+                          <span className="text-yellow-600 text-xs">Ticket not sent</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
