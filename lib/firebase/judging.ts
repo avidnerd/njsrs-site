@@ -352,7 +352,8 @@ export interface FinalAggregateRow {
 
 export function aggregateFinalResults(
   students: Student[],
-  scores: (JudgeScoreDoc & { id: string })[]
+  scores: (JudgeScoreDoc & { id: string })[],
+  assignments?: JudgingAssignment[]
 ): FinalAggregateRow[] {
   const byId = new Map(students.filter((s) => s.id).map((s) => [s.id!, s]));
   const relevant = scores.filter((sc) => sc.phase === "final");
@@ -360,6 +361,15 @@ export function aggregateFinalResults(
     string,
     { totals: number[]; ranks: number[]; breakdown: FinalAggregateRow["scoreBreakdown"] }
   >();
+
+  // Seed from final-phase assignments so promoted-but-unscored students still appear
+  if (assignments) {
+    for (const a of assignments) {
+      if (a.phase === "final" && !byStudent.has(a.studentId)) {
+        byStudent.set(a.studentId, { totals: [], ranks: [], breakdown: [] });
+      }
+    }
+  }
 
   for (const sc of relevant) {
     let entry = byStudent.get(sc.studentId);
@@ -463,6 +473,15 @@ export async function clearFinalRoundPromotions(): Promise<number> {
 export async function clearAllJudgeScores(): Promise<number> {
   const dbi = ensureDb();
   const snap = await getDocs(collection(dbi, "judgeScores"));
+  await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+  return snap.docs.length;
+}
+
+export async function clearFinalRoundScores(): Promise<number> {
+  const dbi = ensureDb();
+  const snap = await getDocs(
+    query(collection(dbi, "judgeScores"), where("phase", "==", "final"))
+  );
   await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
   return snap.docs.length;
 }

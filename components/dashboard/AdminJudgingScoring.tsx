@@ -17,6 +17,7 @@ import {
   getAllAssignments,
   getAllJudgeScores,
   clearAllJudgeScores,
+  clearFinalRoundScores,
   clearFinalRoundPromotions,
   aggregateCategoryResults,
   aggregateFinalResults,
@@ -30,6 +31,7 @@ import {
   SPECIAL_AWARDS,
   getAllSpecialAwardAssignments,
   getAllSpecialAwardScores,
+  clearAllSpecialAwardScores,
   setSpecialAwardAssignment,
   removeSpecialAwardAssignment,
   getAllSpecialAwardCandidates,
@@ -65,6 +67,14 @@ export default function AdminJudgingScoring() {
   // Clear final round promotions
   const [clearingFinal, setClearingFinal] = useState(false);
   const [clearFinalConfirm, setClearFinalConfirm] = useState(false);
+
+  // Clear final round scores only
+  const [clearingFinalScores, setClearingFinalScores] = useState(false);
+  const [clearFinalScoresConfirm, setClearFinalScoresConfirm] = useState(false);
+
+  // Clear special award scores
+  const [clearingSpecialScores, setClearingSpecialScores] = useState(false);
+  const [clearSpecialScoresConfirm, setClearSpecialScoresConfirm] = useState(false);
 
   // Mock judge
   const [creatingMock, setCreatingMock] = useState(false);
@@ -242,6 +252,38 @@ export default function AdminJudgingScoring() {
       setError(e instanceof Error ? e.message : "Failed to clear scores");
     } finally {
       setClearingScores(false);
+    }
+  };
+
+  const handleClearFinalScores = async () => {
+    if (!clearFinalScoresConfirm) { setClearFinalScoresConfirm(true); return; }
+    setClearingFinalScores(true);
+    setError(null);
+    try {
+      const count = await clearFinalRoundScores();
+      await loadAll();
+      setClearFinalScoresConfirm(false);
+      alert(`Cleared ${count} final round score(s).`);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to clear final round scores");
+    } finally {
+      setClearingFinalScores(false);
+    }
+  };
+
+  const handleClearSpecialScores = async () => {
+    if (!clearSpecialScoresConfirm) { setClearSpecialScoresConfirm(true); return; }
+    setClearingSpecialScores(true);
+    setError(null);
+    try {
+      const count = await clearAllSpecialAwardScores();
+      await loadAll();
+      setClearSpecialScoresConfirm(false);
+      alert(`Cleared ${count} special award score(s).`);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to clear special award scores");
+    } finally {
+      setClearingSpecialScores(false);
     }
   };
 
@@ -504,6 +546,48 @@ export default function AdminJudgingScoring() {
             <button
               type="button"
               onClick={() => setClearConfirm(false)}
+              className="text-sm text-gray-500 hover:text-gray-700 underline"
+            >
+              Cancel
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={handleClearFinalScores}
+            disabled={clearingFinalScores}
+            className={`px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60 ${
+              clearFinalScoresConfirm
+                ? "bg-red-600 text-white hover:bg-red-700"
+                : "bg-white border border-red-300 text-red-700 hover:bg-red-50"
+            }`}
+          >
+            {clearingFinalScores ? "Clearing…" : clearFinalScoresConfirm ? "Confirm — clear final scores" : "Clear final round scores"}
+          </button>
+          {clearFinalScoresConfirm && (
+            <button
+              type="button"
+              onClick={() => setClearFinalScoresConfirm(false)}
+              className="text-sm text-gray-500 hover:text-gray-700 underline"
+            >
+              Cancel
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={handleClearSpecialScores}
+            disabled={clearingSpecialScores}
+            className={`px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60 ${
+              clearSpecialScoresConfirm
+                ? "bg-red-600 text-white hover:bg-red-700"
+                : "bg-white border border-red-300 text-red-700 hover:bg-red-50"
+            }`}
+          >
+            {clearingSpecialScores ? "Clearing…" : clearSpecialScoresConfirm ? "Confirm — clear special award scores" : "Clear special award scores"}
+          </button>
+          {clearSpecialScoresConfirm && (
+            <button
+              type="button"
+              onClick={() => setClearSpecialScoresConfirm(false)}
               className="text-sm text-gray-500 hover:text-gray-700 underline"
             >
               Cancel
@@ -1007,7 +1091,9 @@ export default function AdminJudgingScoring() {
                     <tbody>
                       {rows.map((r, idx) => (
                         <tr key={r.studentId} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="p-3 font-medium text-gray-500">{idx + 1}</td>
+                          <td className="p-3 font-medium text-gray-500">
+                            {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : idx + 1}
+                          </td>
                           <td className="p-3 font-medium text-gray-900">{r.studentName}</td>
                           <td className="p-3 text-gray-700 max-w-xs truncate">{r.projectTitle || "—"}</td>
                           <td className="p-3 tabular-nums">{r.avgTotalScore.toFixed(2)}</td>
@@ -1035,7 +1121,7 @@ export default function AdminJudgingScoring() {
                 downloadCsv(
                   `njsrs_final_standings_${new Date().toISOString().slice(0, 10)}.csv`,
                   exportScoresToCsv(
-                    aggregateFinalResults(students, scores).map((r) => ({
+                    aggregateFinalResults(students, scores, assignments).map((r) => ({
                       studentId: r.studentId,
                       studentName: r.studentName,
                       projectTitle: r.projectTitle,
@@ -1082,12 +1168,16 @@ export default function AdminJudgingScoring() {
                   </tr>
                 </thead>
                 <tbody>
-                  {aggregateFinalResults(students, scores).map((r, idx) => (
-                    <tr key={r.studentId} className="border-b border-gray-100">
-                      <td className="p-3 font-medium text-gray-500">{idx + 1}</td>
+                  {aggregateFinalResults(students, scores, assignments).map((r, idx) => (
+                    <tr key={r.studentId} className={`border-b border-gray-100 ${r.judgeCount === 0 ? "bg-amber-50" : ""}`}>
+                      <td className="p-3 font-medium text-gray-500">
+                        {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : idx + 1}
+                      </td>
                       <td className="p-3 font-medium text-gray-900">{r.studentName}</td>
                       <td className="p-3 text-gray-700 max-w-xs truncate">{r.projectTitle || "—"}</td>
-                      <td className="p-3 tabular-nums">{r.avgTotalScore.toFixed(2)}</td>
+                      <td className="p-3 tabular-nums">
+                        {r.judgeCount === 0 ? <span className="text-amber-600 text-xs">Not scored yet</span> : r.avgTotalScore.toFixed(2)}
+                      </td>
                       <td className="p-3 tabular-nums">
                         {r.avgRank != null ? r.avgRank.toFixed(2) : "—"}
                       </td>

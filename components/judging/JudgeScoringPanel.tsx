@@ -28,11 +28,15 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
   const [loading, setLoading] = useState(true);
   const [rubrics, setRubrics] = useState<Record<string, JudgingRubricScores>>({});
   const [notesMap, setNotesMap] = useState<Record<string, string>>({});
-  const [rankMap, setRankMap] = useState<Record<string, number | "">>({});
+  // orderedGroups: groupKey -> ordered array of studentIds (position = rank)
+  const [orderedGroups, setOrderedGroups] = useState<Record<string, string[]>>({});
   const [savingScoresId, setSavingScoresId] = useState<string | null>(null);
   const [savingRanksKey, setSavingRanksKey] = useState<string | null>(null);
   const [savedScoresId, setSavedScoresId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  // Drag state
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -47,7 +51,6 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
       const stuMap = new Map<string, Student>();
       const r: Record<string, JudgingRubricScores> = {};
       const n: Record<string, string> = {};
-      const rk: Record<string, number | ""> = {};
       for (const a of assigns) {
         const st = await getStudent(a.studentId);
         if (st?.id) stuMap.set(st.id, st);
@@ -55,17 +58,15 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
         if (existing) {
           r[a.studentId] = { ...emptyRubricScores(), ...existing.rubric };
           n[a.studentId] = existing.notes || "";
-          rk[a.studentId] = existing.rank ?? "";
         } else {
           r[a.studentId] = emptyRubricScores();
           n[a.studentId] = "";
-          rk[a.studentId] = "";
         }
       }
       setStudents(stuMap);
       setRubrics(r);
       setNotesMap(n);
-      setRankMap(rk);
+      // orderedGroups will be initialized by the useEffect below when grouped updates
     } catch (e: unknown) {
       setMessage({ type: "err", text: e instanceof Error ? e.message : "Failed to load" });
     } finally {
@@ -97,6 +98,28 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
     }));
   }, [assignments, phase, categoryNames]);
 
+  // Initialize orderedGroups when grouped changes (preserving existing order)
+  useEffect(() => {
+    if (grouped.length === 0) return;
+    setOrderedGroups((prev) => {
+      const next = { ...prev };
+      for (const group of grouped) {
+        const existing = prev[group.key];
+        const ids = group.items.map((a) => a.studentId);
+        if (!existing) {
+          next[group.key] = ids;
+        } else {
+          // Keep order of existing, add any new, remove any gone
+          const idSet = new Set(ids);
+          const filtered = existing.filter((id) => idSet.has(id));
+          const added = ids.filter((id) => !existing.includes(id));
+          next[group.key] = [...filtered, ...added];
+        }
+      }
+      return next;
+    });
+  }, [grouped]);
+
   const updateRubric = (studentId: string, key: keyof JudgingRubricScores, val: number) => {
     setRubrics((prev) => ({
       ...prev,
@@ -104,8 +127,16 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
     }));
   };
 
-  // Save rubric + notes for one student; preserve the existing rank.
-  const handleSaveScores = async (studentId: string) => {
+  // Get rank for a student from their position in orderedGroups
+  const getRankForStudent = (groupKey: string, studentId: string): number | null => {
+    const order = orderedGroups[groupKey];
+    if (!order) return null;
+    const idx = order.indexOf(studentId);
+    return idx >= 0 ? idx + 1 : null;
+  };
+
+  // Save rubric + notes for one student; preserve the existing rank from orderedGroups.
+  const handleSaveScores = async (groupKey: string, studentId: string) => {
     const rubric = rubrics[studentId] || emptyRubricScores();
     for (const c of RUBRIC_CRITERIA) {
       const v = Number(rubric[c.key]);
@@ -116,7 +147,7 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
     }
     const assign = assignments.find((a) => a.studentId === studentId);
     const categoryId = phase === "category" ? assign?.categoryId ?? null : null;
-    const existingRank = rankMap[studentId];
+    const existingRank = getRankForStudent(groupKey, studentId);
     setSavingScoresId(studentId);
     setMessage(null);
     try {
@@ -126,7 +157,7 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
         studentId,
         categoryId,
         rubric,
-        existingRank !== "" ? Number(existingRank) : null,
+        existingRank,
         notesMap[studentId] || ""
       );
       setSavedScoresId(studentId);
@@ -138,42 +169,21 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
     }
   };
 
-  // Validate + save ranks for every student in a group.
-  const handleSaveRanks = async (groupStudentIds: string[], categoryId: string | null) => {
-    const n = groupStudentIds.length;
-    const ranks: number[] = [];
-    for (const sid of groupStudentIds) {
-      const r = rankMap[sid];
-      if (r === "" || r == null) {
-        setMessage({ type: "err", text: "Enter a rank (1 = best) for every student before submitting." });
-        return;
-      }
-      const num = Number(r);
-      if (!Number.isInteger(num) || num < 1 || num > n) {
-        setMessage({ type: "err", text: `Each rank must be an integer from 1 to ${n}.` });
-        return;
-      }
-      ranks.push(num);
-    }
-    const sorted = [...ranks].sort((a, b) => a - b);
-    for (let i = 0; i < n; i++) {
-      if (sorted[i] !== i + 1) {
-        setMessage({ type: "err", text: "Ranks must be unique and use every number from 1 to " + n + " (no ties or gaps)." });
-        return;
-      }
-    }
+  // Save ranks for every student in a group (derived from orderedGroups position).
+  const handleSaveRanks = async (groupKey: string, groupStudentIds: string[], categoryId: string | null) => {
+    const order = orderedGroups[groupKey] || groupStudentIds;
     setSavingRanksKey(groupStudentIds.join(","));
     setMessage(null);
     try {
       await Promise.all(
-        groupStudentIds.map((sid) =>
+        order.map((sid, idx) =>
           saveJudgeScore(
             phase,
             judgeId,
             sid,
             categoryId,
             rubrics[sid] || emptyRubricScores(),
-            Number(rankMap[sid]),
+            idx + 1,
             notesMap[sid] || ""
           )
         )
@@ -184,6 +194,54 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
     } finally {
       setSavingRanksKey(null);
     }
+  };
+
+  // Drag handlers
+  const handleDragStart = (studentId: string) => {
+    setDragId(studentId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, studentId: string) => {
+    e.preventDefault();
+    setDragOverId(studentId);
+  };
+
+  const handleDrop = (groupKey: string, targetId: string) => {
+    if (!dragId || dragId === targetId) {
+      setDragId(null);
+      setDragOverId(null);
+      return;
+    }
+    setOrderedGroups((prev) => {
+      const arr = [...(prev[groupKey] || [])];
+      const fromIdx = arr.indexOf(dragId);
+      const toIdx = arr.indexOf(targetId);
+      if (fromIdx === -1 || toIdx === -1) return prev;
+      arr.splice(fromIdx, 1);
+      arr.splice(toIdx, 0, dragId);
+      return { ...prev, [groupKey]: arr };
+    });
+    setDragId(null);
+    setDragOverId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDragId(null);
+    setDragOverId(null);
+  };
+
+  // Move a student to a specific rank position by typing a number
+  const handleMoveToPosition = (groupKey: string, studentId: string, pos: number) => {
+    setOrderedGroups((prev) => {
+      const arr = [...(prev[groupKey] || [])];
+      const n = arr.length;
+      if (pos < 1 || pos > n) return prev;
+      const fromIdx = arr.indexOf(studentId);
+      if (fromIdx === -1) return prev;
+      arr.splice(fromIdx, 1);
+      arr.splice(pos - 1, 0, studentId);
+      return { ...prev, [groupKey]: arr };
+    });
   };
 
   if (loading) {
@@ -216,6 +274,7 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
       {grouped.map((group) => {
         const groupIds = group.items.map((a) => a.studentId);
         const catId = phase === "category" ? group.items[0]?.categoryId ?? null : null;
+        const order = orderedGroups[group.key] || groupIds;
 
         return (
           <section key={group.key} className="space-y-6">
@@ -224,8 +283,8 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
               <h2 className="text-xl font-bold text-primary-blue">{group.title}</h2>
               <p className="text-xs text-gray-500 mt-0.5">
                 {phase === "category"
-                  ? `${groupIds.length} student(s) in this category — complete scores and notes for each, then submit your rankings at the bottom.`
-                  : `${groupIds.length} student(s) in the final round — complete scores and notes for each, then submit your rankings at the bottom.`}
+                  ? `${groupIds.length} student(s) in this category — complete scores and notes for each, then drag to rank them at the bottom.`
+                  : `${groupIds.length} student(s) in the final round — complete scores and notes for each, then drag to rank them at the bottom.`}
               </p>
             </div>
 
@@ -280,9 +339,19 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
 
                     {/* Rubric */}
                     <div className="space-y-4">
-                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
-                        JSHS-style rubric — {RUBRIC_MAX_TOTAL} pts total
-                      </p>
+                      <div className="flex flex-wrap items-center gap-4">
+                        <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
+                          JSHS-style rubric — {RUBRIC_MAX_TOTAL} pts total
+                        </p>
+                        <a
+                          href="/rubric.pdf"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-primary-blue hover:underline"
+                        >
+                          View rubric PDF
+                        </a>
+                      </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {RUBRIC_CRITERIA.map((c) => (
                           <div key={c.key} className="space-y-1">
@@ -330,7 +399,7 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
                       <button
                         type="button"
                         disabled={isSaving}
-                        onClick={() => handleSaveScores(a.studentId)}
+                        onClick={() => handleSaveScores(group.key, a.studentId)}
                         className="px-5 py-2.5 rounded-lg bg-primary-green text-white font-semibold hover:bg-primary-darkGreen disabled:opacity-50 text-sm min-h-[40px]"
                       >
                         {isSaving ? "Saving…" : "Save scores & notes"}
@@ -344,33 +413,67 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
               );
             })}
 
-            {/* Rankings section for this group */}
+            {/* Rankings section — drag to order */}
             <div className="bg-indigo-50 border-2 border-indigo-200 rounded-xl p-5 space-y-4">
               <div>
                 <h3 className="text-lg font-bold text-indigo-900">
                   Submit Rankings — {group.title}
                 </h3>
                 <p className="text-sm text-indigo-700 mt-1">
-                  Assign each student a unique rank from 1 to {groupIds.length} (1 = best).
-                  Review your scores and notes below before submitting.
+                  Drag the cards below to set your ranking (top = rank 1, best). You can also type a number
+                  to jump a student to that position. When done, click &ldquo;Submit rankings.&rdquo;
                 </p>
               </div>
 
-              <div className="space-y-3">
-                {group.items.map((a) => {
-                  const s = students.get(a.studentId);
-                  const rubric = rubrics[a.studentId] || emptyRubricScores();
+              <div className="space-y-2">
+                {order.map((studentId, idx) => {
+                  const s = students.get(studentId);
+                  const rubric = rubrics[studentId] || emptyRubricScores();
                   const total = computeRubricTotal(rubric);
-                  const notes = notesMap[a.studentId] || "";
+                  const notes = notesMap[studentId] || "";
+                  const isDragging = dragId === studentId;
+                  const isOver = dragOverId === studentId && dragId !== studentId;
 
                   return (
                     <div
-                      key={a.studentId}
-                      className="bg-white rounded-lg border border-indigo-200 px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3"
+                      key={studentId}
+                      draggable
+                      onDragStart={() => handleDragStart(studentId)}
+                      onDragOver={(e) => handleDragOver(e, studentId)}
+                      onDrop={() => handleDrop(group.key, studentId)}
+                      onDragEnd={handleDragEnd}
+                      className={`bg-white rounded-lg border px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3 cursor-grab active:cursor-grabbing transition-all ${
+                        isDragging
+                          ? "opacity-40 border-indigo-400"
+                          : isOver
+                          ? "border-indigo-500 shadow-md ring-2 ring-indigo-300"
+                          : "border-indigo-200"
+                      }`}
                     >
+                      {/* Rank badge */}
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-indigo-400 text-lg select-none">⠿</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-medium text-gray-600 whitespace-nowrap">Rank:</span>
+                          <input
+                            type="number"
+                            min={1}
+                            max={order.length}
+                            value={idx + 1}
+                            onChange={(e) => {
+                              const pos = Number(e.target.value);
+                              if (pos >= 1 && pos <= order.length) {
+                                handleMoveToPosition(group.key, studentId, pos);
+                              }
+                            }}
+                            className="w-14 px-2 py-1 border border-gray-300 rounded-lg text-gray-900 text-base text-center"
+                          />
+                        </div>
+                      </div>
+
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-gray-900 truncate">
-                          {s?.projectId || a.studentId}
+                          {s?.projectId || studentId}
                         </p>
                         {s?.projectTitle && (
                           <p className="text-xs text-gray-500 truncate">{s.projectTitle}</p>
@@ -379,30 +482,10 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
                           Score: <strong>{total}/{RUBRIC_MAX_TOTAL}</strong>
                           {notes && (
                             <span className="ml-3 text-gray-500 italic truncate max-w-[260px] inline-block align-bottom">
-                              "{notes.length > 80 ? notes.slice(0, 80) + "…" : notes}"
+                              &ldquo;{notes.length > 80 ? notes.slice(0, 80) + "…" : notes}&rdquo;
                             </span>
                           )}
                         </p>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                          Rank:
-                        </label>
-                        <input
-                          type="number"
-                          min={1}
-                          max={groupIds.length}
-                          value={rankMap[a.studentId] ?? ""}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            setRankMap((prev) => ({
-                              ...prev,
-                              [a.studentId]: v === "" ? "" : Number(v),
-                            }));
-                          }}
-                          className="w-16 px-2 py-1.5 border border-gray-300 rounded-lg text-gray-900 text-base text-center"
-                          placeholder="—"
-                        />
                       </div>
                     </div>
                   );
@@ -412,7 +495,7 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
               <button
                 type="button"
                 disabled={savingRanksKey === groupIds.join(",")}
-                onClick={() => handleSaveRanks(groupIds, catId)}
+                onClick={() => handleSaveRanks(group.key, groupIds, catId)}
                 className="w-full sm:w-auto px-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 disabled:opacity-50 text-base"
               >
                 {savingRanksKey === groupIds.join(",") ? "Saving rankings…" : "Submit rankings"}
@@ -421,6 +504,30 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
           </section>
         );
       })}
+
+      {/* Bottom submit button */}
+      {grouped.length > 0 && (
+        <div className="border-t border-gray-200 pt-6">
+          <p className="text-sm text-gray-500 mb-3">
+            Make sure you have saved scores and submitted rankings for all groups above.
+          </p>
+          <button
+            type="button"
+            disabled={!!savingRanksKey}
+            onClick={async () => {
+              setMessage(null);
+              for (const group of grouped) {
+                const groupIds = group.items.map((a) => a.studentId);
+                const catId = phase === "category" ? group.items[0]?.categoryId ?? null : null;
+                await handleSaveRanks(group.key, groupIds, catId);
+              }
+            }}
+            className="px-8 py-3 rounded-lg bg-indigo-600 text-white font-bold hover:bg-indigo-700 disabled:opacity-50 text-base"
+          >
+            {savingRanksKey ? "Saving…" : "Submit all scores & rankings"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
