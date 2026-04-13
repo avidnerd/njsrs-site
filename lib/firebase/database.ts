@@ -8,6 +8,7 @@ import {
   deleteDoc,
   query,
   where,
+  documentId,
   Timestamp,
 } from "firebase/firestore";
 import { db } from "./config";
@@ -508,6 +509,29 @@ export async function getStudent(studentId: string): Promise<Student | null> {
   }
 
   return null;
+}
+
+/**
+ * Fetch multiple students by their document IDs in batched queries.
+ * Firestore `in` supports up to 30 values; this chunks automatically.
+ * Much more efficient than calling getStudent() N times in a loop.
+ */
+export async function getStudentsByIds(ids: string[]): Promise<Map<string, Student>> {
+  const result = new Map<string, Student>();
+  if (ids.length === 0) return result;
+  const dbInstance = ensureDb();
+  const uniqueIds = [...new Set(ids)];
+  const CHUNK_SIZE = 30;
+  for (let i = 0; i < uniqueIds.length; i += CHUNK_SIZE) {
+    const chunk = uniqueIds.slice(i, i + CHUNK_SIZE);
+    const snap = await getDocs(
+      query(collection(dbInstance, "students"), where(documentId(), "in", chunk))
+    );
+    for (const d of snap.docs) {
+      result.set(d.id, { id: d.id, ...d.data() } as Student);
+    }
+  }
+  return result;
 }
 
 export async function getStudentsBySRA(sraId: string): Promise<Student[]> {

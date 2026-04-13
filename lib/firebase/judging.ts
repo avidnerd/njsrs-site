@@ -255,6 +255,29 @@ export async function saveJudgeScore(
   });
 }
 
+/**
+ * Fetch all scores for a specific judge+phase in a single query.
+ * Use this instead of calling getJudgeScore() per student — saves N-1 reads.
+ */
+export async function getScoresForJudge(
+  phase: JudgingPhase,
+  judgeId: string
+): Promise<Map<string, JudgeScoreDoc>> {
+  const dbi = ensureDb();
+  const q = query(
+    collection(dbi, "judgeScores"),
+    where("judgeId", "==", judgeId),
+    where("phase", "==", phase)
+  );
+  const snap = await getDocs(q);
+  const result = new Map<string, JudgeScoreDoc>();
+  for (const d of snap.docs) {
+    const data = d.data() as JudgeScoreDoc;
+    result.set(data.studentId, data);
+  }
+  return result;
+}
+
 export async function getAllJudgeScores(phase?: JudgingPhase): Promise<(JudgeScoreDoc & { id: string })[]> {
   const dbi = ensureDb();
   if (phase) {

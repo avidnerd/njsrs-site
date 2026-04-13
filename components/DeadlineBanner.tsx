@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-const STORAGE_KEY = "njsrs-deadline-banner-dismissed";
+const STORAGE_KEY = "njsrs-national-jshs-banner-v1";
 
 export default function DeadlineBanner() {
   const [visible, setVisible] = useState(false);
@@ -26,15 +26,20 @@ export default function DeadlineBanner() {
   if (!visible) return null;
 
   return (
-    <div className="bg-amber-500 text-amber-950 px-4 py-2.5 flex items-center justify-center gap-4 text-center text-sm font-medium shadow">
-      <span>
-        <strong>The special awards for the 2026 NJSRS have been announced!</strong>{" "}
-        <a href="/competition#special-awards" className="underline hover:text-amber-900">View them on the Competition page →</a>
-      </span>
+    <div className="bg-primary-blue text-white px-4 py-3 flex items-center justify-center gap-4 text-center shadow-md">
+      <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3">
+        <span className="text-base font-bold tracking-wide uppercase shrink-0">
+          🏆 Official Announcement
+        </span>
+        <span className="text-sm sm:text-base">
+          <strong>NJSRS is now a regional qualifier for the National Junior Science and Humanities Symposium (JSHS).</strong>{" "}
+          The <strong>top 5 finalists</strong> from the Final Round will be invited to represent New Jersey at the National JSHS.
+        </span>
+      </div>
       <button
         type="button"
         onClick={handleDismiss}
-        className="shrink-0 p-1 rounded hover:bg-amber-600/30 focus:outline-none focus:ring-2 focus:ring-amber-700"
+        className="shrink-0 p-1 rounded hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white"
         aria-label="Dismiss"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

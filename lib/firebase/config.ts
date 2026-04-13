@@ -1,6 +1,12 @@
 import { initializeApp, getApps, FirebaseApp } from "firebase/app";
 import { getAuth, Auth } from "firebase/auth";
-import { getFirestore, Firestore } from "firebase/firestore";
+import {
+  initializeFirestore,
+  getFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  Firestore,
+} from "firebase/firestore";
 import { getStorage, FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -21,12 +27,18 @@ if (typeof window !== "undefined") {
   try {
     if (getApps().length === 0) {
       app = initializeApp(firebaseConfig);
+      // Enable offline persistence so scores survive brief WiFi drops
+      db = initializeFirestore(app, {
+        localCache: persistentLocalCache({
+          tabManager: persistentMultipleTabManager(),
+        }),
+      });
     } else {
       app = getApps()[0];
+      db = getFirestore(app);
     }
-    
+
     auth = getAuth(app);
-    db = getFirestore(app);
     storage = getStorage(app);
   } catch (error) {
     console.error("Firebase initialization error:", error);

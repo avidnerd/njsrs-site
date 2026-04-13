@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { getStudent, getCategories } from "@/lib/firebase/database";
+import { getCategories } from "@/lib/firebase/database";
 import type { Student, Category } from "@/lib/firebase/database";
 import {
   getAssignmentsForJudge,
-  getJudgeScore,
+  getScoresForJudge,
   saveJudgeScore,
   RUBRIC_CRITERIA,
   RUBRIC_MAX_TOTAL,
@@ -15,6 +15,7 @@ import {
   type JudgingRubricScores,
   type JudgingAssignment,
 } from "@/lib/firebase/judging";
+import { getStudentsByIds } from "@/lib/firebase/database";
 
 interface JudgeScoringPanelProps {
   judgeId: string;
@@ -48,13 +49,19 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
       setCategoryNames(cn);
       const assigns = await getAssignmentsForJudge(judgeId, phase);
       setAssignments(assigns);
-      const stuMap = new Map<string, Student>();
+
+      // Bulk fetch: 1 query for all students + 1 query for all scores
+      // instead of N individual reads per student
+      const studentIds = assigns.map((a) => a.studentId);
+      const [stuMap, scoresMap] = await Promise.all([
+        getStudentsByIds(studentIds),
+        getScoresForJudge(phase, judgeId),
+      ]);
+
       const r: Record<string, JudgingRubricScores> = {};
       const n: Record<string, string> = {};
       for (const a of assigns) {
-        const st = await getStudent(a.studentId);
-        if (st?.id) stuMap.set(st.id, st);
-        const existing = await getJudgeScore(phase, judgeId, a.studentId);
+        const existing = scoresMap.get(a.studentId);
         if (existing) {
           r[a.studentId] = { ...emptyRubricScores(), ...existing.rubric };
           n[a.studentId] = existing.notes || "";
