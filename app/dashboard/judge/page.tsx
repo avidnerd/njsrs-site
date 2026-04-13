@@ -193,10 +193,20 @@ export default function JudgeDashboardPage() {
                 </div>
               )}
 
-              <p className="text-sm text-gray-600">
-                View your assigned projects, open each student&apos;s research paper, enter rubric
-                scores, private notes, and ranks. Tap a student to expand the scoring form.
-              </p>
+              <div className="flex flex-wrap items-center gap-4">
+                <p className="text-sm text-gray-600">
+                  View your assigned projects, open each student&apos;s research paper, enter rubric
+                  scores, private notes, and ranks.
+                </p>
+                <a
+                  href="/rubric.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary-blue text-white text-sm font-medium hover:opacity-90"
+                >
+                  View Rubric (PDF)
+                </a>
+              </div>
               {(() => {
                 const tabs: { id: PhaseTab; label: string; activeClass: string }[] = [];
                 if (isCategoryJudge) tabs.push({ id: "category", label: "Category judging", activeClass: "bg-amber-100 text-amber-900" });

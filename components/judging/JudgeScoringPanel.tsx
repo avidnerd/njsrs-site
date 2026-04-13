@@ -339,19 +339,9 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
 
                     {/* Rubric */}
                     <div className="space-y-4">
-                      <div className="flex flex-wrap items-center gap-4">
-                        <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
-                          JSHS-style rubric — {RUBRIC_MAX_TOTAL} pts total
-                        </p>
-                        <a
-                          href="/rubric.pdf"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-primary-blue hover:underline"
-                        >
-                          View rubric PDF
-                        </a>
-                      </div>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
+                        JSHS-style rubric — {RUBRIC_MAX_TOTAL} pts total
+                      </p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {RUBRIC_CRITERIA.map((c) => (
                           <div key={c.key} className="space-y-1">
@@ -361,16 +351,15 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
                             </label>
                             <p className="text-xs text-gray-500 leading-snug">{c.description}</p>
                             <input
-                              type="number"
-                              min={0}
-                              max={c.maxPoints}
-                              step={1}
-                              value={rubric[c.key]}
+                              type="text"
+                              inputMode="numeric"
+                              value={rubric[c.key] === 0 ? "" : rubric[c.key]}
                               onChange={(e) => {
                                 const raw = Number(e.target.value);
-                                const clamped = Number.isNaN(raw) ? 0 : Math.min(c.maxPoints, Math.max(0, raw));
+                                const clamped = Number.isNaN(raw) ? 0 : Math.min(c.maxPoints, Math.max(0, Math.floor(raw)));
                                 updateRubric(a.studentId, c.key, clamped);
                               }}
+                              placeholder="0"
                               className="w-full max-w-[110px] px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-base"
                             />
                           </div>
