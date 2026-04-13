@@ -1193,6 +1193,29 @@ export default function AdminJudgingScoring() {
 
       {subTab === "specialResults" && (
         <div className="space-y-6">
+          <div className="flex flex-wrap gap-3 items-center">
+            <button
+              type="button"
+              onClick={handleClearSpecialScores}
+              disabled={clearingSpecialScores}
+              className={`px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60 ${
+                clearSpecialScoresConfirm
+                  ? "bg-red-600 text-white hover:bg-red-700"
+                  : "bg-white border border-red-300 text-red-700 hover:bg-red-50"
+              }`}
+            >
+              {clearingSpecialScores ? "Clearing…" : clearSpecialScoresConfirm ? "Confirm — clear all special award scores" : "Clear all special award scores"}
+            </button>
+            {clearSpecialScoresConfirm && (
+              <button
+                type="button"
+                onClick={() => setClearSpecialScoresConfirm(false)}
+                className="text-sm text-gray-500 hover:text-gray-700 underline"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
           <button
             type="button"
             onClick={() => {
