@@ -11,12 +11,13 @@ import AdminSRCApproval from "@/components/dashboard/AdminSRCApproval";
 import AdminStudentList from "@/components/dashboard/AdminStudentList";
 import AdminCategories from "@/components/dashboard/AdminCategories";
 import AdminJudgingScoring from "@/components/dashboard/AdminJudgingScoring";
+import AdminGuestList from "@/components/dashboard/AdminGuestList";
 
 export default function AdminDashboardPage() {
   const { user, userProfile } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "sras" | "judges" | "src" | "students" | "categories" | "scoring"
+    "sras" | "judges" | "src" | "students" | "categories" | "scoring" | "guests"
   >("sras");
 
   const handleLogout = async () => {
@@ -118,6 +119,16 @@ export default function AdminDashboardPage() {
               >
                 Scoring
               </button>
+              <button
+                onClick={() => setActiveTab("guests")}
+                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                  activeTab === "guests"
+                    ? "border-primary-blue text-primary-blue"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                Guests
+              </button>
             </nav>
           </div>
 
@@ -182,7 +193,7 @@ export default function AdminDashboardPage() {
               </div>
               <AdminCategories />
             </div>
-          ) : (
+          ) : activeTab === "scoring" ? (
             <div>
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
@@ -194,6 +205,18 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
               <AdminJudgingScoring />
+            </div>
+          ) : (
+            <div>
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  Guests
+                </h2>
+                <p className="text-gray-600">
+                  All guests registered by students, with ticket status.
+                </p>
+              </div>
+              <AdminGuestList />
             </div>
           )}
         </div>

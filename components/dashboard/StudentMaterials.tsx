@@ -217,7 +217,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
               accept=".pptx"
               onUpload={handleSlideshowUpload}
               currentFile={student.slideshowUrl}
-              maxSizeMB={25}
+              maxSizeMB={250}
               disabled={isSlidesDisabled}
             />
           </div>
