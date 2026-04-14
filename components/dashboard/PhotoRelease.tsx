@@ -2,17 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { updateStudentMaterials, getStudent } from "@/lib/firebase/database";
+import { updateStudentMaterials } from "@/lib/firebase/database";
 import type { Student, PhotoRelease } from "@/lib/firebase/database";
 
 interface PhotoReleaseProps {
+  student: Student | null;
   onFormUpdate?: () => void;
 }
 
-export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
+export default function PhotoRelease({ student, onFormUpdate }: PhotoReleaseProps) {
   const { user } = useAuth();
-  const [student, setStudent] = useState<Student | null>(null);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<PhotoRelease>({});
   const [parentEmail, setParentEmail] = useState("");
@@ -23,35 +22,19 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
   const isTeamMemberUser =
     student?.id !== undefined && user?.uid !== student?.id;
 
+  // Initialise form from student prop whenever it changes
   useEffect(() => {
-    if (user) {
-      loadStudent();
+    if (!student) return;
+    if (student.photoRelease) {
+      setFormData(student.photoRelease);
+      const isTeamMember = student.id !== undefined && user?.uid !== student.id;
+      setParentEmail(
+        isTeamMember
+          ? student.photoRelease.teamMemberParentEmail || ""
+          : student.photoRelease.parentEmail || ""
+      );
     }
-  }, [user]);
-
-  const loadStudent = async () => {
-    if (!user) return;
-
-    try {
-      const studentData = await getStudent(user.uid);
-      setStudent(studentData);
-      if (studentData?.photoRelease) {
-        setFormData(studentData.photoRelease);
-        // Pre-fill the email for whichever section this user owns
-        const isTeamMember =
-          studentData.id !== undefined && user.uid !== studentData.id;
-        setParentEmail(
-          isTeamMember
-            ? studentData.photoRelease.teamMemberParentEmail || ""
-            : studentData.photoRelease.parentEmail || ""
-        );
-      }
-    } catch (error) {
-      console.error("Error loading student data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [student, user]);
 
   const sendInvitation = async () => {
     if (!user || !student?.id || !parentEmail.trim()) {
@@ -69,7 +52,6 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
     setError("");
     setSuccess("");
 
-    // Always use the primary student's document ID so the API can find the record
     const studentDocId = student.id;
     const token = `${studentDocId}_photorelease_${isTeamMemberUser ? "teammember" : "primary"}_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
@@ -86,10 +68,7 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
         updatedFormData.parentInviteToken = token;
       }
 
-      // Save token to Firestore BEFORE sending the email
-      await updateStudentMaterials(studentDocId, {
-        photoRelease: updatedFormData,
-      });
+      await updateStudentMaterials(studentDocId, { photoRelease: updatedFormData });
 
       const studentName = isTeamMemberUser
         ? `${student.teamMemberFirstName} ${student.teamMemberLastName}`
@@ -115,10 +94,7 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
       setFormData(updatedFormData);
       setSuccess(`Invitation sent to ${parentEmail} successfully!`);
       setTimeout(() => setSuccess(""), 3000);
-      await loadStudent();
-      if (onFormUpdate) {
-        onFormUpdate();
-      }
+      if (onFormUpdate) onFormUpdate();
     } catch (error: any) {
       setError(error.message || "Failed to send invitation");
     } finally {
@@ -154,9 +130,7 @@ export default function PhotoRelease({ onFormUpdate }: PhotoReleaseProps) {
     return "Unknown date";
   };
 
-  if (loading) {
-    return <div className="text-center py-4">Loading...</div>;
-  }
+  if (!student) return null;
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">

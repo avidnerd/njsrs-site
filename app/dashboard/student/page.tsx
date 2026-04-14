@@ -124,9 +124,9 @@ export default function StudentDashboardPage() {
           ) : student ? (
             <div className="space-y-6">
               <StudentStatus student={student} onUpdate={loadStudent} />
-              <StudentMaterials onFormUpdate={loadStudent} />
-              <PhotoRelease onFormUpdate={loadStudent} />
-              <GuestRegistration />
+              <StudentMaterials student={student} onFormUpdate={loadStudent} />
+              <PhotoRelease student={student} onFormUpdate={loadStudent} />
+              <GuestRegistration student={student} onFormUpdate={loadStudent} />
             </div>
           ) : (
             <div className="text-center py-12 space-y-4">

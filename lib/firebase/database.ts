@@ -395,15 +395,11 @@ export async function getStudent(studentId: string): Promise<Student | null> {
   const studentRef = doc(dbInstance, "students", studentId);
 
   try {
-    let studentDoc = await getDoc(studentRef);
+    const studentDoc = await getDoc(studentRef);
     if (snapshotExists(studentDoc)) {
       return { id: studentDoc.id, ...studentDoc.data() } as Student;
     }
-    await new Promise((r) => setTimeout(r, 800));
-    studentDoc = await getDoc(studentRef);
-    if (snapshotExists(studentDoc)) {
-      return { id: studentDoc.id, ...studentDoc.data() } as Student;
-    }
+    // Doc not found — fall through to team-member fallback below
   } catch (error: unknown) {
     console.error("Error getting student document by ID:", error);
   }

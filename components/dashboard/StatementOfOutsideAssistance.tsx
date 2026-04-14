@@ -2,56 +2,40 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { updateStudentMaterials, getStudent } from "@/lib/firebase/database";
+import { updateStudentMaterials } from "@/lib/firebase/database";
 import type { Student, StatementOfOutsideAssistance } from "@/lib/firebase/database";
 import { Timestamp } from "firebase/firestore";
 
 interface StatementOfOutsideAssistanceProps {
+  student: Student | null;
   onFormUpdate?: () => void;
   disabled?: boolean;
 }
 
-export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = false }: StatementOfOutsideAssistanceProps) {
+export default function StatementOfOutsideAssistance({ student, onFormUpdate, disabled = false }: StatementOfOutsideAssistanceProps) {
   const { user } = useAuth();
-  const [student, setStudent] = useState<Student | null>(null);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<StatementOfOutsideAssistance>({});
   const [signature, setSignature] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Initialise from student prop whenever it changes
   useEffect(() => {
-    if (user) {
-      loadStudent();
-    }
-  }, [user]);
-
-  const loadStudent = async () => {
-    if (!user) return;
-    
-    try {
-      const studentData = await getStudent(user.uid);
-      setStudent(studentData);
-      if (studentData?.statementOfOutsideAssistance) {
-        setFormData(studentData.statementOfOutsideAssistance);
-        if (studentData.statementOfOutsideAssistance.studentSignature) {
-          setSignature(studentData.statementOfOutsideAssistance.studentSignature);
-        }
-      } else {
-        
-        setFormData({
-          studentFirstName: studentData?.firstName || "",
-          studentLastName: studentData?.lastName || "",
-          school: studentData?.schoolName || "",
-        });
+    if (!student) return;
+    if (student.statementOfOutsideAssistance) {
+      setFormData(student.statementOfOutsideAssistance);
+      if (student.statementOfOutsideAssistance.studentSignature) {
+        setSignature(student.statementOfOutsideAssistance.studentSignature);
       }
-    } catch (error) {
-      console.error("Error loading student data:", error);
-    } finally {
-      setLoading(false);
+    } else {
+      setFormData({
+        studentFirstName: student.firstName || "",
+        studentLastName: student.lastName || "",
+        school: student.schoolName || "",
+      });
     }
-  };
+  }, [student]);
 
   const saveForm = async () => {
     if (!user || !student?.id) return;
@@ -197,8 +181,8 @@ export default function StatementOfOutsideAssistance({ onFormUpdate, disabled = 
     setFormData(updated);
   };
 
-  if (loading) {
-    return <div className="text-center py-4">Loading...</div>;
+  if (!student) {
+    return null;
   }
 
   return (

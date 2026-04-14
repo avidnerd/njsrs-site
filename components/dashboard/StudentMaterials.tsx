@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { uploadResearchReport, uploadSlideshow, uploadAbstract } from "@/lib/firebase/storage";
-import { updateStudentMaterials, getStudent } from "@/lib/firebase/database";
+import { updateStudentMaterials } from "@/lib/firebase/database";
 import FileUpload from "@/components/upload/FileUpload";
 import StatementOfOutsideAssistance from "./StatementOfOutsideAssistance";
 import type { Student } from "@/lib/firebase/database";
 import Link from "next/link";
 
 interface StudentMaterialsProps {
+  student: Student | null;
   onFormUpdate?: () => void;
 }
 
@@ -18,11 +19,8 @@ const REPORT_ABSTRACT_DEADLINE = new Date("2026-04-10T23:59:59");
 const SOA_DEADLINE = new Date("2026-04-16T23:59:59");
 const SLIDES_DEADLINE = new Date("2026-04-16T23:59:59");
 
-export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps) {
+export default function StudentMaterials({ student, onFormUpdate }: StudentMaterialsProps) {
   const { user } = useAuth();
-  const [student, setStudent] = useState<Student | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<"research" | "slideshow" | "statement">("research");
 
   const now = new Date();
@@ -30,58 +28,26 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
   const isSOADisabled = now >= SOA_DEADLINE;
   const isSlidesDisabled = now >= SLIDES_DEADLINE;
 
-  useEffect(() => {
-    if (user) {
-      loadStudent();
-    }
-  }, [user]);
-
-  const loadStudent = async () => {
-    if (!user) return;
-    
-    try {
-      const studentData = await getStudent(user.uid);
-      setStudent(studentData);
-    } catch (error) {
-      console.error("Error loading student data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleResearchReportUpload = async (file: File) => {
-    if (!user) throw new Error("Not authenticated");
+    if (!user || !student?.id) throw new Error("Not authenticated");
     const url = await uploadResearchReport(user.uid, file);
-    await updateStudentMaterials(user.uid, { researchReportUrl: url });
-    await loadStudent();
-    if (onFormUpdate) {
-      onFormUpdate();
-    }
+    await updateStudentMaterials(student.id, { researchReportUrl: url });
+    if (onFormUpdate) onFormUpdate();
   };
 
   const handleSlideshowUpload = async (file: File) => {
-    if (!user) throw new Error("Not authenticated");
+    if (!user || !student?.id) throw new Error("Not authenticated");
     const url = await uploadSlideshow(user.uid, file);
-    await updateStudentMaterials(user.uid, { slideshowUrl: url });
-    await loadStudent();
-    if (onFormUpdate) {
-      onFormUpdate();
-    }
+    await updateStudentMaterials(student.id, { slideshowUrl: url });
+    if (onFormUpdate) onFormUpdate();
   };
 
   const handleAbstractUpload = async (file: File) => {
-    if (!user) throw new Error("Not authenticated");
+    if (!user || !student?.id) throw new Error("Not authenticated");
     const url = await uploadAbstract(user.uid, file);
-    await updateStudentMaterials(user.uid, { abstractUrl: url });
-    await loadStudent();
-    if (onFormUpdate) {
-      onFormUpdate();
-    }
+    await updateStudentMaterials(student.id, { abstractUrl: url });
+    if (onFormUpdate) onFormUpdate();
   };
-
-  if (loading) {
-    return <div className="text-center py-4">Loading...</div>;
-  }
 
   if (!student || student.status !== "approved") {
     return (
@@ -226,7 +192,7 @@ export default function StudentMaterials({ onFormUpdate }: StudentMaterialsProps
 
       {}
       {activeSection === "statement" && (
-        <StatementOfOutsideAssistance onFormUpdate={onFormUpdate} disabled={isSOADisabled} />
+        <StatementOfOutsideAssistance student={student} onFormUpdate={onFormUpdate} disabled={isSOADisabled} />
       )}
     </div>
   );

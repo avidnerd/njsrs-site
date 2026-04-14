@@ -2,43 +2,37 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getStudent, updateStudentGuests } from "@/lib/firebase/database";
-import type { Guest } from "@/lib/firebase/database";
+import { updateStudentGuests } from "@/lib/firebase/database";
+import type { Student, Guest } from "@/lib/firebase/database";
 
 const MAX_GUESTS = 2;
 const EMPTY_GUEST = (): Guest => ({ name: "", email: "", ticketSent: false });
 
-export default function GuestRegistration() {
+interface GuestRegistrationProps {
+  student: Student | null;
+  onFormUpdate?: () => void;
+}
+
+export default function GuestRegistration({ student, onFormUpdate }: GuestRegistrationProps) {
   const { user } = useAuth();
   const [guests, setGuests] = useState<Guest[]>([EMPTY_GUEST(), EMPTY_GUEST()]);
   const [studentName, setStudentName] = useState("");
   const [studentSchool, setStudentSchool] = useState("");
-  const [loading, setLoading] = useState(true);
   const [sendingIdx, setSendingIdx] = useState<number | null>(null);
   const [savingIdx, setSavingIdx] = useState<number | null>(null);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
+  // Initialise from student prop whenever it changes
   useEffect(() => {
-    if (user) load();
-  }, [user]);
-
-  const load = async () => {
-    if (!user) return;
-    try {
-      const s = await getStudent(user.uid);
-      if (!s) return;
-      setStudentName(`${s.firstName} ${s.lastName}`);
-      setStudentSchool(s.schoolName || "");
-      if (s.guests && s.guests.length > 0) {
-        // Pad to MAX_GUESTS slots
-        const padded = [...s.guests];
-        while (padded.length < MAX_GUESTS) padded.push(EMPTY_GUEST());
-        setGuests(padded);
-      }
-    } finally {
-      setLoading(false);
+    if (!student) return;
+    setStudentName(`${student.firstName} ${student.lastName}`);
+    setStudentSchool(student.schoolName || "");
+    if (student.guests && student.guests.length > 0) {
+      const padded = [...student.guests];
+      while (padded.length < MAX_GUESTS) padded.push(EMPTY_GUEST());
+      setGuests(padded);
     }
-  };
+  }, [student]);
 
   const updateField = (idx: number, field: "name" | "email", value: string) => {
     setGuests((prev) => {
@@ -48,9 +42,8 @@ export default function GuestRegistration() {
     });
   };
 
-  // Save name+email for a slot (without sending ticket)
   const saveGuest = async (idx: number) => {
-    if (!user) return;
+    if (!user || !student?.id) return;
     const g = guests[idx];
     if (!g.name.trim() || !g.email.trim()) {
       setMessage({ type: "err", text: "Please enter both a name and email before saving." });
@@ -62,11 +55,11 @@ export default function GuestRegistration() {
       const updated = guests.map((guest, i) =>
         i === idx ? { ...guest, name: g.name.trim(), email: g.email.trim() } : guest
       );
-      // Only save slots with a name (skip empty trailing slots)
       const toSave = updated.filter((g) => g.name.trim());
-      await updateStudentGuests(user.uid, toSave);
+      await updateStudentGuests(student.id, toSave);
       setGuests(updated);
       setMessage({ type: "ok", text: "Guest info saved." });
+      if (onFormUpdate) onFormUpdate();
     } catch (e: unknown) {
       setMessage({ type: "err", text: e instanceof Error ? e.message : "Save failed." });
     } finally {
@@ -75,7 +68,7 @@ export default function GuestRegistration() {
   };
 
   const sendTicket = async (idx: number) => {
-    if (!user) return;
+    if (!user || !student?.id) return;
     const g = guests[idx];
     if (!g.name.trim() || !g.email.trim()) {
       setMessage({ type: "err", text: "Please enter a name and email before sending the ticket." });
@@ -84,13 +77,11 @@ export default function GuestRegistration() {
     setSendingIdx(idx);
     setMessage(null);
     try {
-      // Save to Firestore first
       const trimmed = { ...g, name: g.name.trim(), email: g.email.trim() };
       const updated = guests.map((guest, i) => (i === idx ? trimmed : guest));
       const toSave = updated.filter((g) => g.name.trim());
-      await updateStudentGuests(user.uid, toSave);
+      await updateStudentGuests(student.id, toSave);
 
-      // Send the ticket email
       const res = await fetch("/api/send-guest-ticket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -104,14 +95,14 @@ export default function GuestRegistration() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to send ticket");
 
-      // Mark ticket as sent
       const withSent = updated.map((guest, i) =>
         i === idx ? { ...guest, ticketSent: true, sentAt: new Date() } : guest
       );
       const toSave2 = withSent.filter((g) => g.name.trim());
-      await updateStudentGuests(user.uid, toSave2);
+      await updateStudentGuests(student.id, toSave2);
       setGuests(withSent);
       setMessage({ type: "ok", text: `Ticket sent to ${trimmed.email}!` });
+      if (onFormUpdate) onFormUpdate();
     } catch (e: unknown) {
       setMessage({ type: "err", text: e instanceof Error ? e.message : "Failed to send ticket." });
     } finally {
@@ -119,7 +110,7 @@ export default function GuestRegistration() {
     }
   };
 
-  if (loading) return null;
+  if (!student) return null;
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
