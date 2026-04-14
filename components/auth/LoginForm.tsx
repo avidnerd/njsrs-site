@@ -20,8 +20,7 @@ export default function LoginForm() {
     if (user && userProfile && loading) {
       setLoading(false);
     } else if (user && !userProfile && !authLoading && loading) {
-      const uid = user.uid;
-      setError(`User profile not found in Firestore. Your User UID is: ${uid}. Please ensure the document ID in the 'users' collection matches this UID exactly. Check the browser console for more details.`);
+      setError("Account not found. Please try refreshing the page. If the problem persists, contact the fair director.");
       setLoading(false);
     }
   }, [user, userProfile, authLoading, loading]);
@@ -31,16 +30,10 @@ export default function LoginForm() {
     setError("");
     setLoading(true);
 
-    const timeoutId = setTimeout(() => {
-      setError("Login is taking longer than expected. Please check the browser console (F12) to see your User UID and verify it matches the Firestore document ID.");
-      setLoading(false);
-    }, 5000);
-
     try {
       await loginUser(email, password);
-      clearTimeout(timeoutId);
+      // Loading will be cleared by the useEffect once AuthContext resolves the profile
     } catch (err: any) {
-      clearTimeout(timeoutId);
       setError(err.message || "Failed to log in");
       setLoading(false);
     }

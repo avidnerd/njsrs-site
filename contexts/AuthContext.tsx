@@ -45,8 +45,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (firebaseUser && db) {
         try {
           const userDocRef = doc(db, "users", firebaseUser.uid);
-          const userDoc = await getDoc(userDocRef);
-          
+
+          // Retry up to 3 times with backoff — the first attempt can fail
+          // if Firebase is still initializing its cache (IndexedDB fallback race).
+          let userDoc;
+          let lastError: unknown;
+          for (let attempt = 0; attempt < 3; attempt++) {
+            try {
+              if (attempt > 0) {
+                await new Promise((r) => setTimeout(r, 600 * attempt));
+              }
+              userDoc = await getDoc(userDocRef);
+              break;
+            } catch (err) {
+              lastError = err;
+            }
+          }
+
+          if (!userDoc) throw lastError;
+
           if (snapshotExists(userDoc)) {
             const data = userDoc.data();
             if (data) {
