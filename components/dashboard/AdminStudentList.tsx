@@ -97,7 +97,11 @@ export default function AdminStudentList() {
         student.lastName?.toLowerCase().includes(searchLower) ||
         student.schoolName?.toLowerCase().includes(searchLower) ||
         student.projectTitle?.toLowerCase().includes(searchLower) ||
-        student.email?.toLowerCase().includes(searchLower)
+        student.email?.toLowerCase().includes(searchLower) ||
+        // Also match team member fields
+        student.teamMemberFirstName?.toLowerCase().includes(searchLower) ||
+        student.teamMemberLastName?.toLowerCase().includes(searchLower) ||
+        student.teamMemberEmail?.toLowerCase().includes(searchLower)
       );
     })
     .sort((a, b) => {
@@ -191,7 +195,10 @@ export default function AdminStudentList() {
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-gray-900">
           All Students ({filteredStudents.length}
-          {searchTerm ? ` of ${students.length}` : ""})
+          {searchTerm ? ` of ${students.length}` : ""}
+          {students.filter((s) => s.isTeamProject).length > 0 &&
+            `, ${students.filter((s) => s.isTeamProject).length} team project${students.filter((s) => s.isTeamProject).length !== 1 ? "s" : ""}`}
+          )
         </h3>
       </div>
       <div className="flex justify-between items-center mb-4">
@@ -264,88 +271,123 @@ export default function AdminStudentList() {
                   </td>
                 </tr>
               ) : (
-                filteredStudents.map((student) => (
-                  <tr key={student.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {student.firstName} {student.lastName}
-                      </div>
-                      <div className="text-sm text-gray-500">{student.email}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {student.schoolName || "N/A"}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                      {student.projectTitle || "N/A"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          student.status === "approved"
-                            ? "bg-green-100 text-green-800"
-                            : student.status === "rejected"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {student.status || "pending"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {categories.find((c) => c.id === student.categoryId)?.name ?? "—"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {student.projectId ? (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-indigo-100 text-indigo-800">
-                          {student.projectId}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400">—</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="space-y-1">
-                        {student.researchReportUrl && (
-                          <div className="text-green-600">✓ Research Report</div>
+                filteredStudents.flatMap((student) => {
+                  const openDetails = async () => {
+                    setSelectedStudent(student);
+                    setSchoolSRAs([]);
+                    if (student.schoolId) {
+                      setLoadingSRAs(true);
+                      try {
+                        const sras = await getSRAsBySchool(student.schoolId);
+                        setSchoolSRAs(sras);
+                      } catch (e) {
+                        console.error("Failed to load school SRAs:", e);
+                      } finally {
+                        setLoadingSRAs(false);
+                      }
+                    }
+                  };
+
+                  const statusBadge = (
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      student.status === "approved" ? "bg-green-100 text-green-800"
+                      : student.status === "rejected" ? "bg-red-100 text-red-800"
+                      : "bg-yellow-100 text-yellow-800"
+                    }`}>
+                      {student.status || "pending"}
+                    </span>
+                  );
+
+                  const rows = [
+                    // ── Primary student row ──
+                    <tr key={student.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {student.firstName} {student.lastName}
+                        </div>
+                        <div className="text-sm text-gray-500">{student.email}</div>
+                        {student.isTeamProject && (
+                          <span className="inline-block mt-1 px-1.5 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700">
+                            Team — Primary
+                          </span>
                         )}
-                        {student.abstractUrl && (
-                          <div className="text-green-600">✓ Abstract</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {student.schoolName || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+                        {student.projectTitle || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">{statusBadge}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {categories.find((c) => c.id === student.categoryId)?.name ?? "—"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {student.projectId ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-indigo-100 text-indigo-800">
+                            {student.projectId}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">—</span>
                         )}
-                        {student.slideshowUrl && (
-                          <div className="text-green-600">✓ Slideshow</div>
-                        )}
-                        {student.statementOfOutsideAssistance?.studentCompleted && (
-                          <div className="text-green-600">✓ SOA Form</div>
-                        )}
-                        {student.photoRelease?.completed && (
-                          <div className="text-green-600">✓ Photo Release</div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={async () => {
-                          setSelectedStudent(student);
-                          setSchoolSRAs([]);
-                          if (student.schoolId) {
-                            setLoadingSRAs(true);
-                            try {
-                              const sras = await getSRAsBySchool(student.schoolId);
-                              setSchoolSRAs(sras);
-                            } catch (e) {
-                              console.error("Failed to load school SRAs:", e);
-                            } finally {
-                              setLoadingSRAs(false);
-                            }
-                          }
-                        }}
-                        className="text-primary-blue hover:text-primary-darkBlue"
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <div className="space-y-1">
+                          {student.researchReportUrl && <div className="text-green-600">✓ Research Report</div>}
+                          {student.abstractUrl && <div className="text-green-600">✓ Abstract</div>}
+                          {student.slideshowUrl && <div className="text-green-600">✓ Slideshow</div>}
+                          {student.statementOfOutsideAssistance?.studentCompleted && <div className="text-green-600">✓ SOA Form</div>}
+                          {student.photoRelease?.completed && <div className="text-green-600">✓ Photo Release</div>}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onClick={openDetails} className="text-primary-blue hover:text-primary-darkBlue">
+                          View Details
+                        </button>
+                      </td>
+                    </tr>,
+                    // ── Team member row ──
+                    ...(student.isTeamProject && student.teamMemberFirstName ? [
+                      <tr key={`${student.id}-member`} className="hover:bg-purple-50 bg-purple-50/40">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
+                            {student.teamMemberFirstName} {student.teamMemberLastName}
+                          </div>
+                          <div className="text-sm text-gray-500">{student.teamMemberEmail}</div>
+                          <span className="inline-block mt-1 px-1.5 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700">
+                            Team — Member
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {student.schoolName || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+                          {student.projectTitle || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">{statusBadge}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {categories.find((c) => c.id === student.categoryId)?.name ?? "—"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {student.projectId ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-indigo-100 text-indigo-800">
+                              {student.projectId}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">—</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button onClick={openDetails} className="text-primary-blue hover:text-primary-darkBlue">
+                            View Team Details
+                          </button>
+                        </td>
+                      </tr>
+                    ] : []),
+                  ];
+                  return rows;
+                })
               )}
             </tbody>
           </table>
