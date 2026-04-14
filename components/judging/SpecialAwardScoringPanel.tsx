@@ -49,32 +49,34 @@ export default function SpecialAwardScoringPanel({ judgeId }: SpecialAwardScorin
         setActiveAwardId(awards[0].id);
       }
 
-      // For each award, fetch candidate IDs and filter students
+      // Fetch candidates + scores for all awards in parallel
       const newCandidateMap: Record<string, Student[]> = {};
       const newRubrics: Record<string, Record<string, Record<string, number>>> = {};
       const newNotes: Record<string, Record<string, string>> = {};
 
-      for (const award of awards) {
-        const candidateIds = await getSpecialAwardCandidates(award.id, judgeId);
-        // If no candidates shortlisted yet, show all students; otherwise filter
-        const awardStudents = candidateIds.length > 0
-          ? allStudents.filter((s) => s.id && candidateIds.includes(s.id))
-          : allStudents.filter((s) => s.id);
-        newCandidateMap[award.id] = awardStudents;
-
-        const scores = await getSpecialAwardScoresForJudge(judgeId, award.id);
-        newRubrics[award.id] = {};
-        newNotes[award.id] = {};
-        for (const sc of scores) {
-          newRubrics[award.id][sc.studentId] = { ...emptySpecialRubric(award.criteria), ...sc.rubric };
-          newNotes[award.id][sc.studentId] = sc.notes || "";
-        }
-        for (const s of awardStudents) {
-          if (!s.id) continue;
-          if (!newRubrics[award.id][s.id]) newRubrics[award.id][s.id] = emptySpecialRubric(award.criteria);
-          if (!newNotes[award.id][s.id]) newNotes[award.id][s.id] = "";
-        }
-      }
+      await Promise.all(
+        awards.map(async (award) => {
+          const [candidateIds, scores] = await Promise.all([
+            getSpecialAwardCandidates(award.id, judgeId),
+            getSpecialAwardScoresForJudge(judgeId, award.id),
+          ]);
+          const awardStudents = candidateIds.length > 0
+            ? allStudents.filter((s) => s.id && candidateIds.includes(s.id))
+            : allStudents.filter((s) => s.id);
+          newCandidateMap[award.id] = awardStudents;
+          newRubrics[award.id] = {};
+          newNotes[award.id] = {};
+          for (const sc of scores) {
+            newRubrics[award.id][sc.studentId] = { ...emptySpecialRubric(award.criteria), ...sc.rubric };
+            newNotes[award.id][sc.studentId] = sc.notes || "";
+          }
+          for (const s of awardStudents) {
+            if (!s.id) continue;
+            if (!newRubrics[award.id][s.id]) newRubrics[award.id][s.id] = emptySpecialRubric(award.criteria);
+            if (!newNotes[award.id][s.id]) newNotes[award.id][s.id] = "";
+          }
+        })
+      );
 
       setCandidateMap(newCandidateMap);
       setRubrics(newRubrics);

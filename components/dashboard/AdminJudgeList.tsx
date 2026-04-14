@@ -12,8 +12,7 @@ export default function AdminJudgeList() {
   const [selectedJudge, setSelectedJudge] = useState<Judge | null>(null);
 
   useEffect(() => {
-    loadJudges();
-    loadCategories();
+    Promise.all([loadJudges(), loadCategories()]);
   }, []);
 
   const loadCategories = async () => {
@@ -39,8 +38,8 @@ export default function AdminJudgeList() {
   const handleApproval = async (judgeId: string, approved: boolean) => {
     try {
       await updateJudgeApproval(judgeId, approved);
-      await loadJudges();
-      setSelectedJudge(null);
+      setJudges((prev) => prev.map((j) => j.id === judgeId ? { ...j, adminApproved: approved } : j));
+      setSelectedJudge((prev) => prev?.id === judgeId ? { ...prev, adminApproved: approved } : prev);
     } catch (error) {
       console.error("Error updating judge approval:", error);
       alert("Failed to update judge approval");

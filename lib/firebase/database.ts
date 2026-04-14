@@ -317,14 +317,9 @@ export async function getSchoolsWithSRAs(): Promise<School[]> {
     }
   });
   
-  const schools: School[] = [];
-  for (const schoolId of schoolIds) {
-    const school = await getSchool(schoolId);
-    if (school) {
-      schools.push(school);
-    }
-  }
-  
+  const schoolIdArr = Array.from(schoolIds);
+  const schoolResults = await Promise.all(schoolIdArr.map((id) => getSchool(id)));
+  const schools = schoolResults.filter(Boolean) as School[];
   return schools.sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -407,101 +402,58 @@ export async function getStudent(studentId: string): Promise<Student | null> {
   try {
     const { getUserProfile } = await import("./auth");
     const userProfile = await getUserProfile(studentId);
-    console.log("User profile for team member:", userProfile);
     if (userProfile?.studentDocumentId) {
-      console.log("Found studentDocumentId in user profile:", userProfile.studentDocumentId);
       const studentDoc = await getDoc(doc(dbInstance, "students", userProfile.studentDocumentId));
       if (snapshotExists(studentDoc)) {
-        console.log("Successfully retrieved student document via studentDocumentId");
         return { id: studentDoc.id, ...studentDoc.data() } as Student;
-      } else {
-        console.log("Student document not found with studentDocumentId:", userProfile.studentDocumentId);
       }
-    } else {
-      console.log("No studentDocumentId in user profile, trying query fallback");
     }
   } catch (error) {
     console.error("Error getting student document from user profile:", error);
   }
-  
+
   try {
-    console.log("Attempting query for teamMemberUserId:", studentId);
     const studentsRef = collection(dbInstance, "students");
     const q = query(studentsRef, where("teamMemberUserId", "==", studentId));
     const querySnapshot = await getDocs(q);
-    console.log("Query returned", querySnapshot.size, "documents");
     if (!querySnapshot.empty) {
       const teamStudentDoc = querySnapshot.docs[0];
-      console.log("Found student document via query:", teamStudentDoc.id);
       const studentData = { id: teamStudentDoc.id, ...teamStudentDoc.data() } as Student;
-      
+      // Cache the studentDocumentId so future lookups skip this query
       if (studentData.id) {
-        const { updateDoc, doc } = await import("firebase/firestore");
         const { getUserProfile } = await import("./auth");
-        try {
-          const userProfile = await getUserProfile(studentId);
-          if (userProfile && !userProfile.studentDocumentId) {
-            await updateDoc(doc(dbInstance, "users", studentId), {
-              studentDocumentId: studentData.id,
-            });
-            console.log("Updated user profile with studentDocumentId for future lookups");
-          }
-        } catch (updateError) {
-          console.error("Error updating user profile with studentDocumentId:", updateError);
+        const userProfile = await getUserProfile(studentId);
+        if (userProfile && !userProfile.studentDocumentId) {
+          updateDoc(doc(dbInstance, "users", studentId), { studentDocumentId: studentData.id }).catch(() => {});
         }
       }
-      
       return studentData;
-    } else {
-      console.log("Query returned no documents - trying to find by teamMemberEmail");
-      const { getUserProfile } = await import("./auth");
-      const userProfile = await getUserProfile(studentId);
-      if (userProfile?.email) {
-        console.log("Searching for student document with teamMemberEmail:", userProfile.email);
-        const emailQuery = query(studentsRef, where("teamMemberEmail", "==", userProfile.email));
-        const emailQuerySnapshot = await getDocs(emailQuery);
-        console.log("Email query returned", emailQuerySnapshot.size, "documents");
-        if (!emailQuerySnapshot.empty) {
-          const teamStudentDoc = emailQuerySnapshot.docs[0];
-          console.log("Found student document via teamMemberEmail:", teamStudentDoc.id);
-          const studentData = { id: teamStudentDoc.id, ...teamStudentDoc.data() } as Student;
-          
-          if (studentData.id && studentData.teamMemberUserId !== studentId) {
-            console.log("Updating student document with correct teamMemberUserId");
-            try {
-              await updateDoc(doc(dbInstance, "students", studentData.id), {
-                teamMemberUserId: studentId,
-              });
-              studentData.teamMemberUserId = studentId;
-            } catch (updateError) {
-              console.error("Error updating student document with teamMemberUserId:", updateError);
-            }
+    }
+
+    // Last resort: look up by team member email
+    const { getUserProfile } = await import("./auth");
+    const userProfile = await getUserProfile(studentId);
+    if (userProfile?.email) {
+      const emailQuery = query(studentsRef, where("teamMemberEmail", "==", userProfile.email));
+      const emailSnap = await getDocs(emailQuery);
+      if (!emailSnap.empty) {
+        const teamStudentDoc = emailSnap.docs[0];
+        const studentData = { id: teamStudentDoc.id, ...teamStudentDoc.data() } as Student;
+        // Fix up IDs for future lookups
+        if (studentData.id) {
+          if (studentData.teamMemberUserId !== studentId) {
+            updateDoc(doc(dbInstance, "students", studentData.id), { teamMemberUserId: studentId }).catch(() => {});
+            studentData.teamMemberUserId = studentId;
           }
-          
-          if (studentData.id) {
-            const { updateDoc, doc } = await import("firebase/firestore");
-            try {
-              const userProfile = await getUserProfile(studentId);
-              if (userProfile && !userProfile.studentDocumentId) {
-                await updateDoc(doc(dbInstance, "users", studentId), {
-                  studentDocumentId: studentData.id,
-                });
-                console.log("Updated user profile with studentDocumentId for future lookups");
-              }
-            } catch (updateError) {
-              console.error("Error updating user profile with studentDocumentId:", updateError);
-            }
+          if (!userProfile.studentDocumentId) {
+            updateDoc(doc(dbInstance, "users", studentId), { studentDocumentId: studentData.id }).catch(() => {});
           }
-          
-          return studentData;
         }
+        return studentData;
       }
-      console.log("Could not find student document via teamMemberEmail either");
     }
   } catch (error: any) {
-    console.error("Error querying for team member student:", error);
-    console.error("Error code:", error.code);
-    console.error("Error message:", error.message);
+    console.error("Error querying for team member student:", error.message);
   }
 
   return null;
@@ -748,22 +700,24 @@ export interface Admin {
 
 export async function getAllSRAs(): Promise<SRA[]> {
   const dbInstance = ensureDb();
-  const srasRef = collection(dbInstance, "sras");
-  const querySnapshot = await getDocs(srasRef);
+  const querySnapshot = await getDocs(collection(dbInstance, "sras"));
   const sras = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as SRA));
-  
-  const usersRef = collection(dbInstance, "users");
-  const usersSnapshot = await getDocs(usersRef);
-  const usersMap = new Map<string, { emailVerified?: boolean }>();
-  
-  usersSnapshot.docs.forEach((doc) => {
-    const userData = doc.data();
-    usersMap.set(doc.id, { emailVerified: userData.emailVerified || false });
-  });
-  
+
+  // Fetch only the user docs for the SRA IDs we actually have (not all users)
+  const sraIds = sras.map((s) => s.id).filter(Boolean) as string[];
+  const usersMap = new Map<string, boolean>();
+  const CHUNK = 30;
+  for (let i = 0; i < sraIds.length; i += CHUNK) {
+    const chunk = sraIds.slice(i, i + CHUNK);
+    const snap = await getDocs(
+      query(collection(dbInstance, "users"), where(documentId(), "in", chunk))
+    );
+    snap.docs.forEach((d) => usersMap.set(d.id, d.data().emailVerified || false));
+  }
+
   return sras.map((sra) => ({
     ...sra,
-    emailVerified: sra.id ? usersMap.get(sra.id)?.emailVerified || false : false,
+    emailVerified: sra.id ? usersMap.get(sra.id) || false : false,
   }));
 }
 

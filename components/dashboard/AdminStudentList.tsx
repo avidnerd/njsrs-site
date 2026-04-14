@@ -42,8 +42,7 @@ export default function AdminStudentList() {
   const [assignMessage, setAssignMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
-    loadStudents();
-    loadCategories();
+    Promise.all([loadStudents(), loadCategories()]);
   }, []);
 
   const loadCategories = async () => {

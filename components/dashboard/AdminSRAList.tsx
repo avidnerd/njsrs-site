@@ -30,8 +30,8 @@ export default function AdminSRAList() {
   const handleApproval = async (sraId: string, approved: boolean) => {
     try {
       await updateSRAApproval(sraId, approved);
-      await loadSRAs();
-      setSelectedSRA(null);
+      setSRAs((prev) => prev.map((s) => s.id === sraId ? { ...s, adminApproved: approved } : s));
+      setSelectedSRA((prev) => prev?.id === sraId ? { ...prev, adminApproved: approved } : prev);
     } catch (error) {
       alert("Failed to update SRA approval");
     }
