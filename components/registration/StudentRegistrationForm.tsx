@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { registerStudent } from "@/lib/firebase/registration";
-import { getSchoolsWithSRAs, getSRAsBySchool } from "@/lib/firebase/database";
+import { getSchoolsWithSRAs } from "@/lib/firebase/database";
 import { useRouter } from "next/navigation";
-import type { School, SRA } from "@/lib/firebase/database";
+import type { School } from "@/lib/firebase/database";
 
 export default function StudentRegistrationForm() {
   const router = useRouter();
@@ -19,7 +19,6 @@ export default function StudentRegistrationForm() {
     projectDescription: "",
     shirtSize: "",
     schoolId: "",
-    sraId: "",
     primaryScientificDomain: [] as string[],
     experimentalMethodology: [] as string[],
     primaryRealWorldFocus: "",
@@ -31,23 +30,12 @@ export default function StudentRegistrationForm() {
     teamMemberShirtSize: "",
   });
   const [schools, setSchools] = useState<School[]>([]);
-  const [sras, setSRAs] = useState<SRA[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadSchools();
   }, []);
-
-  useEffect(() => {
-    if (formData.schoolId) {
-      loadSRAs();
-    } else {
-      setSRAs([]);
-      setFormData({ ...formData, sraId: "" });
-      setError(""); 
-    }
-  }, [formData.schoolId]);
 
   const loadSchools = async () => {
     try {
@@ -56,21 +44,6 @@ export default function StudentRegistrationForm() {
     } catch (err) {
       console.error("Error loading schools:", err);
       setError("Error loading schools. Please try again.");
-    }
-  };
-
-  const loadSRAs = async () => {
-    try {
-      const schoolSRAs = await getSRAsBySchool(formData.schoolId);
-      setSRAs(schoolSRAs);
-      if (schoolSRAs.length === 0) {
-        setError("No Science Research Advisors found for this school. Please contact your school to register an SRA first.");
-      } else {
-        setError(""); 
-      }
-    } catch (err) {
-      console.error("Error loading SRAs:", err);
-      setError("Error loading SRAs for this school");
     }
   };
 
@@ -127,11 +100,6 @@ export default function StudentRegistrationForm() {
 
     if (!formData.schoolId) {
       setError("Please select your school");
-      return;
-    }
-
-    if (!formData.sraId) {
-      setError("Please select your Science Research Advisor");
       return;
     }
 
@@ -211,7 +179,6 @@ export default function StudentRegistrationForm() {
         lastName: formData.lastName,
         schoolId: formData.schoolId,
         schoolName: selectedSchool?.name || "",
-        sraId: formData.sraId,
         grade: formData.grade,
         projectTitle: formData.projectTitle,
         projectDescription: formData.projectDescription,
@@ -427,18 +394,12 @@ export default function StudentRegistrationForm() {
           School *
         </label>
         <p className="text-sm text-gray-500 mb-2">
-          Note: if you do not see your school, it means that there is no Science Research Advisor currently registered at your school. Any member of your school&apos;s administration or faculty can register as a science research advisor, but they must be able to be present at the competition to chaperone your school&apos;s team. If there is an SRA registered at your school, make sure you contact them prior to registering so that they know to approve your registration.
+          Note: if you do not see your school, it means that there is no Science Research Advisor currently registered at your school. Any member of your school&apos;s administration or faculty can register as a science research advisor, but they must be able to be present at the competition to chaperone your school&apos;s team.
         </p>
         <select
           id="school"
           value={formData.schoolId}
-          onChange={(e) => {
-            setFormData({
-              ...formData,
-              schoolId: e.target.value,
-              sraId: "", 
-            });
-          }}
+          onChange={(e) => setFormData({ ...formData, schoolId: e.target.value })}
           required
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
         >
@@ -455,34 +416,6 @@ export default function StudentRegistrationForm() {
           </p>
         )}
       </div>
-
-      {formData.schoolId && (
-        <div>
-          <label htmlFor="sra" className="block text-sm font-medium mb-1 text-gray-900">
-            Science Research Advisor *
-          </label>
-          {sras.length === 0 ? (
-            <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-              No SRAs found for this school. Please contact your school to register an SRA first.
-            </div>
-          ) : (
-            <select
-              id="sra"
-              value={formData.sraId}
-              onChange={(e) => setFormData({ ...formData, sraId: e.target.value })}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-green focus:border-transparent text-gray-900"
-            >
-              <option value="">Select your SRA...</option>
-              {sras.map((sra) => (
-                <option key={sra.id} value={sra.id}>
-                  {sra.firstName} {sra.lastName} {sra.title ? `(${sra.title})` : ""}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-      )}
 
       <div>
         <label htmlFor="projectTitle" className="block text-sm font-medium mb-1 text-gray-900">
@@ -770,7 +703,7 @@ export default function StudentRegistrationForm() {
 
       <button
         type="submit"
-        disabled={loading || sras.length === 0}
+        disabled={loading}
         className="w-full bg-primary-green text-white py-3 px-4 rounded-md hover:bg-primary-darkGreen disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
       >
         {loading ? "Registering..." : "REGISTER AS STUDENT"}

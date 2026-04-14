@@ -12,7 +12,7 @@ import { doc, setDoc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
 
 export interface UserProfile {
   email: string;
-  role: "sra" | "student" | "judge" | "fair_director" | "website_manager";
+  role: "sra" | "student" | "judge" | "fair_director" | "website_manager" | "proctor";
   createdAt: Date;
   profileComplete: boolean;
   emailVerified?: boolean;

@@ -278,6 +278,30 @@ export async function getScoresForJudge(
   return result;
 }
 
+/** Fetch all category-phase assignments for a given categoryId (used by proctors). */
+export async function getAssignmentsByCategory(categoryId: string): Promise<JudgingAssignment[]> {
+  const dbi = ensureDb();
+  const q = query(
+    collection(dbi, "judgingAssignments"),
+    where("phase", "==", "category"),
+    where("categoryId", "==", categoryId)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as JudgingAssignment));
+}
+
+/** Fetch all category-phase scores for a given categoryId (used by proctors). */
+export async function getScoresByCategory(categoryId: string): Promise<JudgeScoreDoc[]> {
+  const dbi = ensureDb();
+  const q = query(
+    collection(dbi, "judgeScores"),
+    where("phase", "==", "category"),
+    where("categoryId", "==", categoryId)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => d.data() as JudgeScoreDoc);
+}
+
 export async function getAllJudgeScores(phase?: JudgingPhase): Promise<(JudgeScoreDoc & { id: string })[]> {
   const dbi = ensureDb();
   if (phase) {

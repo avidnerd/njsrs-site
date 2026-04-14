@@ -12,12 +12,13 @@ import AdminStudentList from "@/components/dashboard/AdminStudentList";
 import AdminCategories from "@/components/dashboard/AdminCategories";
 import AdminJudgingScoring from "@/components/dashboard/AdminJudgingScoring";
 import AdminGuestList from "@/components/dashboard/AdminGuestList";
+import AdminProctorList from "@/components/dashboard/AdminProctorList";
 
 export default function AdminDashboardPage() {
   const { user, userProfile } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "sras" | "judges" | "src" | "students" | "categories" | "scoring" | "guests"
+    "sras" | "judges" | "src" | "students" | "categories" | "scoring" | "guests" | "proctors"
   >("sras");
 
   const handleLogout = async () => {
@@ -129,6 +130,16 @@ export default function AdminDashboardPage() {
               >
                 Guests
               </button>
+              <button
+                onClick={() => setActiveTab("proctors")}
+                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                  activeTab === "proctors"
+                    ? "border-primary-blue text-primary-blue"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                Proctors
+              </button>
             </nav>
           </div>
 
@@ -206,7 +217,7 @@ export default function AdminDashboardPage() {
               </div>
               <AdminJudgingScoring />
             </div>
-          ) : (
+          ) : activeTab === "guests" ? (
             <div>
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
@@ -217,6 +228,18 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
               <AdminGuestList />
+            </div>
+          ) : (
+            <div>
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  Proctors
+                </h2>
+                <p className="text-gray-600">
+                  Create proctor accounts and assign them to a category. Proctors can mark the current presenter in real time, visible at <strong>njsrs.org/live</strong>.
+                </p>
+              </div>
+              <AdminProctorList />
             </div>
           )}
         </div>

@@ -8,9 +8,11 @@ export default function AdminCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [newName, setNewName] = useState("");
+  const [newRoom, setNewRoom] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
+  const [editingRoom, setEditingRoom] = useState("");
   const [savingId, setSavingId] = useState<string | null>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,8 +41,9 @@ export default function AdminCategories() {
     if (!name) return;
     setSubmitting(true);
     try {
-      await createCategory(name);
+      await createCategory(name, newRoom.trim());
       setNewName("");
+      setNewRoom("");
       await loadCategories();
     } catch (e) {
       console.error(e);
@@ -53,6 +56,7 @@ export default function AdminCategories() {
   const startEdit = (c: Category) => {
     setEditingId(c.id!);
     setEditingName(c.name);
+    setEditingRoom(c.room ?? "");
   };
 
   const cancelEdit = () => {
@@ -63,10 +67,11 @@ export default function AdminCategories() {
   const handleSaveEdit = async (id: string) => {
     const name = editingName.trim();
     if (!name) return;
+    const room = editingRoom.trim();
     setSavingId(id);
     try {
-      await updateCategory(id, name);
-      setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, name } : c)));
+      await updateCategory(id, name, room);
+      setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, name, room } : c)));
       setEditingId(null);
     } catch (e) {
       console.error(e);
@@ -107,6 +112,14 @@ export default function AdminCategories() {
             className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-gray-900 text-sm"
             onKeyDown={(e) => e.key === "Enter" && handleCreate()}
           />
+          <input
+            type="text"
+            value={newRoom}
+            onChange={(e) => setNewRoom(e.target.value)}
+            placeholder="Room (e.g. 204)"
+            className="w-32 rounded-md border border-gray-300 px-3 py-2 text-gray-900 text-sm"
+            onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+          />
           <button
             type="button"
             onClick={handleCreate}
@@ -142,6 +155,17 @@ export default function AdminCategories() {
                       }}
                       className="flex-1 rounded-md border border-primary-blue px-3 py-1 text-gray-900 text-sm focus:ring-2 focus:ring-primary-blue focus:outline-none"
                     />
+                    <input
+                      type="text"
+                      value={editingRoom}
+                      onChange={(e) => setEditingRoom(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSaveEdit(c.id!);
+                        if (e.key === "Escape") cancelEdit();
+                      }}
+                      placeholder="Room"
+                      className="w-24 rounded-md border border-primary-blue px-3 py-1 text-gray-900 text-sm focus:ring-2 focus:ring-primary-blue focus:outline-none"
+                    />
                     <button
                       type="button"
                       disabled={savingId === c.id || !editingName.trim()}
@@ -161,6 +185,11 @@ export default function AdminCategories() {
                 ) : (
                   <>
                     <span className="flex-1 text-gray-900 font-medium">{c.name}</span>
+                    {c.room && (
+                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded font-mono">
+                        Room {c.room}
+                      </span>
+                    )}
                     <button
                       type="button"
                       onClick={() => startEdit(c)}

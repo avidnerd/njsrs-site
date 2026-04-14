@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles?: ("sra" | "student" | "judge" | "fair_director" | "website_manager")[];
+  allowedRoles?: ("sra" | "student" | "judge" | "fair_director" | "website_manager" | "proctor")[];
 }
 
 export default function ProtectedRoute({
@@ -24,7 +24,12 @@ export default function ProtectedRoute({
       }
 
       
-      if (userProfile && userProfile.role !== "fair_director" && userProfile.role !== "website_manager") {
+      if (
+        userProfile &&
+        userProfile.role !== "fair_director" &&
+        userProfile.role !== "website_manager" &&
+        userProfile.role !== "proctor"
+      ) {
         if (!userProfile.emailVerified) {
           router.push("/verify");
           return;
@@ -41,6 +46,9 @@ export default function ProtectedRoute({
             break;
           case "judge":
             router.push("/dashboard/judge");
+            break;
+          case "proctor":
+            router.push("/dashboard/proctor");
             break;
           case "fair_director":
           case "website_manager":
@@ -67,7 +75,12 @@ export default function ProtectedRoute({
   }
 
   
-  if (userProfile && userProfile.role !== "fair_director" && userProfile.role !== "website_manager") {
+  if (
+    userProfile &&
+    userProfile.role !== "fair_director" &&
+    userProfile.role !== "website_manager" &&
+    userProfile.role !== "proctor"
+  ) {
     if (!userProfile.emailVerified) {
       return null;
     }

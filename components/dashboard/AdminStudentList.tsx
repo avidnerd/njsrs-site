@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAllStudents, getCategories, updateStudentCategory, batchAssignProjectIds } from "@/lib/firebase/database";
-import type { Student, Category } from "@/lib/firebase/database";
+import { getAllStudents, getCategories, updateStudentCategory, batchAssignProjectIds, getSRAsBySchool, updateStudentSRA } from "@/lib/firebase/database";
+import type { Student, Category, SRA } from "@/lib/firebase/database";
 import { Timestamp } from "firebase/firestore";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -40,6 +40,8 @@ export default function AdminStudentList() {
   const [resetMessage, setResetMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [assigningIds, setAssigningIds] = useState(false);
   const [assignMessage, setAssignMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [schoolSRAs, setSchoolSRAs] = useState<SRA[]>([]);
+  const [loadingSRAs, setLoadingSRAs] = useState(false);
 
   useEffect(() => {
     Promise.all([loadStudents(), loadCategories()]);
@@ -322,7 +324,21 @@ export default function AdminStudentList() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
-                        onClick={() => setSelectedStudent(student)}
+                        onClick={async () => {
+                          setSelectedStudent(student);
+                          setSchoolSRAs([]);
+                          if (student.schoolId) {
+                            setLoadingSRAs(true);
+                            try {
+                              const sras = await getSRAsBySchool(student.schoolId);
+                              setSchoolSRAs(sras);
+                            } catch (e) {
+                              console.error("Failed to load school SRAs:", e);
+                            } finally {
+                              setLoadingSRAs(false);
+                            }
+                          }
+                        }}
                         className="text-primary-blue hover:text-primary-darkBlue"
                       >
                         View Details
@@ -409,6 +425,53 @@ export default function AdminStudentList() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div className="border-b pb-4">
+                <h4 className="font-semibold mb-2">Sponsor (SRA) Assignment</h4>
+                <p className="text-sm text-gray-600 mb-2">
+                  Current sponsor:{" "}
+                  {selectedStudent.sraName
+                    ? <strong>{selectedStudent.sraName}</strong>
+                    : <span className="text-amber-600 font-medium">Not assigned</span>
+                  }
+                </p>
+                {loadingSRAs ? (
+                  <p className="text-sm text-gray-500">Loading sponsors…</p>
+                ) : schoolSRAs.length === 0 ? (
+                  <p className="text-sm text-gray-500">No sponsors registered for this school.</p>
+                ) : (
+                  <select
+                    value={selectedStudent.sraId ?? ""}
+                    onChange={async (e) => {
+                      const newSraId = e.target.value;
+                      const newSra = schoolSRAs.find((s) => s.id === newSraId);
+                      if (!selectedStudent.id) return;
+                      const newSraName = newSra ? `${newSra.firstName} ${newSra.lastName}` : "";
+                      try {
+                        await updateStudentSRA(selectedStudent.id, newSraId, newSraName);
+                        setSelectedStudent({ ...selectedStudent, sraId: newSraId, sraName: newSraName });
+                        setStudents((prev) =>
+                          prev.map((s) =>
+                            s.id === selectedStudent.id ? { ...s, sraId: newSraId, sraName: newSraName } : s
+                          )
+                        );
+                      } catch (err) {
+                        console.error(err);
+                        alert("Failed to update sponsor.");
+                      }
+                    }}
+                    className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+                  >
+                    <option value="">— Unassigned —</option>
+                    {schoolSRAs.map((sra) => (
+                      <option key={sra.id} value={sra.id}>
+                        {sra.firstName} {sra.lastName}
+                        {!sra.adminApproved ? " (pending approval)" : ""}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               {}

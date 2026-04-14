@@ -74,13 +74,14 @@ service cloud.firestore {
                      isSRA() ||
                      isAdmin() ||
                      hasJudgingAssignmentToStudent(studentId) ||
-                     getUserRole() == 'judge';
+                     getUserRole() == 'judge' ||
+                     getUserRole() == 'proctor';
       allow create: if isAuthenticated() && request.auth.uid == studentId;
       allow update: if isOwner(studentId) ||
                         isTeamMember() ||
                         (isSRA() && resource.data.sraId == request.auth.uid) ||
                         isAdmin();
-      allow list: if isAuthenticated() && (getUserRole() == 'student' || isSRA() || isAdmin() || getUserRole() == 'judge');
+      allow list: if isAuthenticated() && (getUserRole() == 'student' || isSRA() || isAdmin() || getUserRole() == 'judge' || getUserRole() == 'proctor');
     }
 
     match /categories/{categoryId} {
@@ -98,15 +99,18 @@ service cloud.firestore {
       allow get: if isAdmin() ||
         (isAuthenticated() && resource.data.judgeId == request.auth.uid);
       allow list: if isAdmin() ||
-        (isAuthenticated() && getUserRole() == 'judge');
+        (isAuthenticated() && getUserRole() == 'judge') ||
+        (isAuthenticated() && getUserRole() == 'proctor');
       allow create, update, delete: if isAdmin();
     }
 
     match /judgeScores/{scoreId} {
       allow get: if isAdmin() ||
-        (isAuthenticated() && getUserRole() == 'judge');
+        (isAuthenticated() && getUserRole() == 'judge') ||
+        (isAuthenticated() && getUserRole() == 'proctor');
       allow list: if isAdmin() ||
-        (isAuthenticated() && getUserRole() == 'judge');
+        (isAuthenticated() && getUserRole() == 'judge') ||
+        (isAuthenticated() && getUserRole() == 'proctor');
       allow create: if isAuthenticated() &&
         request.resource.data.judgeId == request.auth.uid;
       allow update: if isAuthenticated() &&
@@ -138,5 +142,19 @@ service cloud.firestore {
         resource.data.judgeId == request.auth.uid;
       allow delete: if isAdmin();
     }
+
+    match /proctors/{proctorId} {
+      // Admin manages proctor profiles; proctors can read their own
+      allow read: if isAdmin() || isOwner(proctorId);
+      allow write: if isAdmin();
+    }
+
+    match /liveStatus/{categoryId} {
+      // Public read so anyone can view the live board without logging in
+      allow read: if true;
+      // Proctors write their own category; admins can write any
+      allow write: if isAdmin() || getUserRole() == 'proctor';
+    }
+
   }
 }

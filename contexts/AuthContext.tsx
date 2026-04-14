@@ -8,7 +8,7 @@ import { snapshotExists } from "@/lib/firebase/database";
 
 interface UserProfile {
   email: string;
-  role: "sra" | "student" | "judge" | "fair_director" | "website_manager";
+  role: "sra" | "student" | "judge" | "fair_director" | "website_manager" | "proctor";
   createdAt: Date;
   profileComplete: boolean;
   emailVerified?: boolean;

@@ -1,5 +1,5 @@
 import { registerUser } from "./auth";
-import { createSRA, createJudge, createSchool, getSRAsBySchool, snapshotExists } from "./database";
+import { createSRA, createJudge, createSchool, snapshotExists } from "./database";
 import type { SRA, Student, Judge, School } from "./database";
 
 export async function registerSRA(
@@ -48,15 +48,8 @@ export async function registerSRA(
 export async function registerStudent(
   email: string,
   password: string,
-  studentData: Omit<Student, "id" | "email" | "createdAt" | "status" | "sraName">
+  studentData: Omit<Student, "id" | "email" | "createdAt" | "status" | "sraName" | "sraId"> & { sraId?: string }
 ): Promise<{ verificationCode: string }> {
-  const sras = await getSRAsBySchool(studentData.schoolId);
-  const selectedSRA = sras.find((sra) => sra.id === studentData.sraId);
-  
-  if (!selectedSRA) {
-    throw new Error("Selected SRA not found");
-  }
-
   const { userCredential, verificationCode } = await registerUser(email, password, "student");
 
   let teamMemberUserId: string | undefined;
@@ -87,8 +80,9 @@ export async function registerStudent(
 
   const payload = {
     ...studentData,
+    sraId: studentData.sraId ?? "",
     email,
-    sraName: `${selectedSRA.firstName} ${selectedSRA.lastName}`,
+    sraName: "",
     teamMemberUserId,
   };
 
