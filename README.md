@@ -13,13 +13,14 @@ The main roles are to: manage five distinct user roles through a single admin da
 3. [Admin Dashboard — Tab by Tab](#3-admin-dashboard--tab-by-tab)
 4. [Science Research Advisors (SRAs)](#4-science-research-advisors-sras)
 5. [Students](#5-students)
-6. [Judges](#6-judges)
-7. [Scoring System](#7-scoring-system)
-8. [Special Awards](#8-special-awards)
-9. [Proctors and the Live Monitor](#9-proctors-and-the-live-monitor)
-10. [Running the Event — Day-Of Checklist](#10-running-the-event--day-of-checklist)
-11. [Technical Setup and Deployment](#11-technical-setup-and-deployment)
-12. [Troubleshooting](#12-troubleshooting)
+6. [Team Projects](#6-team-projects)
+7. [Chaperones](#7-chaperones)
+8. [Judges](#8-judges)
+9. [Scoring System](#9-scoring-system)
+10. [Special Awards](#10-special-awards)
+11. [Proctors and the Live Monitor](#11-proctors-and-the-live-monitor)
+12. [Technical Setup and Deployment](#12-technical-setup-and-deployment)
+13. [Troubleshooting](#13-troubleshooting)
 
 ---
 
@@ -88,6 +89,7 @@ Navigate to `/dashboard/admin`. The dashboard has eight tabs:
 | Scoring | Assign judges to students; view standings; manage rounds |
 | Guests | View all guests registered by students, with ticket status |
 | Proctors | Create proctor accounts for event-day use |
+| Chaperones | View all chaperones registered by SRAs, grouped by school |
 
 ---
 
@@ -159,7 +161,64 @@ photoRelease        (nested object with parent signature)
 
 ---
 
-## 6. Judges
+## 6. Team Projects
+
+Students can register as a two-person team. The primary student registers normally and checks "This is a team project," then fills in their partner's name and email. There is no separate login for the team member — everything lives on the primary student's account.
+
+### How teams appear in the admin
+
+The **Students tab** shows each team as two rows:
+- **Primary row** — the student who registered. Shows a purple **Team — Primary** badge under their name.
+- **Member row** — immediately below, with a light purple background and a **Team — Member** badge. Shows the partner's name and email. The school, status, category, and project ID columns show the shared project's values.
+
+Clicking "View Details" or "View Team Details" on either row opens the primary student's detail modal, since all the project data (materials, SRA, category, project ID) lives on the primary record.
+
+### Assigning team projects
+
+Treat the primary student as the canonical record. Assign the SRA, category, and project ID to the primary student — it applies to the whole team. Both names will appear in the export CSV if you add them; otherwise, the primary name is the one on the project record.
+
+### Data fields (on `students/{uid}`)
+```
+isTeamProject          (boolean)
+teamMemberFirstName
+teamMemberLastName
+teamMemberEmail
+```
+
+---
+
+## 7. Chaperones
+
+SRAs can designate a chaperone for their school — typically a parent, guardian, or additional faculty member who will accompany students to the event. The chaperone is specified by the SRA through their dashboard, and the system sends an invitation link for the chaperone to confirm attendance and sign off electronically.
+
+### Admin view (Chaperones tab)
+
+The **Chaperones tab** shows all chaperones grouped by school. For each chaperone you can see:
+- The **SRA** they are linked to (name + email)
+- Chaperone **name**, **email** (clickable mailto link), and **phone**
+- **Invite Sent** badge — whether the invitation email was dispatched
+- **Confirmed** badge — whether the chaperone clicked the link and signed
+- **Confirmation date** — when they confirmed
+
+Use the search bar to filter by school name, SRA name, or chaperone name/email.
+
+### Data structure (nested inside `sras/{uid}`)
+
+Chaperone info is stored as a `chaperone` sub-object on the SRA document:
+```
+chaperone.name
+chaperone.email
+chaperone.phone
+chaperone.inviteToken    (used to generate the confirmation URL)
+chaperone.inviteSent     (boolean)
+chaperone.confirmed      (boolean)
+chaperone.confirmationDate
+chaperone.signature
+```
+
+---
+
+## 8. Judges
 
 ### What judges do
 Judges score student projects using a 100-point rubric across 10 criteria (Research Problem, Scientific Thought, Creativity, etc.). They are assigned to specific students in specific rounds. They can also rank their students within a group.
@@ -185,7 +244,7 @@ The judge dashboard shows a "View Rubric (PDF)" button at the top that links to 
 
 ---
 
-## 7. Scoring System
+## 9. Scoring System
 
 ### Rounds
 
@@ -251,7 +310,7 @@ totalScore, rank, notes, updatedAt
 
 ---
 
-## 8. Special Awards
+## 10. Special Awards
 
 Special awards are defined in `lib/firebase/specialAwards.ts` as a static list. Each award has:
 - A name and ID
@@ -268,7 +327,7 @@ Judges see each candidate and fill out the award-specific rubric. The highest sc
 
 ---
 
-## 9. Proctors and the Live Monitor
+## 11. Proctors and the Live Monitor
 
 ### What proctors do
 Proctors are event-day staff assigned to a single category. Their resonsibility is to monitor the judge presentations and keep track of timing and category judging. They have two responsibilities:
@@ -321,7 +380,7 @@ createdAt
 
 ---
 
-## 10. Technical Setup and Deployment
+## 12. Technical Setup and Deployment
 
 ### Local development
 
@@ -403,7 +462,7 @@ Requires `firebase-service-account.json` at the repo root (not committed to git)
 
 ---
 
-## 11. Troubleshooting
+## 13. Troubleshooting
 
 **Admin cannot reach `/dashboard/admin`**
 - Check `users/{uid}.role` in Firestore. It must be exactly `fair_director` or `website_manager` (no typos, no extra spaces).
