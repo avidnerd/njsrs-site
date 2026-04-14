@@ -351,6 +351,14 @@ export async function getSRAsBySchool(schoolId: string): Promise<SRA[]> {
   return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as SRA));
 }
 
+export async function getSRAsBySchoolName(schoolName: string): Promise<SRA[]> {
+  const dbInstance = ensureDb();
+  const srasRef = collection(dbInstance, "sras");
+  const q = query(srasRef, where("schoolName", "==", schoolName));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as SRA));
+}
+
 export async function createStudent(
   studentId: string,
   student: Omit<Student, "id" | "createdAt" | "status">

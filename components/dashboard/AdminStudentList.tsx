@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAllStudents, getCategories, updateStudentCategory, batchAssignProjectIds, getSRAsBySchool, updateStudentSRA } from "@/lib/firebase/database";
+import { getAllStudents, getCategories, updateStudentCategory, batchAssignProjectIds, getSRAsBySchool, getSRAsBySchoolName, updateStudentSRA } from "@/lib/firebase/database";
 import type { Student, Category, SRA } from "@/lib/firebase/database";
 import { Timestamp } from "firebase/firestore";
 import { useAuth } from "@/contexts/AuthContext";
@@ -275,16 +275,25 @@ export default function AdminStudentList() {
                   const openDetails = async () => {
                     setSelectedStudent(student);
                     setSchoolSRAs([]);
-                    if (student.schoolId) {
-                      setLoadingSRAs(true);
-                      try {
-                        const sras = await getSRAsBySchool(student.schoolId);
-                        setSchoolSRAs(sras);
-                      } catch (e) {
-                        console.error("Failed to load school SRAs:", e);
-                      } finally {
-                        setLoadingSRAs(false);
-                      }
+                    setLoadingSRAs(true);
+                    try {
+                      const queries: Promise<SRA[]>[] = [];
+                      if (student.schoolId) queries.push(getSRAsBySchool(student.schoolId));
+                      if (student.schoolName) queries.push(getSRAsBySchoolName(student.schoolName));
+                      const results = await Promise.all(queries);
+                      const merged = results.flat();
+                      // Deduplicate by id
+                      const seen = new Set<string>();
+                      const unique = merged.filter((s) => {
+                        if (!s.id || seen.has(s.id)) return false;
+                        seen.add(s.id);
+                        return true;
+                      });
+                      setSchoolSRAs(unique);
+                    } catch (e) {
+                      console.error("Failed to load school SRAs:", e);
+                    } finally {
+                      setLoadingSRAs(false);
                     }
                   };
 
