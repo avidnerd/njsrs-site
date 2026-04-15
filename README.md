@@ -1,6 +1,6 @@
 # NJSRS Website — Admin & Operations Manual
 
-This is the operations manual for the New Jersey Science Research Symposium (NJSRS) web platform. The system handles participant registration, judging assignments, score collection, and live event tracking. It is built on Next.js 14 with Firebase (Auth, Firestore, Storage) and deployed on Vercel. This can also be used as a content management system for other science fairs :D !
+This is the operations manual for the New Jersey Science Research Symposium (NJSRS) website and platform. The system handles participant registration, judging assignments, score collection, and live event tracking. It is built on Next.js 14 with Firebase (Auth, Firestore, Storage) and deployed on Vercel. This can also be used as a content management system for other science fairs :D !
 
 The main roles are to: manage five distinct user roles through a single admin dashboard, collect and aggregate judge scores across category and final rounds, track special award judging, and surface a real-time presenter board during the event. If you have any questions about the website or usage, please feel free to email me at subhi.k.steph@gmail.com
 
