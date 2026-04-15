@@ -633,6 +633,41 @@ export async function updateStudentGuests(studentId: string, guests: Guest[]): P
   await updateDoc(doc(dbInstance, "students", studentId), { guests });
 }
 
+export interface AdminGuest {
+  id?: string;
+  name: string;
+  email: string;
+  ticketSent: boolean;
+  sentAt?: Date | Timestamp;
+  createdAt: Date | Timestamp;
+}
+
+export async function addAdminGuest(name: string, email: string): Promise<string> {
+  const dbInstance = ensureDb();
+  const ref = doc(collection(dbInstance, "adminGuests"));
+  await setDoc(ref, {
+    name,
+    email,
+    ticketSent: false,
+    createdAt: Timestamp.now(),
+  });
+  return ref.id;
+}
+
+export async function markAdminGuestTicketSent(guestId: string): Promise<void> {
+  const dbInstance = ensureDb();
+  await updateDoc(doc(dbInstance, "adminGuests", guestId), {
+    ticketSent: true,
+    sentAt: Timestamp.now(),
+  });
+}
+
+export async function getAllAdminGuests(): Promise<AdminGuest[]> {
+  const dbInstance = ensureDb();
+  const snap = await getDocs(collection(dbInstance, "adminGuests"));
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as AdminGuest));
+}
+
 export async function requestSRCApproval(studentId: string): Promise<void> {
   const dbInstance = ensureDb();
   const studentRef = doc(dbInstance, "students", studentId);

@@ -156,5 +156,9 @@ service cloud.firestore {
       allow write: if isAdmin() || getUserRole() == 'proctor';
     }
 
+    match /adminGuests/{guestId} {
+      allow read, write: if isAdmin();
+    }
+
   }
 }
