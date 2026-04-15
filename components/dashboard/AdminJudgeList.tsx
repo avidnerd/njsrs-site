@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { getAllJudges, updateJudgeApproval, getCategories, updateJudgeCategories } from "@/lib/firebase/database";
 import type { Judge, Category } from "@/lib/firebase/database";
 import { getAllSpecialAwardAssignments, SPECIAL_AWARDS } from "@/lib/firebase/specialAwards";
+import { getAllAssignments } from "@/lib/firebase/judging";
 
 export default function AdminJudgeList() {
   const [judges, setJudges] = useState<Judge[]>([]);
@@ -13,10 +14,27 @@ export default function AdminJudgeList() {
   const [selectedJudge, setSelectedJudge] = useState<Judge | null>(null);
   // judgeId → award names
   const [specialAwardMap, setSpecialAwardMap] = useState<Record<string, string[]>>({});
+  // judgeId → category names they are actually assigned to in the category round
+  const [assignedCatMap, setAssignedCatMap] = useState<Record<string, Set<string>>>({});
 
   useEffect(() => {
-    Promise.all([loadJudges(), loadCategories(), loadSpecialAwards()]);
+    Promise.all([loadJudges(), loadCategories(), loadSpecialAwards(), loadCategoryAssignments()]);
   }, []);
+
+  const loadCategoryAssignments = async () => {
+    try {
+      const assignments = await getAllAssignments("category");
+      const map: Record<string, Set<string>> = {};
+      for (const a of assignments) {
+        if (!a.judgeId || !a.categoryId) continue;
+        if (!map[a.judgeId]) map[a.judgeId] = new Set();
+        map[a.judgeId].add(a.categoryId);
+      }
+      setAssignedCatMap(map);
+    } catch (e) {
+      console.error("Error loading category assignments:", e);
+    }
+  };
 
   const loadSpecialAwards = async () => {
     try {
@@ -147,7 +165,8 @@ export default function AdminJudgeList() {
                   remote_morning_only: { label: "Remote — AM Only", color: "bg-sky-100 text-sky-800" },
                 };
                 const avail = judge.availabilityApril18 ? availabilityLabel[judge.availabilityApril18] : null;
-                const catNames = (judge.categoryIds ?? [])
+                const assignedCatIds = assignedCatMap[judge.id!] ?? new Set<string>();
+                const catNames = [...assignedCatIds]
                   .map((id) => categories.find((c) => c.id === id)?.name)
                   .filter(Boolean) as string[];
                 const awardNames = specialAwardMap[judge.id!] ?? [];
