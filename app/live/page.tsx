@@ -50,7 +50,8 @@ export default function LiveMonitorPage() {
                 key={s.categoryId}
                 className="rounded-2xl border border-gray-700 bg-gray-900 px-6 py-5 shadow-lg"
               >
-                <div className="flex items-start justify-between gap-2 mb-1">
+                {/* Category header */}
+                <div className="flex items-start justify-between gap-2 mb-3">
                   <p className="text-xs font-semibold uppercase tracking-widest text-indigo-400">
                     {s.categoryName}
                   </p>
@@ -60,11 +61,32 @@ export default function LiveMonitorPage() {
                     </span>
                   )}
                 </div>
-                <p className="text-2xl font-bold text-white leading-tight">
-                  {s.projectId}
-                </p>
-                <p className="text-gray-300 text-sm mt-1 leading-snug">{s.projectTitle}</p>
-                <p className="text-gray-500 text-xs mt-3">{s.studentName}</p>
+
+                {/* Current presenter */}
+                <div>
+                  <span className="inline-block px-1.5 py-0.5 rounded text-xs font-bold bg-indigo-600 text-white uppercase tracking-wide mb-1.5">
+                    Now Presenting
+                  </span>
+                  <p className="text-2xl font-bold text-white leading-tight">{s.projectId}</p>
+                  <p className="text-gray-300 text-sm mt-0.5 leading-snug">{s.projectTitle}</p>
+                  <p className="text-gray-500 text-xs mt-2">{s.studentName}</p>
+                </div>
+
+                {/* Next presenter */}
+                {s.nextStudentName && (
+                  <div className="mt-4 pt-4 border-t border-gray-700">
+                    <span className="inline-block px-1.5 py-0.5 rounded text-xs font-bold bg-amber-500 text-white uppercase tracking-wide mb-1.5">
+                      Up Next
+                    </span>
+                    <p className="text-lg font-bold text-amber-300 leading-tight">
+                      {s.nextProjectId && <span className="mr-2">{s.nextProjectId}</span>}
+                      {s.nextStudentName}
+                    </p>
+                    {s.nextProjectTitle && (
+                      <p className="text-gray-400 text-sm mt-0.5 leading-snug">{s.nextProjectTitle}</p>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>

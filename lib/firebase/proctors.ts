@@ -4,7 +4,9 @@ import {
   getDoc,
   getDocs,
   setDoc,
+  updateDoc,
   deleteDoc,
+  deleteField,
   onSnapshot,
   query,
   where,
@@ -25,6 +27,7 @@ export interface ProctorProfile {
   email: string;
   categoryId: string;
   categoryName: string;
+  room?: string;
   createdAt: Date | Timestamp;
 }
 
@@ -36,6 +39,10 @@ export interface LivePresenter {
   projectTitle: string;
   studentName: string;
   updatedAt: Date | Timestamp;
+  // Next presenter (optional)
+  nextProjectId?: string;
+  nextProjectTitle?: string;
+  nextStudentName?: string;
 }
 
 // ── Proctor profiles ─────────────────────────────────────────────────────────
@@ -56,6 +63,11 @@ export async function getProctor(uid: string): Promise<ProctorProfile | null> {
 export async function deleteProctor(uid: string): Promise<void> {
   const dbInstance = ensureDb();
   await deleteDoc(doc(dbInstance, "proctors", uid));
+}
+
+export async function updateProctorRoom(uid: string, room: string): Promise<void> {
+  const dbInstance = ensureDb();
+  await updateDoc(doc(dbInstance, "proctors", uid), { room });
 }
 
 // ── Live presenter status ─────────────────────────────────────────────────────
@@ -83,6 +95,29 @@ export async function setLivePresenter(
 export async function clearLivePresenter(categoryId: string): Promise<void> {
   const dbInstance = ensureDb();
   await deleteDoc(doc(dbInstance, "liveStatus", categoryId));
+}
+
+export async function setNextPresenter(
+  categoryId: string,
+  projectId: string,
+  projectTitle: string,
+  studentName: string
+): Promise<void> {
+  const dbInstance = ensureDb();
+  await setDoc(
+    doc(dbInstance, "liveStatus", categoryId),
+    { nextProjectId: projectId, nextProjectTitle: projectTitle, nextStudentName: studentName },
+    { merge: true }
+  );
+}
+
+export async function clearNextPresenter(categoryId: string): Promise<void> {
+  const dbInstance = ensureDb();
+  await updateDoc(doc(dbInstance, "liveStatus", categoryId), {
+    nextProjectId: deleteField(),
+    nextProjectTitle: deleteField(),
+    nextStudentName: deleteField(),
+  });
 }
 
 export async function getAllLiveStatuses(): Promise<LivePresenter[]> {

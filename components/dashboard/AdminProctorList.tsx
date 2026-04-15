@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getAllProctors } from "@/lib/firebase/proctors";
+import { getAllProctors, updateProctorRoom } from "@/lib/firebase/proctors";
 import type { ProctorProfile } from "@/lib/firebase/proctors";
 import { getCategories } from "@/lib/firebase/database";
 import type { Category } from "@/lib/firebase/database";
@@ -16,6 +16,9 @@ export default function AdminProctorList() {
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  // proctorId → room draft value being edited
+  const [roomEdits, setRoomEdits] = useState<Record<string, string>>({});
+  const [savingRoom, setSavingRoom] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     firstName: "",
@@ -106,6 +109,21 @@ export default function AdminProctorList() {
       setMessage({ type: "err", text: e.message });
     } finally {
       setDeleting(null);
+    }
+  };
+
+  const handleSaveRoom = async (proctor: ProctorProfile) => {
+    if (!proctor.id) return;
+    const room = (roomEdits[proctor.id] ?? proctor.room ?? "").trim();
+    setSavingRoom(proctor.id);
+    try {
+      await updateProctorRoom(proctor.id, room);
+      setProctors((prev) => prev.map((p) => p.id === proctor.id ? { ...p, room } : p));
+      setRoomEdits((prev) => { const next = { ...prev }; delete next[proctor.id!]; return next; });
+    } catch (e: any) {
+      setMessage({ type: "err", text: e.message ?? "Failed to save room." });
+    } finally {
+      setSavingRoom(null);
     }
   };
 
@@ -225,24 +243,54 @@ export default function AdminProctorList() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {proctors.map((p) => (
-            <div key={p.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex justify-between items-start gap-4">
-              <div>
-                <p className="font-semibold text-gray-900">{p.firstName} {p.lastName}</p>
-                <p className="text-sm text-gray-600">{p.email}</p>
-                <span className="inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                  {p.categoryName || "No category"}
-                </span>
+          {proctors.map((p) => {
+            const roomDraft = roomEdits[p.id!] ?? p.room ?? "";
+            const isDirty = p.id! in roomEdits && roomEdits[p.id!] !== (p.room ?? "");
+            return (
+              <div key={p.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-3">
+                <div className="flex justify-between items-start gap-4">
+                  <div>
+                    <p className="font-semibold text-gray-900">{p.firstName} {p.lastName}</p>
+                    <p className="text-sm text-gray-600">{p.email}</p>
+                    <span className="inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                      {p.categoryName || "No category"}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleDelete(p)}
+                    disabled={deleting === p.id}
+                    className="text-sm text-red-600 hover:text-red-800 font-medium disabled:opacity-50 shrink-0"
+                  >
+                    {deleting === p.id ? "Deleting…" : "Delete"}
+                  </button>
+                </div>
+                {/* Room assignment */}
+                <div className="flex items-center gap-2 pt-1 border-t border-gray-100">
+                  <label className="text-xs font-medium text-gray-500 whitespace-nowrap">Room</label>
+                  <input
+                    type="text"
+                    value={roomDraft}
+                    placeholder="e.g. 204"
+                    onChange={(e) => setRoomEdits((prev) => ({ ...prev, [p.id!]: e.target.value }))}
+                    onKeyDown={(e) => { if (e.key === "Enter") handleSaveRoom(p); }}
+                    className="flex-1 min-w-0 px-2 py-1 border border-gray-300 rounded-md text-sm text-gray-900 focus:ring-2 focus:ring-primary-blue focus:outline-none"
+                  />
+                  {isDirty && (
+                    <button
+                      onClick={() => handleSaveRoom(p)}
+                      disabled={savingRoom === p.id}
+                      className="px-3 py-1 rounded-md bg-primary-blue text-white text-xs font-medium hover:opacity-90 disabled:opacity-50 shrink-0"
+                    >
+                      {savingRoom === p.id ? "Saving…" : "Save"}
+                    </button>
+                  )}
+                  {!isDirty && p.room && (
+                    <span className="text-xs text-green-700 font-medium shrink-0">Saved</span>
+                  )}
+                </div>
               </div>
-              <button
-                onClick={() => handleDelete(p)}
-                disabled={deleting === p.id}
-                className="text-sm text-red-600 hover:text-red-800 font-medium disabled:opacity-50 shrink-0"
-              >
-                {deleting === p.id ? "Deleting…" : "Delete"}
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

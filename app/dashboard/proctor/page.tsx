@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { logoutUser } from "@/lib/firebase/auth";
-import { getProctor, setLivePresenter, clearLivePresenter } from "@/lib/firebase/proctors";
+import { getProctor, setLivePresenter, clearLivePresenter, setNextPresenter, clearNextPresenter } from "@/lib/firebase/proctors";
 import type { ProctorProfile } from "@/lib/firebase/proctors";
 import { getAllStudents, getAllJudges, getCategories } from "@/lib/firebase/database";
 import type { Student, Judge, Category } from "@/lib/firebase/database";
@@ -27,6 +27,7 @@ export default function ProctorDashboardPage() {
   // `${judgeId}_${studentId}` → JudgeScoreDoc
   const [scoreSet, setScoreSet] = useState<Set<string>>(new Set());
   const [currentPresenterId, setCurrentPresenterId] = useState<string | null>(null);
+  const [nextPresenterId, setNextPresenterId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<ActiveTab>("presenter");
   const [loading, setLoading] = useState(true);
   const [setting, setSetting] = useState(false);
@@ -50,7 +51,8 @@ export default function ProctorDashboardPage() {
       setProctor(proctorData);
 
       const cat = allCategories.find((c) => c.id === proctorData?.categoryId);
-      setCategoryRoom(cat?.room ?? "");
+      // Proctor's own room takes precedence over the category-level room
+      setCategoryRoom(proctorData?.room ?? cat?.room ?? "");
 
       const categoryStudents = proctorData?.categoryId
         ? allStudents.filter((s) => s.categoryId === proctorData.categoryId && s.status === "approved")
@@ -127,6 +129,56 @@ export default function ProctorDashboardPage() {
     }
   };
 
+  const handleSetNextPresenter = async (student: Student) => {
+    if (!proctor || !student.id) return;
+    setSetting(true);
+    setMessage(null);
+    try {
+      await setNextPresenter(
+        proctor.categoryId,
+        student.projectId ?? student.id,
+        student.projectTitle ?? "Untitled",
+        `${student.firstName} ${student.lastName}`
+      );
+      setNextPresenterId(student.id);
+      // Alert the student by email
+      if (student.email) {
+        fetch("/api/alert-next-presenter", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            studentName: `${student.firstName} ${student.lastName}`,
+            studentEmail: student.email,
+            projectId: student.projectId ?? "",
+            projectTitle: student.projectTitle ?? "",
+            categoryName: proctor.categoryName,
+            room: categoryRoom,
+          }),
+        }).catch(() => {});
+      }
+      setMessage({ type: "ok", text: `Next presenter set: ${student.projectId ?? ""} — ${student.projectTitle}. Alert sent to ${student.email}.` });
+    } catch (e: any) {
+      setMessage({ type: "err", text: e.message || "Failed to set next presenter" });
+    } finally {
+      setSetting(false);
+    }
+  };
+
+  const handleClearNextPresenter = async () => {
+    if (!proctor) return;
+    setSetting(true);
+    setMessage(null);
+    try {
+      await clearNextPresenter(proctor.categoryId);
+      setNextPresenterId(null);
+      setMessage({ type: "ok", text: "Next presenter cleared." });
+    } catch (e: any) {
+      setMessage({ type: "err", text: e.message || "Failed to clear next presenter" });
+    } finally {
+      setSetting(false);
+    }
+  };
+
   const handleLogout = async () => {
     await logoutUser();
     router.push("/");
@@ -187,14 +239,27 @@ export default function ProctorDashboardPage() {
                     {students.length} approved student{students.length !== 1 ? "s" : ""} in this category
                   </p>
                 </div>
-                {currentPresenterId && activeTab === "presenter" && (
-                  <button
-                    onClick={handleClearPresenter}
-                    disabled={setting}
-                    className="px-4 py-2 rounded-lg bg-white border border-indigo-300 text-indigo-700 text-sm font-medium hover:bg-indigo-50 disabled:opacity-50 shrink-0"
-                  >
-                    Clear presenter
-                  </button>
+                {activeTab === "presenter" && (currentPresenterId || nextPresenterId) && (
+                  <div className="flex gap-2 flex-wrap">
+                    {currentPresenterId && (
+                      <button
+                        onClick={handleClearPresenter}
+                        disabled={setting}
+                        className="px-4 py-2 rounded-lg bg-white border border-indigo-300 text-indigo-700 text-sm font-medium hover:bg-indigo-50 disabled:opacity-50 shrink-0"
+                      >
+                        Clear presenter
+                      </button>
+                    )}
+                    {nextPresenterId && (
+                      <button
+                        onClick={handleClearNextPresenter}
+                        disabled={setting}
+                        className="px-4 py-2 rounded-lg bg-white border border-amber-300 text-amber-700 text-sm font-medium hover:bg-amber-50 disabled:opacity-50 shrink-0"
+                      >
+                        Clear next
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
 
@@ -243,18 +308,30 @@ export default function ProctorDashboardPage() {
                   <div className="space-y-4">
                     {sortedStudents.map((s) => {
                       const isPresenting = currentPresenterId === s.id;
+                      const isNext = nextPresenterId === s.id;
                       return (
                         <div
                           key={s.id}
                           className={`bg-white rounded-xl border shadow-sm overflow-hidden ${
-                            isPresenting ? "border-indigo-400 ring-2 ring-indigo-300" : "border-gray-200"
+                            isPresenting ? "border-indigo-400 ring-2 ring-indigo-300"
+                            : isNext ? "border-amber-400 ring-2 ring-amber-200"
+                            : "border-gray-200"
                           }`}
                         >
-                          <div className={`px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b ${isPresenting ? "bg-indigo-50 border-indigo-200" : "bg-gray-50 border-gray-200"}`}>
+                          <div className={`px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b ${
+                            isPresenting ? "bg-indigo-50 border-indigo-200"
+                            : isNext ? "bg-amber-50 border-amber-200"
+                            : "bg-gray-50 border-gray-200"
+                          }`}>
                             <div>
                               {isPresenting && (
                                 <span className="inline-block mb-1 px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-600 text-white uppercase tracking-wide">
                                   Now presenting
+                                </span>
+                              )}
+                              {isNext && (
+                                <span className="inline-block mb-1 px-2 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-white uppercase tracking-wide">
+                                  Up next — alert sent
                                 </span>
                               )}
                               <h3 className="font-semibold text-gray-900">
@@ -267,17 +344,32 @@ export default function ProctorDashboardPage() {
                                 <p className="text-sm text-gray-600 mt-0.5">{s.projectTitle}</p>
                               )}
                             </div>
-                            <button
-                              onClick={() => handleSetPresenter(s)}
-                              disabled={setting || isPresenting}
-                              className={`px-4 py-2 rounded-lg text-sm font-semibold shrink-0 ${
-                                isPresenting
-                                  ? "bg-indigo-100 text-indigo-700 cursor-default"
-                                  : "bg-primary-blue text-white hover:opacity-90 disabled:opacity-50"
-                              }`}
-                            >
-                              {isPresenting ? "Currently presenting" : "Set as presenter"}
-                            </button>
+                            <div className="flex gap-2 flex-wrap shrink-0">
+                              <button
+                                onClick={() => handleSetPresenter(s)}
+                                disabled={setting || isPresenting}
+                                className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+                                  isPresenting
+                                    ? "bg-indigo-100 text-indigo-700 cursor-default"
+                                    : "bg-primary-blue text-white hover:opacity-90 disabled:opacity-50"
+                                }`}
+                              >
+                                {isPresenting ? "Currently presenting" : "Set as presenter"}
+                              </button>
+                              {!isPresenting && (
+                                <button
+                                  onClick={() => isNext ? handleClearNextPresenter() : handleSetNextPresenter(s)}
+                                  disabled={setting}
+                                  className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+                                    isNext
+                                      ? "bg-amber-100 text-amber-700 hover:bg-amber-200 disabled:opacity-50"
+                                      : "bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50"
+                                  }`}
+                                >
+                                  {isNext ? "Clear next" : "Set as next"}
+                                </button>
+                              )}
+                            </div>
                           </div>
 
                           <div className="px-5 py-4 flex flex-wrap gap-3">
