@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { getAllJudges, updateJudgeApproval, getCategories, updateJudgeCategories } from "@/lib/firebase/database";
 import type { Judge, Category } from "@/lib/firebase/database";
+import { getAllSpecialAwardAssignments, SPECIAL_AWARDS } from "@/lib/firebase/specialAwards";
 
 export default function AdminJudgeList() {
   const [judges, setJudges] = useState<Judge[]>([]);
@@ -10,10 +11,28 @@ export default function AdminJudgeList() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "approved" | "pending">("all");
   const [selectedJudge, setSelectedJudge] = useState<Judge | null>(null);
+  // judgeId → award names
+  const [specialAwardMap, setSpecialAwardMap] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
-    Promise.all([loadJudges(), loadCategories()]);
+    Promise.all([loadJudges(), loadCategories(), loadSpecialAwards()]);
   }, []);
+
+  const loadSpecialAwards = async () => {
+    try {
+      const assignments = await getAllSpecialAwardAssignments();
+      const map: Record<string, string[]> = {};
+      for (const a of assignments) {
+        const award = SPECIAL_AWARDS.find((aw) => aw.id === a.awardId);
+        if (!award) continue;
+        if (!map[a.judgeId]) map[a.judgeId] = [];
+        map[a.judgeId].push(award.name);
+      }
+      setSpecialAwardMap(map);
+    } catch (e) {
+      console.error("Error loading special award assignments:", e);
+    }
+  };
 
   const loadCategories = async () => {
     try {
@@ -120,11 +139,45 @@ export default function AdminJudgeList() {
                   {judge.adminApproved ? "APPROVED" : "PENDING"}
                 </span>
               </div>
-              {(judge.categoryIds?.length ?? 0) > 0 && (
-                <p className="text-xs text-gray-500 mb-2">
-                  Categories: {judge.categoryIds!.map((id) => categories.find((c) => c.id === id)?.name).filter(Boolean).join(", ") || "—"}
-                </p>
-              )}
+              {/* ── Badges ── */}
+              {(() => {
+                const availabilityLabel: Record<string, { label: string; color: string }> = {
+                  in_person_full_day: { label: "In Person — Full Day", color: "bg-green-100 text-green-800" },
+                  in_person_morning_only: { label: "In Person — AM Only", color: "bg-teal-100 text-teal-800" },
+                  remote_morning_only: { label: "Remote — AM Only", color: "bg-sky-100 text-sky-800" },
+                };
+                const avail = judge.availabilityApril18 ? availabilityLabel[judge.availabilityApril18] : null;
+                const catNames = (judge.categoryIds ?? [])
+                  .map((id) => categories.find((c) => c.id === id)?.name)
+                  .filter(Boolean) as string[];
+                const awardNames = specialAwardMap[judge.id!] ?? [];
+                const isFinal = judge.finalRoundJudge === true;
+                if (!avail && catNames.length === 0 && awardNames.length === 0 && !isFinal) return null;
+                return (
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {avail && (
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${avail.color}`}>
+                        {avail.label}
+                      </span>
+                    )}
+                    {isFinal && (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
+                        Final Round
+                      </span>
+                    )}
+                    {catNames.map((name) => (
+                      <span key={name} className="px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800">
+                        {name}
+                      </span>
+                    ))}
+                    {awardNames.map((name) => (
+                      <span key={name} className="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
+                        {name}
+                      </span>
+                    ))}
+                  </div>
+                );
+              })()}
               <div className="space-y-2 mb-4">
                 {judge.highestDegree && (
                   <p className="text-sm text-gray-600">
