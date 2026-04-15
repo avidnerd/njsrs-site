@@ -152,7 +152,6 @@ export default function AdminJudgeList() {
                   .filter(Boolean) as string[];
                 const awardNames = specialAwardMap[judge.id!] ?? [];
                 const isFinal = judge.finalRoundJudge === true;
-                if (!avail && catNames.length === 0 && awardNames.length === 0 && !isFinal) return null;
                 return (
                   <div className="flex flex-wrap gap-1.5 mb-3">
                     {avail && (
@@ -165,11 +164,15 @@ export default function AdminJudgeList() {
                         Final Round
                       </span>
                     )}
-                    {catNames.map((name) => (
+                    {catNames.length > 0 ? catNames.map((name) => (
                       <span key={name} className="px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800">
                         {name}
                       </span>
-                    ))}
+                    )) : (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                        Not Assigned
+                      </span>
+                    )}
                     {awardNames.map((name) => (
                       <span key={name} className="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
                         {name}
