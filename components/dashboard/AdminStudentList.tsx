@@ -112,6 +112,7 @@ export default function AdminStudentList() {
 
   const exportToCSV = () => {
     const headers = [
+      "Role",
       "First Name",
       "Last Name",
       "Email",
@@ -129,14 +130,19 @@ export default function AdminStudentList() {
       "Project ID",
     ];
 
-    const rows = students.map((student) => {
+    const rows = students.flatMap((student) => {
       const domains = student.primaryScientificDomain || [];
       const methodologies = student.experimentalMethodology || [];
       const realWorldFocus = student.primaryRealWorldFocus || "";
       const otherFocus = student.primaryRealWorldFocusOther || "";
       const finalFocus = realWorldFocus === "Other" && otherFocus ? otherFocus : realWorldFocus;
       const description = (student.projectDescription || "").replace(/"/g, '""').replace(/\r?\n/g, " ");
-      return [
+      const categoryName = (categories.find((c) => c.id === student.categoryId)?.name) || "";
+      const projectId = student.projectId || "";
+      const status = student.status || "pending";
+
+      const primaryRow = [
+        student.isTeamProject ? "Team — Primary" : "Individual",
         student.firstName || "",
         student.lastName || "",
         student.email || "",
@@ -149,10 +155,34 @@ export default function AdminStudentList() {
         methodologies.join("; ") || "",
         finalFocus || "",
         student.shirtSize || "",
-        student.status || "pending",
-        (categories.find((c) => c.id === student.categoryId)?.name) || "",
-        student.projectId || "",
+        status,
+        categoryName,
+        projectId,
       ];
+
+      if (student.isTeamProject && student.teamMemberFirstName) {
+        const memberRow = [
+          "Team — Member",
+          student.teamMemberFirstName || "",
+          student.teamMemberLastName || "",
+          student.teamMemberEmail || "",
+          student.schoolName || "",
+          "", // grade not collected for team member
+          student.projectTitle || "",
+          description,
+          domains[0] || "",
+          domains[1] || "",
+          methodologies.join("; ") || "",
+          finalFocus || "",
+          student.teamMemberShirtSize || "",
+          status,
+          categoryName,
+          projectId,
+        ];
+        return [primaryRow, memberRow];
+      }
+
+      return [primaryRow];
     });
 
     const csvContent = [
