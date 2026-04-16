@@ -105,7 +105,7 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
     }));
   }, [assignments, phase, categoryNames]);
 
-  // Initialize orderedGroups when grouped changes (preserving existing order)
+  // Initialize orderedGroups when grouped/students change (preserving existing order)
   useEffect(() => {
     if (grouped.length === 0) return;
     setOrderedGroups((prev) => {
@@ -114,7 +114,15 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
         const existing = prev[group.key];
         const ids = group.items.map((a) => a.studentId);
         if (!existing) {
-          next[group.key] = ids;
+          // Sort by presentationOrder on first load
+          next[group.key] = [...ids].sort((a, b) => {
+            const sa = students.get(a);
+            const sb = students.get(b);
+            const oa = sa?.presentationOrder ?? 9999;
+            const ob = sb?.presentationOrder ?? 9999;
+            if (oa !== ob) return oa - ob;
+            return (sa?.projectId ?? "").localeCompare(sb?.projectId ?? "");
+          });
         } else {
           // Keep order of existing, add any new, remove any gone
           const idSet = new Set(ids);
@@ -125,7 +133,7 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
       }
       return next;
     });
-  }, [grouped]);
+  }, [grouped, students]);
 
   const updateRubric = (studentId: string, key: keyof JudgingRubricScores, val: number) => {
     setRubrics((prev) => ({

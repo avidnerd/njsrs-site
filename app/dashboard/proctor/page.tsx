@@ -184,7 +184,12 @@ export default function ProctorDashboardPage() {
     router.push("/");
   };
 
-  const sortedStudents = [...students].sort((a, b) => (a.projectId ?? "").localeCompare(b.projectId ?? ""));
+  const sortedStudents = [...students].sort((a, b) => {
+    const oa = a.presentationOrder ?? 9999;
+    const ob = b.presentationOrder ?? 9999;
+    if (oa !== ob) return oa - ob;
+    return (a.projectId ?? "").localeCompare(b.projectId ?? "");
+  });
 
   // Summary counts for the scoring tab header
   const totalAssignments = Array.from(assignmentsByStudent.values()).reduce((s, a) => s + a.length, 0);

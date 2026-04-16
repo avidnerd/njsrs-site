@@ -99,6 +99,7 @@ export interface Student {
   categoryId?: string;
   guests?: Guest[];
   projectId?: string;
+  presentationOrder?: number;
 }
 
 export interface Guest {
@@ -850,6 +851,15 @@ export async function updateStudentCategory(studentId: string, categoryId: strin
   const dbInstance = ensureDb();
   const studentRef = doc(dbInstance, "students", studentId);
   await updateDoc(studentRef, { categoryId: categoryId || null });
+}
+
+export async function batchSetPresentationOrders(updates: { id: string; order: number }[]): Promise<void> {
+  const dbInstance = ensureDb();
+  await Promise.all(
+    updates.map(({ id, order }) =>
+      updateDoc(doc(dbInstance, "students", id), { presentationOrder: order })
+    )
+  );
 }
 
 export async function updateJudgeCategories(judgeId: string, categoryIds: string[]): Promise<void> {

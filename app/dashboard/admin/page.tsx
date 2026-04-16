@@ -14,12 +14,13 @@ import AdminJudgingScoring from "@/components/dashboard/AdminJudgingScoring";
 import AdminGuestList from "@/components/dashboard/AdminGuestList";
 import AdminProctorList from "@/components/dashboard/AdminProctorList";
 import AdminChaperoneList from "@/components/dashboard/AdminChaperoneList";
+import AdminPresentationOrder from "@/components/dashboard/AdminPresentationOrder";
 
 export default function AdminDashboardPage() {
   const { user, userProfile } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "sras" | "judges" | "src" | "students" | "categories" | "scoring" | "guests" | "proctors" | "chaperones"
+    "sras" | "judges" | "src" | "students" | "categories" | "scoring" | "guests" | "proctors" | "chaperones" | "order"
   >("sras");
 
   const handleLogout = async () => {
@@ -151,6 +152,16 @@ export default function AdminDashboardPage() {
               >
                 Chaperones
               </button>
+              <button
+                onClick={() => setActiveTab("order")}
+                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                  activeTab === "order"
+                    ? "border-primary-blue text-primary-blue"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                Presentation Order
+              </button>
             </nav>
           </div>
 
@@ -252,7 +263,7 @@ export default function AdminDashboardPage() {
               </div>
               <AdminProctorList />
             </div>
-          ) : (
+          ) : activeTab === "chaperones" ? (
             <div>
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
@@ -263,6 +274,18 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
               <AdminChaperoneList />
+            </div>
+          ) : (
+            <div>
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  Presentation Order
+                </h2>
+                <p className="text-gray-600">
+                  Set the order in which students present within each category. This order is shown on the proctor dashboard and on each judge&apos;s scoring panel.
+                </p>
+              </div>
+              <AdminPresentationOrder />
             </div>
           )}
         </div>
