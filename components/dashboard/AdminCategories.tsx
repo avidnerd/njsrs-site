@@ -9,10 +9,12 @@ export default function AdminCategories() {
   const [loading, setLoading] = useState(true);
   const [newName, setNewName] = useState("");
   const [newRoom, setNewRoom] = useState("");
+  const [newPrefix, setNewPrefix] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
   const [editingRoom, setEditingRoom] = useState("");
+  const [editingPrefix, setEditingPrefix] = useState("");
   const [savingId, setSavingId] = useState<string | null>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,9 +43,10 @@ export default function AdminCategories() {
     if (!name) return;
     setSubmitting(true);
     try {
-      await createCategory(name, newRoom.trim());
+      await createCategory(name, newRoom.trim(), newPrefix.trim().toUpperCase());
       setNewName("");
       setNewRoom("");
+      setNewPrefix("");
       await loadCategories();
     } catch (e) {
       console.error(e);
@@ -57,6 +60,7 @@ export default function AdminCategories() {
     setEditingId(c.id!);
     setEditingName(c.name);
     setEditingRoom(c.room ?? "");
+    setEditingPrefix(c.prefix ?? "");
   };
 
   const cancelEdit = () => {
@@ -68,10 +72,11 @@ export default function AdminCategories() {
     const name = editingName.trim();
     if (!name) return;
     const room = editingRoom.trim();
+    const prefix = editingPrefix.trim().toUpperCase();
     setSavingId(id);
     try {
-      await updateCategory(id, name, room);
-      setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, name, room } : c)));
+      await updateCategory(id, name, room, prefix);
+      setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, name, room, prefix } : c)));
       setEditingId(null);
     } catch (e) {
       console.error(e);
@@ -103,13 +108,22 @@ export default function AdminCategories() {
         <p className="text-sm text-gray-600 mb-4">
           Categories are used to assign students and judges (e.g. by discipline or track). Create categories here, then assign students and judges under All Students and Judges.
         </p>
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           <input
             type="text"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Category name (e.g. Life Sciences)"
-            className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-gray-900 text-sm"
+            className="flex-1 min-w-48 rounded-md border border-gray-300 px-3 py-2 text-gray-900 text-sm"
+            onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+          />
+          <input
+            type="text"
+            value={newPrefix}
+            onChange={(e) => setNewPrefix(e.target.value.toUpperCase())}
+            placeholder="ID prefix (e.g. LS)"
+            className="w-32 rounded-md border border-gray-300 px-3 py-2 text-gray-900 text-sm font-mono"
+            maxLength={6}
             onKeyDown={(e) => e.key === "Enter" && handleCreate()}
           />
           <input
@@ -117,7 +131,7 @@ export default function AdminCategories() {
             value={newRoom}
             onChange={(e) => setNewRoom(e.target.value)}
             placeholder="Room (e.g. 204)"
-            className="w-32 rounded-md border border-gray-300 px-3 py-2 text-gray-900 text-sm"
+            className="w-28 rounded-md border border-gray-300 px-3 py-2 text-gray-900 text-sm"
             onKeyDown={(e) => e.key === "Enter" && handleCreate()}
           />
           <button
@@ -157,6 +171,18 @@ export default function AdminCategories() {
                     />
                     <input
                       type="text"
+                      value={editingPrefix}
+                      onChange={(e) => setEditingPrefix(e.target.value.toUpperCase())}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSaveEdit(c.id!);
+                        if (e.key === "Escape") cancelEdit();
+                      }}
+                      placeholder="Prefix"
+                      maxLength={6}
+                      className="w-20 rounded-md border border-primary-blue px-3 py-1 text-gray-900 text-sm font-mono focus:ring-2 focus:ring-primary-blue focus:outline-none"
+                    />
+                    <input
+                      type="text"
                       value={editingRoom}
                       onChange={(e) => setEditingRoom(e.target.value)}
                       onKeyDown={(e) => {
@@ -185,6 +211,13 @@ export default function AdminCategories() {
                 ) : (
                   <>
                     <span className="flex-1 text-gray-900 font-medium">{c.name}</span>
+                    {c.prefix ? (
+                      <span className="text-xs text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded font-mono border border-indigo-200">
+                        {c.prefix}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-400 italic">auto</span>
+                    )}
                     {c.room && (
                       <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded font-mono">
                         Room {c.room}

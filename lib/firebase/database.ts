@@ -268,6 +268,7 @@ export interface Category {
   name: string;
   order?: number;
   room?: string;
+  prefix?: string; // project ID prefix override (e.g. "CB"); auto-derived if not set
 }
 
 export async function createSchool(school: Omit<School, "id" | "createdAt">): Promise<string> {
@@ -580,10 +581,15 @@ export async function updateStudentMaterials(
   await updateDoc(studentRef, updates);
 }
 
+const STOP_WORDS = new Set(["and", "or", "of", "the", "in", "for", "to", "a", "an", "with", "by", "at"]);
+
 /** Derive a two-letter prefix from a category name (e.g. "Computational Biology" → "CB"). */
 function categoryPrefix(name: string): string {
   const cleaned = name.replace(/\(.*?\)/g, "").trim();
-  const words = cleaned.split(/[\s,]+/).filter((w) => /^[A-Za-z]/.test(w));
+  const words = cleaned
+    .split(/[\s,]+/)
+    .filter((w) => /^[A-Za-z]/.test(w) && !STOP_WORDS.has(w.toLowerCase()));
+  if (words.length === 0) return name.slice(0, 2).toUpperCase();
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();
 }
@@ -612,7 +618,7 @@ export async function batchAssignProjectIds(
   for (const [catId, group] of byCat) {
     const cat = catMap.get(catId);
     if (!cat) continue;
-    const prefix = categoryPrefix(cat.name);
+    const prefix = cat.prefix?.trim().toUpperCase() || categoryPrefix(cat.name);
     // Sort alphabetically within category
     const sorted = [...group].sort((a, b) => {
       const last = (a.lastName ?? "").localeCompare(b.lastName ?? "");
@@ -815,19 +821,19 @@ export async function getCategories(): Promise<Category[]> {
     .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 }
 
-export async function createCategory(name: string, room?: string): Promise<string> {
+export async function createCategory(name: string, room?: string, prefix?: string): Promise<string> {
   const dbInstance = ensureDb();
   const categoriesRef = collection(dbInstance, "categories");
   const snapshot = await getDocs(categoriesRef);
   const order = snapshot.size;
   const newRef = doc(categoriesRef);
-  await setDoc(newRef, { name, order, room: room ?? "" });
+  await setDoc(newRef, { name, order, room: room ?? "", prefix: prefix ?? "" });
   return newRef.id;
 }
 
-export async function updateCategory(categoryId: string, name: string, room?: string): Promise<void> {
+export async function updateCategory(categoryId: string, name: string, room?: string, prefix?: string): Promise<void> {
   const dbInstance = ensureDb();
-  await updateDoc(doc(dbInstance, "categories", categoryId), { name, room: room ?? "" });
+  await updateDoc(doc(dbInstance, "categories", categoryId), { name, room: room ?? "", prefix: prefix ?? "" });
 }
 
 export async function deleteCategory(categoryId: string): Promise<void> {
