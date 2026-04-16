@@ -22,6 +22,7 @@ import {
   aggregateCategoryResults,
   aggregateFinalResults,
   promoteFirstPlaceToFinal,
+  promoteStudentsToFinal,
   exportScoresToCsv,
   exportDetailScoresToCsv,
   type JudgingPhase,
@@ -160,6 +161,11 @@ export default function AdminJudgingScoring() {
   const [finalBusyId, setFinalBusyId] = useState<string | null>(null);
   const [promotingFinalists, setPromotingFinalists] = useState(false);
   const [promoteResult, setPromoteResult] = useState<string | null>(null);
+
+  // Manual final round selection (category results tab)
+  const [selectedForFinal, setSelectedForFinal] = useState<Set<string>>(new Set());
+  const [promotingManual, setPromotingManual] = useState(false);
+  const [manualPromoteResult, setManualPromoteResult] = useState<string | null>(null);
 
   const toggleFinalJudge = async (judge: Judge, on: boolean) => {
     setFinalBusyId(judge.id!);
@@ -986,7 +992,37 @@ export default function AdminJudgingScoring() {
         </div>
       )}
 
-      {subTab === "category" && (
+      {subTab === "category" && (() => {
+        const alreadyInFinal = new Set(
+          assignments.filter((a) => a.phase === "final").map((a) => a.studentId)
+        );
+
+        const handleManualPromote = async () => {
+          const ids = [...selectedForFinal].filter((id) => !alreadyInFinal.has(id));
+          if (ids.length === 0) {
+            setManualPromoteResult("All selected students are already in the final round.");
+            return;
+          }
+          const finalJudgeIds = judges.filter((j) => j.finalRoundJudge && j.id).map((j) => j.id!);
+          if (finalJudgeIds.length === 0) {
+            setManualPromoteResult("No final round judges are assigned yet. Go to the Final Round tab first.");
+            return;
+          }
+          setPromotingManual(true);
+          setManualPromoteResult(null);
+          try {
+            await promoteStudentsToFinal(ids, finalJudgeIds);
+            await loadAll();
+            setSelectedForFinal(new Set());
+            setManualPromoteResult(`${ids.length} student(s) promoted to the final round.`);
+          } catch (e: unknown) {
+            setManualPromoteResult(e instanceof Error ? e.message : "Promotion failed");
+          } finally {
+            setPromotingManual(false);
+          }
+        };
+
+        return (
         <div className="space-y-6">
           <div className="flex flex-wrap gap-3 items-center">
             <button
@@ -1086,31 +1122,84 @@ export default function AdminJudgingScoring() {
                         <th className="p-3">Avg score</th>
                         <th className="p-3">Avg rank</th>
                         <th className="p-3">Judges</th>
+                        <th className="p-3 text-center">Final</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {rows.map((r, idx) => (
-                        <tr key={r.studentId} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="p-3 font-medium text-gray-500">
-                            {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : idx + 1}
-                          </td>
-                          <td className="p-3 font-medium text-gray-900">{r.studentName}</td>
-                          <td className="p-3 text-gray-700 max-w-xs truncate">{r.projectTitle || "—"}</td>
-                          <td className="p-3 tabular-nums">{r.avgTotalScore.toFixed(2)}</td>
-                          <td className="p-3 tabular-nums">
-                            {r.avgRank != null ? r.avgRank.toFixed(2) : "—"}
-                          </td>
-                          <td className="p-3 text-gray-600">{r.judgeCount}</td>
-                        </tr>
-                      ))}
+                      {rows.map((r, idx) => {
+                        const inFinal = alreadyInFinal.has(r.studentId);
+                        const checked = selectedForFinal.has(r.studentId);
+                        return (
+                          <tr key={r.studentId} className={`border-b border-gray-100 hover:bg-gray-50 ${inFinal ? "bg-indigo-50" : ""}`}>
+                            <td className="p-3 font-medium text-gray-500">
+                              {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : idx + 1}
+                            </td>
+                            <td className="p-3 font-medium text-gray-900">{r.studentName}</td>
+                            <td className="p-3 text-gray-700 max-w-xs truncate">{r.projectTitle || "—"}</td>
+                            <td className="p-3 tabular-nums">{r.avgTotalScore.toFixed(2)}</td>
+                            <td className="p-3 tabular-nums">
+                              {r.avgRank != null ? r.avgRank.toFixed(2) : "—"}
+                            </td>
+                            <td className="p-3 text-gray-600">{r.judgeCount}</td>
+                            <td className="p-3 text-center">
+                              {inFinal ? (
+                                <span className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full">
+                                  ✓ In final
+                                </span>
+                              ) : (
+                                <input
+                                  type="checkbox"
+                                  checked={checked}
+                                  onChange={() => {
+                                    setSelectedForFinal((prev) => {
+                                      const next = new Set(prev);
+                                      if (next.has(r.studentId)) next.delete(r.studentId);
+                                      else next.add(r.studentId);
+                                      return next;
+                                    });
+                                  }}
+                                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 cursor-pointer"
+                                />
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
               </div>
             );
           })}
+
+          {/* Promote selected button */}
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={handleManualPromote}
+              disabled={promotingManual || selectedForFinal.size === 0}
+              className="px-5 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {promotingManual
+                ? "Promoting…"
+                : `Promote selected to final round (${selectedForFinal.size})`}
+            </button>
+            {selectedForFinal.size > 0 && (
+              <button
+                type="button"
+                onClick={() => setSelectedForFinal(new Set())}
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
+                Clear selection
+              </button>
+            )}
+            {manualPromoteResult && (
+              <p className="text-sm font-medium text-green-700">{manualPromoteResult}</p>
+            )}
+          </div>
         </div>
-      )}
+        );
+      })()}
 
       {subTab === "final" && (
         <div className="space-y-4">

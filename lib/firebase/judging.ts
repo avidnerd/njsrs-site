@@ -508,6 +508,21 @@ export async function promoteFirstPlaceToFinal(
   return firstPlaceIds.length;
 }
 
+/** Promote an explicit list of student IDs to the final round. */
+export async function promoteStudentsToFinal(
+  studentIds: string[],
+  finalJudgeIds: string[]
+): Promise<void> {
+  if (studentIds.length === 0 || finalJudgeIds.length === 0) return;
+  await Promise.all(
+    studentIds.flatMap((studentId) =>
+      finalJudgeIds.map((judgeId) =>
+        setJudgingAssignment(judgeId, studentId, "final", null)
+      )
+    )
+  );
+}
+
 export async function clearFinalRoundPromotions(): Promise<number> {
   const dbi = ensureDb();
   const snap = await getDocs(

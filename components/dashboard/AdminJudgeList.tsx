@@ -5,13 +5,16 @@ import { getAllJudges, updateJudgeApproval, getCategories, updateJudgeCategories
 import type { Judge, Category } from "@/lib/firebase/database";
 import { getAllSpecialAwardAssignments, SPECIAL_AWARDS } from "@/lib/firebase/specialAwards";
 import { getAllAssignments } from "@/lib/firebase/judging";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function AdminJudgeList() {
+  const { user } = useAuth();
   const [judges, setJudges] = useState<Judge[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "approved" | "pending">("all");
   const [selectedJudge, setSelectedJudge] = useState<Judge | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   // judgeId → award names
   const [specialAwardMap, setSpecialAwardMap] = useState<Record<string, string[]>>({});
   // judgeId → category names they are actually assigned to in the category round
@@ -80,6 +83,28 @@ export default function AdminJudgeList() {
     } catch (error) {
       console.error("Error updating judge approval:", error);
       alert("Failed to update judge approval");
+    }
+  };
+
+  const handleDelete = async (judge: Judge) => {
+    if (!user || !judge.id) return;
+    if (!confirm(`Permanently delete judge account for ${judge.firstName} ${judge.lastName}? This cannot be undone.`)) return;
+    setDeletingId(judge.id);
+    try {
+      const idToken = await user.getIdToken();
+      const res = await fetch("/api/delete-judge", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminIdToken: idToken, uid: judge.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to delete judge");
+      setJudges((prev) => prev.filter((j) => j.id !== judge.id));
+      if (selectedJudge?.id === judge.id) setSelectedJudge(null);
+    } catch (e: any) {
+      alert(e.message ?? "Failed to delete judge.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -227,6 +252,13 @@ export default function AdminJudgeList() {
                     Approve
                   </button>
                 )}
+                <button
+                  onClick={() => handleDelete(judge)}
+                  disabled={deletingId === judge.id}
+                  className="px-3 py-2 rounded-md bg-red-50 text-red-600 hover:bg-red-100 text-sm font-medium disabled:opacity-50"
+                >
+                  {deletingId === judge.id ? "…" : "Delete"}
+                </button>
               </div>
             </div>
           ))}
