@@ -13,6 +13,20 @@ import {
   Timestamp,
   type Unsubscribe,
 } from "firebase/firestore";
+
+export interface PublishedFinalist {
+  studentId: string;
+  studentName: string;
+  projectId?: string;
+  projectTitle?: string;
+  categoryName?: string;
+}
+
+export interface FinalistsDoc {
+  published: boolean;
+  publishedAt: Timestamp;
+  students: PublishedFinalist[];
+}
 import { db } from "./config";
 
 function ensureDb() {
@@ -133,5 +147,36 @@ export function subscribeLiveStatuses(
   const dbInstance = ensureDb();
   return onSnapshot(collection(dbInstance, "liveStatus"), (snap) => {
     callback(snap.docs.map((d) => d.data() as LivePresenter));
+  });
+}
+
+// ── Finalists board ───────────────────────────────────────────────────────────
+
+const FINALISTS_DOC = "siteConfig/finalists";
+
+export async function publishFinalists(students: PublishedFinalist[]): Promise<void> {
+  const dbInstance = ensureDb();
+  await setDoc(doc(dbInstance, "siteConfig", "finalists"), {
+    published: true,
+    publishedAt: Timestamp.now(),
+    students,
+  });
+}
+
+export async function unpublishFinalists(): Promise<void> {
+  const dbInstance = ensureDb();
+  await setDoc(doc(dbInstance, "siteConfig", "finalists"), {
+    published: false,
+    publishedAt: Timestamp.now(),
+    students: [],
+  });
+}
+
+export function subscribeFinalists(
+  callback: (data: FinalistsDoc | null) => void
+): Unsubscribe {
+  const dbInstance = ensureDb();
+  return onSnapshot(doc(dbInstance, "siteConfig", "finalists"), (snap) => {
+    callback(snap.exists() ? (snap.data() as FinalistsDoc) : null);
   });
 }

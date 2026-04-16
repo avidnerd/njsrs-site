@@ -29,6 +29,7 @@ import {
   type JudgingPhase,
   type JudgingAssignment,
 } from "@/lib/firebase/judging";
+import { publishFinalists, unpublishFinalists } from "@/lib/firebase/proctors";
 import {
   SPECIAL_AWARDS,
   getAllSpecialAwardAssignments,
@@ -163,6 +164,10 @@ export default function AdminJudgingScoring() {
   const [finalBusyId, setFinalBusyId] = useState<string | null>(null);
   const [promotingFinalists, setPromotingFinalists] = useState(false);
   const [promoteResult, setPromoteResult] = useState<string | null>(null);
+
+  // Publish finalists to live page
+  const [publishingFinalists, setPublishingFinalists] = useState(false);
+  const [finalistsPublished, setFinalistsPublished] = useState(false);
 
   // Manual final round selection (category results tab)
   const [selectedForFinal, setSelectedForFinal] = useState<Set<string>>(new Set());
@@ -469,6 +474,40 @@ export default function AdminJudgingScoring() {
       setError(e instanceof Error ? e.message : "Failed to unassign judge");
     } finally {
       setCleaningKey(null);
+    }
+  };
+
+  const handlePublishFinalists = async (unpublish = false) => {
+    setPublishingFinalists(true);
+    setError(null);
+    try {
+      if (unpublish) {
+        await unpublishFinalists();
+        setFinalistsPublished(false);
+      } else {
+        const finalStudentIds = new Set(
+          assignments.filter((a) => a.phase === "final").map((a) => a.studentId)
+        );
+        const finalists = students
+          .filter((s) => s.id && finalStudentIds.has(s.id))
+          .map((s) => ({
+            studentId: s.id!,
+            studentName: `${s.firstName} ${s.lastName}`,
+            projectId: s.projectId ?? "",
+            projectTitle: s.projectTitle ?? "",
+            categoryName: categories.find((c) => c.id === s.categoryId)?.name ?? "",
+          }));
+        if (finalists.length === 0) {
+          setError("No finalists found. Promote students to the final round first.");
+          return;
+        }
+        await publishFinalists(finalists);
+        setFinalistsPublished(true);
+      }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to update finalists");
+    } finally {
+      setPublishingFinalists(false);
     }
   };
 
@@ -1298,6 +1337,38 @@ export default function AdminJudgingScoring() {
               Export final detail (per judge, per student)
             </button>
           </div>
+
+          {/* Publish finalists to live page */}
+          <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-5 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="font-semibold text-indigo-900 text-sm">Post finalists to njsrs.org/live</p>
+              <p className="text-xs text-indigo-700 mt-0.5">
+                Publishes the current final-round student list to the public live board.{" "}
+                {finalistsPublished && <span className="font-medium text-green-700">✓ Currently posted</span>}
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => handlePublishFinalists(false)}
+                disabled={publishingFinalists}
+                className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
+              >
+                {publishingFinalists ? "Posting…" : finalistsPublished ? "Re-post finalists" : "Post finalists"}
+              </button>
+              {finalistsPublished && (
+                <button
+                  type="button"
+                  onClick={() => handlePublishFinalists(true)}
+                  disabled={publishingFinalists}
+                  className="bg-white border border-indigo-300 text-indigo-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 disabled:opacity-50"
+                >
+                  Remove from live page
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm">

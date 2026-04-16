@@ -1,21 +1,30 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { subscribeLiveStatuses } from "@/lib/firebase/proctors";
-import type { LivePresenter } from "@/lib/firebase/proctors";
+import { subscribeLiveStatuses, subscribeFinalists } from "@/lib/firebase/proctors";
+import type { LivePresenter, FinalistsDoc } from "@/lib/firebase/proctors";
 
 export default function LiveMonitorPage() {
   const [statuses, setStatuses] = useState<LivePresenter[]>([]);
+  const [finalists, setFinalists] = useState<FinalistsDoc | null>(null);
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = subscribeLiveStatuses((data) => {
+    const unsubStatuses = subscribeLiveStatuses((data) => {
       const sorted = [...data].sort((a, b) => a.categoryName.localeCompare(b.categoryName));
       setStatuses(sorted);
       setConnected(true);
     });
-    return () => unsubscribe();
+    const unsubFinalists = subscribeFinalists((data) => {
+      setFinalists(data);
+    });
+    return () => {
+      unsubStatuses();
+      unsubFinalists();
+    };
   }, []);
+
+  const showFinalists = finalists?.published && (finalists.students?.length ?? 0) > 0;
 
   return (
     <div className="min-h-screen bg-gray-950 text-white px-4 py-10">
@@ -35,6 +44,44 @@ export default function LiveMonitorPage() {
             <span className="text-xs text-gray-400">{connected ? "Live" : "Connecting…"}</span>
           </div>
         </div>
+
+        {/* Finalists board */}
+        {showFinalists && (
+          <div className="mb-10 rounded-2xl border border-yellow-400/40 bg-gradient-to-b from-yellow-950/60 to-gray-900 px-6 py-6 shadow-xl">
+            <div className="flex items-center gap-3 mb-5">
+              <span className="text-2xl">🏆</span>
+              <div>
+                <h2 className="text-xl font-extrabold text-yellow-300 tracking-tight">
+                  Final Round Finalists
+                </h2>
+                <p className="text-xs text-yellow-600 mt-0.5">Congratulations to all who advanced!</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {finalists!.students.map((s) => (
+                <div
+                  key={s.studentId}
+                  className="rounded-xl border border-yellow-400/20 bg-gray-900/70 px-4 py-3"
+                >
+                  {s.categoryName && (
+                    <p className="text-xs font-semibold uppercase tracking-widest text-yellow-500 mb-1">
+                      {s.categoryName}
+                    </p>
+                  )}
+                  <p className="font-bold text-white text-base leading-tight">
+                    {s.projectId && (
+                      <span className="text-yellow-300 mr-2 font-mono">{s.projectId}</span>
+                    )}
+                    {s.studentName}
+                  </p>
+                  {s.projectTitle && (
+                    <p className="text-gray-400 text-sm mt-0.5 leading-snug">{s.projectTitle}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {!connected ? (
           <p className="text-center text-gray-500 py-16">Connecting to live data…</p>

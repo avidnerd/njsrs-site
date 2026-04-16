@@ -160,5 +160,11 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    match /siteConfig/{docId} {
+      // Public read so the live page can show finalists without auth
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
   }
 }
