@@ -14,6 +14,7 @@ import {
 import {
   setJudgingAssignment,
   removeJudgingAssignment,
+  removeAllCategoryAssignmentsForJudge,
   getAllAssignments,
   getAllJudgeScores,
   clearAllJudgeScores,
@@ -58,6 +59,7 @@ export default function AdminJudgingScoring() {
   const [savingCandidatesId, setSavingCandidatesId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busyKey, setBusyKey] = useState<string | null>(null);
+  const [cleaningKey, setCleaningKey] = useState<string | null>(null);
   const [specialBusyKey, setSpecialBusyKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -414,7 +416,12 @@ export default function AdminJudgingScoring() {
     setSavingCandidatesId(key);
     setError(null);
     try {
-      await setSpecialAwardCandidates(awardId, judgeId, specialCandidates[key] ?? []);
+      // Filter out deleted students before saving
+      const activeIds = (specialCandidates[key] ?? []).filter((id) =>
+        students.some((s) => s.id === id)
+      );
+      await setSpecialAwardCandidates(awardId, judgeId, activeIds);
+      setSpecialCandidates((prev) => ({ ...prev, [key]: activeIds }));
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to save candidates");
     } finally {
@@ -448,6 +455,20 @@ export default function AdminJudgingScoring() {
       setError(e instanceof Error ? e.message : "Update failed");
     } finally {
       setBusyKey(null);
+    }
+  };
+
+  const handleUnassignFromCategory = async (categoryId: string, judgeId: string) => {
+    const key = `${categoryId}_${judgeId}`;
+    setCleaningKey(key);
+    setError(null);
+    try {
+      await removeAllCategoryAssignmentsForJudge(judgeId, categoryId);
+      await loadAll();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to unassign judge");
+    } finally {
+      setCleaningKey(null);
     }
   };
 
@@ -700,7 +721,40 @@ export default function AdminJudgingScoring() {
               {categories.map((cat) => {
                 const catStudents = categoryMap.get(cat.id!) ?? [];
                 const eligibleJudges = judgesForCategory(cat.id!);
-                if (catStudents.length === 0) return null;
+                if (catStudents.length === 0) {
+                  // Check for judges with orphaned assignments (students moved out of this category)
+                  const orphanedJudges = approvedJudges.filter((j) =>
+                    assignments.some(
+                      (a) => a.phase === "category" && a.categoryId === cat.id! && a.judgeId === j.id!
+                    )
+                  );
+                  if (orphanedJudges.length === 0) return null;
+                  return (
+                    <div key={cat.id} className="bg-white rounded-xl shadow border border-orange-200 overflow-hidden">
+                      <div className="bg-orange-50 px-4 py-3 border-b border-orange-200">
+                        <h3 className="font-semibold text-orange-900">{cat.name}</h3>
+                        <p className="text-xs text-orange-700 mt-0.5">
+                          No students in this category — {orphanedJudges.length} judge(s) still have assignments here. Unassign them to free them for other categories.
+                        </p>
+                      </div>
+                      <div className="px-4 py-3 flex flex-wrap gap-3">
+                        {orphanedJudges.map((j) => (
+                          <div key={j.id} className="flex items-center gap-2 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2">
+                            <span className="text-sm text-gray-900">{j.firstName} {j.lastName}</span>
+                            <button
+                              type="button"
+                              disabled={cleaningKey === `${cat.id!}_${j.id!}`}
+                              onClick={() => handleUnassignFromCategory(cat.id!, j.id!)}
+                              className="text-xs text-red-600 hover:text-red-800 underline disabled:opacity-50"
+                            >
+                              {cleaningKey === `${cat.id!}_${j.id!}` ? "Removing…" : "Unassign"}
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
                 return (
                   <div key={cat.id} className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
                     <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
@@ -897,6 +951,7 @@ export default function AdminJudgingScoring() {
                         {assignedJudges.map((j) => {
                           const key = candidatesKey(award.id, j.id!);
                           const selected = specialCandidates[key] ?? [];
+                          const activeSelected = selected.filter((id) => students.some((s) => s.id === id));
                           return (
                             <div key={j.id} className="rounded-lg border border-gray-200 p-3 space-y-3">
                               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -920,7 +975,7 @@ export default function AdminJudgingScoring() {
                                   onClick={() => saveCandidates(award.id, j.id!)}
                                   className="text-xs px-3 py-1.5 rounded-lg bg-primary-blue text-white hover:opacity-90 disabled:opacity-50 shrink-0"
                                 >
-                                  {savingCandidatesId === key ? "Saving…" : `Save shortlist (${selected.length})`}
+                                  {savingCandidatesId === key ? "Saving…" : `Save shortlist (${activeSelected.length})`}
                                 </button>
                               </div>
                               {students.length === 0 ? (

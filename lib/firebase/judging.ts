@@ -196,6 +196,22 @@ export async function removeJudgingAssignment(
   if (snapshotExists(snap)) await deleteDoc(scoreRef);
 }
 
+/** Remove all category-phase assignments for a judge in a specific category (cleanup when students move out). */
+export async function removeAllCategoryAssignmentsForJudge(
+  judgeId: string,
+  categoryId: string
+): Promise<void> {
+  const dbi = ensureDb();
+  const q = query(
+    collection(dbi, "judgingAssignments"),
+    where("judgeId", "==", judgeId),
+    where("phase", "==", "category"),
+    where("categoryId", "==", categoryId)
+  );
+  const snap = await getDocs(q);
+  await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+}
+
 export async function getAssignmentsForJudge(judgeId: string, phase: JudgingPhase): Promise<JudgingAssignment[]> {
   const dbi = ensureDb();
   const q = query(
