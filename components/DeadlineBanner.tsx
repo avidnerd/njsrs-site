@@ -32,8 +32,7 @@ export default function DeadlineBanner() {
           🏆 Official Announcement
         </span>
         <span className="text-sm sm:text-base">
-          <strong>NJSRS is now a regional qualifier for the National Junior Science and Humanities Symposium (JSHS).</strong>{" "}
-          The <strong>top 5 finalists</strong> from the Final Round will be invited to represent New Jersey at the National JSHS.
+          <strong>View the Live Presentation Schedule at njsrs.org/live</strong>{" "}
         </span>
       </div>
       <button
