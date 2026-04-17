@@ -84,6 +84,15 @@ export async function updateProctorRoom(uid: string, room: string): Promise<void
   await updateDoc(doc(dbInstance, "proctors", uid), { room });
 }
 
+export async function updateProctorCategory(
+  uid: string,
+  categoryId: string,
+  categoryName: string
+): Promise<void> {
+  const dbInstance = ensureDb();
+  await updateDoc(doc(dbInstance, "proctors", uid), { categoryId, categoryName });
+}
+
 // ── Live presenter status ─────────────────────────────────────────────────────
 
 export async function setLivePresenter(
