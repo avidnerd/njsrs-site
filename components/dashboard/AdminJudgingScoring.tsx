@@ -76,6 +76,13 @@ export default function AdminJudgingScoring() {
   const [clearingJshsPicks, setClearingJshsPicks] = useState(false);
   const [clearJshsPicksConfirm, setClearJshsPicksConfirm] = useState(false);
 
+  // Create final round judge
+  const [showCreateFinalJudge, setShowCreateFinalJudge] = useState(false);
+  const [createFinalJudgeForm, setCreateFinalJudgeForm] = useState({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [creatingFinalJudge, setCreatingFinalJudge] = useState(false);
+  const [createFinalJudgeResult, setCreateFinalJudgeResult] = useState<{ email: string; password: string } | null>(null);
+
   // Clear scores
   const [clearingScores, setClearingScores] = useState(false);
   const [clearConfirm, setClearConfirm] = useState(false);
@@ -211,6 +218,17 @@ export default function AdminJudgingScoring() {
     setError(null);
     try {
       await updateJudgeFinalRoundStatus(judge.id!, on);
+      // When designating a judge as final round, assign them to all already-promoted finalists
+      if (on) {
+        const finalStudentIds = [...new Set(
+          assignments.filter((a) => a.phase === "final").map((a) => a.studentId)
+        )];
+        if (finalStudentIds.length > 0) {
+          await Promise.all(
+            finalStudentIds.map((sid) => setJudgingAssignment(judge.id!, sid, "final", null))
+          );
+        }
+      }
       await loadAll();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Update failed");
@@ -234,6 +252,58 @@ export default function AdminJudgingScoring() {
       setError(e instanceof Error ? e.message : "Update failed");
     } finally {
       setJshsBusyId(null);
+    }
+  };
+
+  const handleCreateFinalJudge = async () => {
+    if (!user) return;
+    const { firstName, lastName, email, password, confirmPassword } = createFinalJudgeForm;
+    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
+      setError("First name, last name, and email are all required.");
+      return;
+    }
+    if (!password) {
+      setError("Please set a password for this account.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    setCreatingFinalJudge(true);
+    setError(null);
+    setCreateFinalJudgeResult(null);
+    try {
+      const idToken = await user.getIdToken();
+      const res = await fetch("/api/admin/create-final-judge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminIdToken: idToken, firstName: firstName.trim(), lastName: lastName.trim(), email: email.trim(), password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create account");
+      setCreateFinalJudgeResult({ email: data.email, password: data.password });
+      setCreateFinalJudgeForm({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
+      setShowPassword(false);
+
+      // Auto-assign new judge to all already-promoted finalists
+      const finalStudentIds = [...new Set(
+        assignments.filter((a) => a.phase === "final").map((a) => a.studentId)
+      )];
+      if (finalStudentIds.length > 0) {
+        await Promise.all(
+          finalStudentIds.map((sid) => setJudgingAssignment(data.uid, sid, "final", null))
+        );
+      }
+      await loadAll();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to create judge account");
+    } finally {
+      setCreatingFinalJudge(false);
     }
   };
 
@@ -1044,6 +1114,115 @@ export default function AdminJudgingScoring() {
                   })}
                 </div>
               )}
+              {/* Create a new final round judge account */}
+              <div className="mt-4 rounded-xl border border-gray-200 bg-white p-4 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Create a final round judge account</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Creates a new login for someone who will judge the final round. They are automatically assigned to all current finalists.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setShowCreateFinalJudge((v) => !v); setCreateFinalJudgeResult(null); setError(null); }}
+                    className="shrink-0 text-sm text-primary-blue hover:underline"
+                  >
+                    {showCreateFinalJudge ? "Cancel" : "Create account"}
+                  </button>
+                </div>
+                {showCreateFinalJudge && (
+                  <div className="space-y-3 pt-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">First name</label>
+                        <input
+                          type="text"
+                          value={createFinalJudgeForm.firstName}
+                          onChange={(e) => setCreateFinalJudgeForm((f) => ({ ...f, firstName: e.target.value }))}
+                          placeholder="Jane"
+                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-blue"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Last name</label>
+                        <input
+                          type="text"
+                          value={createFinalJudgeForm.lastName}
+                          onChange={(e) => setCreateFinalJudgeForm((f) => ({ ...f, lastName: e.target.value }))}
+                          placeholder="Smith"
+                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-blue"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Email address</label>
+                      <input
+                        type="email"
+                        value={createFinalJudgeForm.email}
+                        onChange={(e) => setCreateFinalJudgeForm((f) => ({ ...f, email: e.target.value }))}
+                        placeholder="judge@example.com"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-blue"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Password</label>
+                        <div className="relative">
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            value={createFinalJudgeForm.password}
+                            onChange={(e) => setCreateFinalJudgeForm((f) => ({ ...f, password: e.target.value }))}
+                            placeholder="Min. 6 characters"
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-blue pr-16"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((v) => !v)}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500 hover:text-gray-700"
+                          >
+                            {showPassword ? "Hide" : "Show"}
+                          </button>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Confirm password</label>
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={createFinalJudgeForm.confirmPassword}
+                          onChange={(e) => setCreateFinalJudgeForm((f) => ({ ...f, confirmPassword: e.target.value }))}
+                          placeholder="Repeat password"
+                          className={`w-full rounded-lg border px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-blue ${
+                            createFinalJudgeForm.confirmPassword && createFinalJudgeForm.password !== createFinalJudgeForm.confirmPassword
+                              ? "border-red-400"
+                              : "border-gray-300"
+                          }`}
+                        />
+                        {createFinalJudgeForm.confirmPassword && createFinalJudgeForm.password !== createFinalJudgeForm.confirmPassword && (
+                          <p className="text-xs text-red-500 mt-0.5">Passwords do not match</p>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCreateFinalJudge}
+                      disabled={creatingFinalJudge}
+                      className="px-4 py-2 rounded-lg bg-primary-blue text-white text-sm font-semibold hover:bg-primary-darkBlue disabled:opacity-50"
+                    >
+                      {creatingFinalJudge ? "Creating account…" : "Create account & assign to finalists"}
+                    </button>
+                  </div>
+                )}
+                {createFinalJudgeResult && (
+                  <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm space-y-1">
+                    <p className="font-semibold text-green-800">✓ Account created and assigned to all current finalists</p>
+                    <p className="font-mono text-green-900">Email: {createFinalJudgeResult.email}</p>
+                    <p className="font-mono text-green-900">Password: {createFinalJudgeResult.password}</p>
+                    <p className="text-xs text-green-700 mt-1">Share these credentials with the judge. They can log in at njsrs.org and will see all finalists immediately.</p>
+                  </div>
+                )}
+              </div>
+
               {/* JSHS Judge selector */}
               <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 space-y-3">
                 <div>
