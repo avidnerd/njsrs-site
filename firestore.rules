@@ -166,5 +166,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /jshsPicks/{judgeId} {
+      // JSHS judge reads and writes their own picks; admins can read all
+      allow read: if isAdmin() || isOwner(judgeId);
+      allow list: if isAdmin();
+      allow create, update: if isAuthenticated() && request.auth.uid == judgeId;
+      allow delete: if isAdmin();
+    }
+
   }
 }

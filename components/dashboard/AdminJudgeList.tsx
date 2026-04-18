@@ -196,6 +196,7 @@ export default function AdminJudgeList() {
                   .filter(Boolean) as string[];
                 const awardNames = specialAwardMap[judge.id!] ?? [];
                 const isFinal = judge.finalRoundJudge === true;
+                const isJshs = judge.jshsJudge === true;
                 return (
                   <div className="flex flex-wrap gap-1.5 mb-3">
                     {avail && (
@@ -206,6 +207,11 @@ export default function AdminJudgeList() {
                     {isFinal && (
                       <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
                         Final Round
+                      </span>
+                    )}
+                    {isJshs && (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                        JSHS Judge
                       </span>
                     )}
                     {catNames.length > 0 ? catNames.map((name) => (

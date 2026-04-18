@@ -7,10 +7,16 @@ import {
   getAllJudges,
   getCategories,
   updateJudgeFinalRoundStatus,
+  updateJudgeJshsStatus,
   type Student,
   type Judge,
   type Category,
 } from "@/lib/firebase/database";
+import {
+  getAllJshsPicks,
+  clearJshsPicks,
+  type JshsPicksDoc,
+} from "@/lib/firebase/jshsPicks";
 import {
   setJudgingAssignment,
   removeJudgingAssignment,
@@ -63,6 +69,12 @@ export default function AdminJudgingScoring() {
   const [cleaningKey, setCleaningKey] = useState<string | null>(null);
   const [specialBusyKey, setSpecialBusyKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // JSHS judge picks
+  const [jshsPicks, setJshsPicks] = useState<(JshsPicksDoc & { id: string })[]>([]);
+  const [jshsBusyId, setJshsBusyId] = useState<string | null>(null);
+  const [clearingJshsPicks, setClearingJshsPicks] = useState(false);
+  const [clearJshsPicksConfirm, setClearJshsPicksConfirm] = useState(false);
 
   // Clear scores
   const [clearingScores, setClearingScores] = useState(false);
@@ -144,16 +156,36 @@ export default function AdminJudgingScoring() {
     [judges]
   );
 
-  // Final round eligible: approved + in-person full day + NOT in category round + NOT in special awards
+  // Judge ID designated as the JSHS judge (only one)
+  const jshsJudgeId = useMemo(
+    () => judges.find((j) => j.jshsJudge && j.id)?.id ?? null,
+    [judges]
+  );
+
+  // Final round eligible: approved + in-person full day + NOT in category round + NOT in special awards + NOT JSHS judge
   const finalRoundEligibleJudges = useMemo(
     () =>
       approvedJudges.filter(
         (j) =>
           j.availabilityApril18 === "in_person_full_day" &&
           !categoryAssignedJudgeIds.has(j.id!) &&
-          !specialAssignedJudgeIds.has(j.id!)
+          !specialAssignedJudgeIds.has(j.id!) &&
+          j.id !== jshsJudgeId
       ),
-    [approvedJudges, categoryAssignedJudgeIds, specialAssignedJudgeIds]
+    [approvedJudges, categoryAssignedJudgeIds, specialAssignedJudgeIds, jshsJudgeId]
+  );
+
+  // JSHS judge eligible: approved + in-person full day + NOT a regular final round judge + NOT special awards + NOT category
+  const jshsEligibleJudges = useMemo(
+    () =>
+      approvedJudges.filter(
+        (j) =>
+          j.availabilityApril18 === "in_person_full_day" &&
+          !finalAssignedJudgeIds.has(j.id!) &&
+          !specialAssignedJudgeIds.has(j.id!) &&
+          !categoryAssignedJudgeIds.has(j.id!)
+      ),
+    [approvedJudges, finalAssignedJudgeIds, specialAssignedJudgeIds, categoryAssignedJudgeIds]
   );
 
   const isFinalJudge = useCallback(
@@ -187,6 +219,63 @@ export default function AdminJudgingScoring() {
     }
   };
 
+  const toggleJshsJudge = async (judge: Judge, on: boolean) => {
+    setJshsBusyId(judge.id!);
+    setError(null);
+    try {
+      // Deselect any currently-selected JSHS judge first (only one allowed)
+      if (on) {
+        const current = judges.find((j) => j.jshsJudge && j.id !== judge.id);
+        if (current?.id) await updateJudgeJshsStatus(current.id, false);
+      }
+      await updateJudgeJshsStatus(judge.id!, on);
+      await loadAll();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Update failed");
+    } finally {
+      setJshsBusyId(null);
+    }
+  };
+
+  const handleClearJshsPicks = async () => {
+    if (!clearJshsPicksConfirm) { setClearJshsPicksConfirm(true); return; }
+    setClearingJshsPicks(true);
+    setError(null);
+    try {
+      const count = await clearJshsPicks();
+      await loadAll();
+      setClearJshsPicksConfirm(false);
+      alert(`Cleared ${count} JSHS pick document(s).`);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to clear JSHS picks");
+    } finally {
+      setClearingJshsPicks(false);
+    }
+  };
+
+  /**
+   * Fetches the current final-round assignments from Firestore and publishes
+   * that list to the live page. Uses the in-memory `students` and `categories`
+   * state for names / titles (they don't change during promotion).
+   */
+  const autoPublishFinalists = useCallback(async () => {
+    const freshAssignments = await getAllAssignments("final");
+    const finalStudentIds = new Set(freshAssignments.map((a) => a.studentId));
+    const finalistData = students
+      .filter((s) => s.id && finalStudentIds.has(s.id))
+      .map((s) => ({
+        studentId: s.id!,
+        studentName: `${s.firstName} ${s.lastName}`,
+        projectId: s.projectId ?? "",
+        projectTitle: s.projectTitle ?? "",
+        categoryName: categories.find((c) => c.id === s.categoryId)?.name ?? "",
+      }));
+    if (finalistData.length > 0) {
+      await publishFinalists(finalistData);
+      setFinalistsPublished(true);
+    }
+  }, [students, categories]);
+
   const handlePromoteFirstPlace = async () => {
     setPromotingFinalists(true);
     setPromoteResult(null);
@@ -194,8 +283,9 @@ export default function AdminJudgingScoring() {
     try {
       const finalJudgeIds = judges.filter((j) => j.finalRoundJudge && j.id).map((j) => j.id!);
       const count = await promoteFirstPlaceToFinal(categories, students, scores, finalJudgeIds);
+      await autoPublishFinalists();
       await loadAll();
-      setPromoteResult(`${count} first-place winner(s) assigned to ${finalJudgeIds.length} final round judge(s).`);
+      setPromoteResult(`${count} first-place winner(s) promoted and posted to the live page.`);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Promotion failed");
     } finally {
@@ -206,7 +296,7 @@ export default function AdminJudgingScoring() {
   const loadAll = useCallback(async () => {
     setError(null);
     try {
-      const [stu, jud, cat, asg, sc, spAsg, spCand, spSc] = await Promise.all([
+      const [stu, jud, cat, asg, sc, spAsg, spCand, spSc, jshsPks] = await Promise.all([
         getAllStudents(),
         getAllJudges(),
         getCategories(),
@@ -215,6 +305,7 @@ export default function AdminJudgingScoring() {
         getAllSpecialAwardAssignments(),
         getAllSpecialAwardCandidates(),
         getAllSpecialAwardScores(),
+        getAllJshsPicks(),
       ]);
       setStudents(stu);
       setJudges(jud);
@@ -224,6 +315,7 @@ export default function AdminJudgingScoring() {
       setSpecialAssignments(spAsg);
       setSpecialCandidates(spCand);
       setSpecialScores(spSc);
+      setJshsPicks(jshsPks);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to load judging data");
     } finally {
@@ -659,6 +751,27 @@ export default function AdminJudgingScoring() {
               Cancel
             </button>
           )}
+          <button
+            type="button"
+            onClick={handleClearJshsPicks}
+            disabled={clearingJshsPicks}
+            className={`px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60 ${
+              clearJshsPicksConfirm
+                ? "bg-red-600 text-white hover:bg-red-700"
+                : "bg-white border border-red-300 text-red-700 hover:bg-red-50"
+            }`}
+          >
+            {clearingJshsPicks ? "Clearing…" : clearJshsPicksConfirm ? "Confirm — clear JSHS picks" : "Clear JSHS picks"}
+          </button>
+          {clearJshsPicksConfirm && (
+            <button
+              type="button"
+              onClick={() => setClearJshsPicksConfirm(false)}
+              className="text-sm text-gray-500 hover:text-gray-700 underline"
+            >
+              Cancel
+            </button>
+          )}
         </div>
         {mockResult && (
           <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm space-y-1">
@@ -931,6 +1044,59 @@ export default function AdminJudgingScoring() {
                   })}
                 </div>
               )}
+              {/* JSHS Judge selector */}
+              <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 space-y-3">
+                <div>
+                  <p className="text-sm font-semibold text-amber-900">JSHS Judge (optional — 1 person max)</p>
+                  <p className="text-xs text-amber-700 mt-0.5">
+                    The JSHS judge reviews all finalists and selects their personal top 5. Their picks are
+                    recorded separately and <strong>do not affect official final-round scores</strong>.
+                    Select one judge from the list below — this role is exclusive from all other judging roles.
+                  </p>
+                </div>
+                {jshsJudgeId && (() => {
+                  const current = judges.find((j) => j.id === jshsJudgeId);
+                  return current ? (
+                    <div className="flex items-center gap-2 rounded-lg border border-amber-300 bg-white px-3 py-2 w-fit">
+                      <span className="text-sm font-medium text-amber-900">
+                        ✓ {current.firstName} {current.lastName}
+                        {current.institution ? ` — ${current.institution}` : ""}
+                      </span>
+                      <button
+                        type="button"
+                        disabled={jshsBusyId === current.id}
+                        onClick={() => toggleJshsJudge(current, false)}
+                        className="text-xs text-red-500 hover:text-red-700 underline disabled:opacity-50"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : null;
+                })()}
+                {!jshsJudgeId && (
+                  jshsEligibleJudges.length === 0 ? (
+                    <p className="text-sm text-amber-800 italic">
+                      No eligible judges found. Judges must have selected &quot;In-person, full day&quot; and must not already be assigned to any other judging role.
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {jshsEligibleJudges.map((j) => (
+                        <button
+                          key={j.id}
+                          type="button"
+                          disabled={jshsBusyId === j.id}
+                          onClick={() => toggleJshsJudge(j, true)}
+                          className="text-sm px-3 py-1.5 rounded-lg border border-amber-300 bg-white text-amber-800 hover:border-amber-500 hover:text-amber-900 transition-colors disabled:opacity-40"
+                        >
+                          {j.firstName} {j.lastName}
+                          {j.institution ? ` (${j.institution})` : ""}
+                        </button>
+                      ))}
+                    </div>
+                  )
+                )}
+              </div>
+
               {/* Promote first-place winners */}
               {finalAssignedJudgeIds.size > 0 && (
                 <div className="mt-4 rounded-xl border border-indigo-200 bg-indigo-50 p-4 space-y-3">
@@ -1106,9 +1272,10 @@ export default function AdminJudgingScoring() {
           setManualPromoteResult(null);
           try {
             await promoteStudentsToFinal(ids, finalJudgeIds);
+            await autoPublishFinalists();
             await loadAll();
             setSelectedForFinal(new Set());
-            setManualPromoteResult(`${ids.length} student(s) promoted to the final round.`);
+            setManualPromoteResult(`${ids.length} student(s) promoted and posted to the live page.`);
           } catch (e: unknown) {
             setManualPromoteResult(e instanceof Error ? e.message : "Promotion failed");
           } finally {
@@ -1296,6 +1463,7 @@ export default function AdminJudgingScoring() {
       })()}
 
       {subTab === "final" && (
+        <>
         <div className="space-y-4">
           <div className="flex flex-wrap gap-3">
             <button
@@ -1383,7 +1551,11 @@ export default function AdminJudgingScoring() {
                   </tr>
                 </thead>
                 <tbody>
-                  {aggregateFinalResults(students, scores, assignments).map((r, idx) => (
+                  {aggregateFinalResults(students, scores.filter((sc) => {
+                    // Exclude the JSHS judge's scores from official final results
+                    if (!jshsJudgeId) return true;
+                    return sc.judgeId !== jshsJudgeId;
+                  }), assignments).map((r, idx) => (
                     <tr key={r.studentId} className={`border-b border-gray-100 ${r.judgeCount === 0 ? "bg-amber-50" : ""}`}>
                       <td className="p-3 font-medium text-gray-500">
                         {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : idx + 1}
@@ -1404,6 +1576,64 @@ export default function AdminJudgingScoring() {
             </div>
           </div>
         </div>
+
+        {/* JSHS Judge picks panel */}
+        {(() => {
+          if (jshsPicks.length === 0 && !jshsJudgeId) return null;
+          const stuMap = new Map(students.filter((s) => s.id).map((s) => [s.id!, s]));
+          const currentJshsJudge = jshsJudgeId ? judges.find((j) => j.id === jshsJudgeId) : null;
+          const picks = jshsPicks[0]; // Only one JSHS judge
+          return (
+            <div className="rounded-xl border border-amber-300 bg-amber-50 overflow-hidden">
+              <div className="px-4 py-3 border-b border-amber-200 flex items-center justify-between gap-2">
+                <div>
+                  <h3 className="font-semibold text-amber-900 text-sm">JSHS Judge — Top 5 Picks</h3>
+                  <p className="text-xs text-amber-700 mt-0.5">
+                    These selections are <strong>not counted</strong> in the official final-round standings.
+                    {currentJshsJudge && ` Submitted by: ${currentJshsJudge.firstName} ${currentJshsJudge.lastName}`}
+                  </p>
+                </div>
+              </div>
+              {!picks ? (
+                <p className="px-4 py-3 text-sm text-amber-800 italic">
+                  {jshsJudgeId
+                    ? "The JSHS judge has not submitted their picks yet."
+                    : "No JSHS judge has been assigned yet."}
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-amber-200 text-left text-amber-800 bg-amber-50">
+                        <th className="p-3 w-10">Pick</th>
+                        <th className="p-3">Student</th>
+                        <th className="p-3">Project</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {picks.studentIds.map((sid, idx) => {
+                        const s = stuMap.get(sid);
+                        return (
+                          <tr key={sid} className="border-b border-amber-100 bg-white hover:bg-amber-50">
+                            <td className="p-3 font-bold text-amber-700">#{idx + 1}</td>
+                            <td className="p-3 font-medium text-gray-900">
+                              {s ? `${s.firstName} ${s.lastName}` : sid}
+                              {s?.projectId && (
+                                <span className="ml-2 text-xs text-indigo-600 font-semibold">{s.projectId}</span>
+                              )}
+                            </td>
+                            <td className="p-3 text-gray-700 max-w-xs truncate">{s?.projectTitle || "—"}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+        </>
       )}
 
       {subTab === "specialResults" && (

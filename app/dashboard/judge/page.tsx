@@ -11,8 +11,9 @@ import { getAssignmentsForJudge } from "@/lib/firebase/judging";
 import { getSpecialAwardAssignmentsForJudge, SPECIAL_AWARDS } from "@/lib/firebase/specialAwards";
 import JudgeScoringPanel from "@/components/judging/JudgeScoringPanel";
 import SpecialAwardScoringPanel from "@/components/judging/SpecialAwardScoringPanel";
+import JshsPickPanel from "@/components/judging/JshsPickPanel";
 
-type PhaseTab = "category" | "final" | "special";
+type PhaseTab = "category" | "final" | "special" | "jshs";
 
 export default function JudgeDashboardPage() {
   const { user, userProfile } = useAuth();
@@ -48,6 +49,8 @@ export default function JudgeDashboardPage() {
         setPhaseTab("category");
       } else if (judge?.finalRoundJudge) {
         setPhaseTab("final");
+      } else if (judge?.jshsJudge) {
+        setPhaseTab("jshs");
       } else if (names.length > 0) {
         setPhaseTab("special");
       }
@@ -113,18 +116,21 @@ export default function JudgeDashboardPage() {
               {/* Reporting time + role summary */}
               {(() => {
                 const isFinal = judgeData?.finalRoundJudge === true;
+                const isJshs = judgeData?.jshsJudge === true;
                 const isSpecial = specialAwardNames.length > 0;
                 const roles: string[] = [];
                 if (isCategoryJudge) roles.push("Category Judge");
                 if (isFinal) roles.push("Final Round Judge");
+                if (isJshs) roles.push("JSHS Judge");
                 if (isSpecial) roles.push("Special Award Judge");
                 if (roles.length === 0) return null;
 
                 // Build a plain-English schedule line
                 let scheduleLine: React.ReactNode;
-                if (isCategoryJudge && (isFinal || isSpecial)) {
+                if (isCategoryJudge && (isFinal || isJshs || isSpecial)) {
                   const afternoon = [
                     isFinal && "final round",
+                    isJshs && "JSHS",
                     isSpecial && "special award",
                   ].filter(Boolean).join(" and ");
                   scheduleLine = (
@@ -176,6 +182,18 @@ export default function JudgeDashboardPage() {
                 </div>
               )}
 
+              {/* JSHS judge notice */}
+              {judgeData?.jshsJudge && (
+                <div className="rounded-xl bg-amber-50 border border-amber-300 px-5 py-4">
+                  <p className="text-sm font-bold text-amber-900 mb-1">
+                    You have been selected as the JSHS Judge
+                  </p>
+                  <p className="text-sm text-amber-800">
+                    Your role is to review the final-round presentations and select your top 5. Your picks will be recorded separately and <strong>will not affect the official scores</strong> or standings of any finalist. Report at 12:00 PM on April 18, 2026.
+                  </p>
+                </div>
+              )}
+
               {/* Special award judge notice — omitted when also a category judge (role banner already covers it) */}
               {specialAwardNames.length > 0 && !isCategoryJudge && (
                 <div className="rounded-xl bg-purple-50 border border-purple-300 px-5 py-4">
@@ -211,6 +229,7 @@ export default function JudgeDashboardPage() {
                 const tabs: { id: PhaseTab; label: string; activeClass: string }[] = [];
                 if (isCategoryJudge) tabs.push({ id: "category", label: "Category judging", activeClass: "bg-amber-100 text-amber-900" });
                 if (judgeData?.finalRoundJudge) tabs.push({ id: "final", label: "Final round", activeClass: "bg-indigo-100 text-indigo-900" });
+                if (judgeData?.jshsJudge) tabs.push({ id: "jshs", label: "JSHS top 5", activeClass: "bg-amber-100 text-amber-900" });
                 if (specialAwardNames.length > 0) tabs.push({ id: "special", label: "Special awards", activeClass: "bg-purple-100 text-purple-900" });
                 if (tabs.length === 0) return null;
                 return (
@@ -233,6 +252,8 @@ export default function JudgeDashboardPage() {
                     )}
                     {phaseTab === "special" ? (
                       <SpecialAwardScoringPanel judgeId={user.uid} />
+                    ) : phaseTab === "jshs" ? (
+                      <JshsPickPanel judgeId={user.uid} />
                     ) : (
                       <JudgeScoringPanel judgeId={user.uid} phase={phaseTab as "category" | "final"} />
                     )}

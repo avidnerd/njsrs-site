@@ -350,7 +350,7 @@ export function aggregateCategoryResults(
   const relevant = scores.filter(
     (sc) =>
       sc.phase === "category" &&
-      (sc.categoryId === categoryId || sc.categoryId == null) &&
+      sc.categoryId === categoryId &&
       sidSet.has(sc.studentId)
   );
 
