@@ -35,7 +35,15 @@ import {
   type JudgingPhase,
   type JudgingAssignment,
 } from "@/lib/firebase/judging";
-import { publishFinalists, unpublishFinalists } from "@/lib/firebase/proctors";
+import {
+  publishFinalists,
+  unpublishFinalists,
+  updateFinalistsList,
+  setScoringLock,
+  subscribeFinalists,
+  subscribeScoringLock,
+  type PublishedFinalist,
+} from "@/lib/firebase/proctors";
 import {
   SPECIAL_AWARDS,
   getAllSpecialAwardAssignments,
@@ -207,6 +215,17 @@ export default function AdminJudgingScoring() {
   // Publish finalists to live page
   const [publishingFinalists, setPublishingFinalists] = useState(false);
   const [finalistsPublished, setFinalistsPublished] = useState(false);
+
+  // Manual finalists editor
+  const [publishedFinalistsList, setPublishedFinalistsList] = useState<PublishedFinalist[]>([]);
+  const [editingFinalists, setEditingFinalists] = useState(false);
+  const [draftFinalists, setDraftFinalists] = useState<PublishedFinalist[]>([]);
+  const [savingFinalistsDraft, setSavingFinalistsDraft] = useState(false);
+  const [finalistsAddStudentId, setFinalistsAddStudentId] = useState("");
+
+  // Scoring lock
+  const [scoresLocked, setScoresLocked] = useState(false);
+  const [togglingLock, setTogglingLock] = useState(false);
 
   // Manual final round selection (category results tab)
   const [selectedForFinal, setSelectedForFinal] = useState<Set<string>>(new Set());
@@ -396,6 +415,67 @@ export default function AdminJudgingScoring() {
   useEffect(() => {
     loadAll();
   }, [loadAll]);
+
+  useEffect(() => {
+    const unsubFinalists = subscribeFinalists((data) => {
+      setFinalistsPublished(data?.published ?? false);
+      setPublishedFinalistsList(data?.students ?? []);
+    });
+    const unsubLock = subscribeScoringLock((locked) => {
+      setScoresLocked(locked);
+    });
+    return () => { unsubFinalists(); unsubLock(); };
+  }, []);
+
+  const handleToggleLock = async () => {
+    setTogglingLock(true);
+    setError(null);
+    try {
+      await setScoringLock(!scoresLocked);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to update lock");
+    } finally {
+      setTogglingLock(false);
+    }
+  };
+
+  const openFinalistsEditor = () => {
+    setDraftFinalists([...publishedFinalistsList]);
+    setFinalistsAddStudentId("");
+    setEditingFinalists(true);
+  };
+
+  const addFinalistToDraft = () => {
+    const student = students.find((s) => s.id === finalistsAddStudentId);
+    if (!student || !student.id) return;
+    if (draftFinalists.some((f) => f.studentId === student.id)) return;
+    const entry: PublishedFinalist = {
+      studentId: student.id,
+      studentName: `${student.firstName} ${student.lastName}`,
+      projectId: student.projectId ?? "",
+      projectTitle: student.projectTitle ?? "",
+      categoryName: categories.find((c) => c.id === student.categoryId)?.name ?? "",
+    };
+    setDraftFinalists((prev) => [...prev, entry]);
+    setFinalistsAddStudentId("");
+  };
+
+  const removeFinalistFromDraft = (studentId: string) => {
+    setDraftFinalists((prev) => prev.filter((f) => f.studentId !== studentId));
+  };
+
+  const saveFinalistsDraft = async () => {
+    setSavingFinalistsDraft(true);
+    setError(null);
+    try {
+      await updateFinalistsList(draftFinalists);
+      setEditingFinalists(false);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to save finalists");
+    } finally {
+      setSavingFinalistsDraft(false);
+    }
+  };
 
   const handleClearFinalPromotions = async () => {
     if (!clearFinalConfirm) { setClearFinalConfirm(true); return; }
@@ -1685,6 +1765,29 @@ export default function AdminJudgingScoring() {
             </button>
           </div>
 
+          {/* Lock all judge scores */}
+          <div className={`rounded-xl border px-5 py-4 flex flex-wrap items-center justify-between gap-4 ${scoresLocked ? "border-red-300 bg-red-50" : "border-gray-200 bg-white"}`}>
+            <div>
+              <p className="font-semibold text-sm text-gray-900">Lock judge scores</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                When locked, judges cannot save or modify any scores.{" "}
+                {scoresLocked && <span className="font-semibold text-red-700">⚠ Scores are currently locked</span>}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleToggleLock}
+              disabled={togglingLock}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50 ${
+                scoresLocked
+                  ? "bg-red-600 text-white hover:bg-red-700"
+                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              {togglingLock ? "Updating…" : scoresLocked ? "Unlock scores" : "Lock all scores"}
+            </button>
+          </div>
+
           {/* Publish finalists to live page */}
           <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-5 py-4 flex flex-wrap items-center justify-between gap-4">
             <div>
@@ -1714,6 +1817,116 @@ export default function AdminJudgingScoring() {
                 </button>
               )}
             </div>
+          </div>
+
+          {/* Manual finalists editor */}
+          <div className="rounded-xl border border-purple-200 bg-purple-50 px-5 py-4 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="font-semibold text-purple-900 text-sm">Manually edit live finalists</p>
+                <p className="text-xs text-purple-700 mt-0.5">
+                  Add or remove students shown on the live finalists board without changing the full final-round assignments.
+                  {publishedFinalistsList.length > 0 && ` Currently showing ${publishedFinalistsList.length} finalist(s).`}
+                </p>
+              </div>
+              {!editingFinalists && (
+                <button
+                  type="button"
+                  onClick={openFinalistsEditor}
+                  className="px-4 py-2 rounded-lg text-sm font-semibold bg-purple-600 text-white hover:bg-purple-700"
+                >
+                  Edit finalists list
+                </button>
+              )}
+            </div>
+
+            {editingFinalists && (
+              <div className="space-y-3">
+                {/* Add a student */}
+                <div className="flex gap-2 items-center flex-wrap">
+                  <select
+                    value={finalistsAddStudentId}
+                    onChange={(e) => setFinalistsAddStudentId(e.target.value)}
+                    className="flex-1 min-w-0 border border-purple-300 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-purple-400"
+                  >
+                    <option value="">— Select a student to add —</option>
+                    {students
+                      .filter((s) => s.id && s.status === "approved" && !draftFinalists.some((f) => f.studentId === s.id))
+                      .sort((a, b) => (a.projectId ?? "").localeCompare(b.projectId ?? ""))
+                      .map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.projectId ? `[${s.projectId}] ` : ""}{s.firstName} {s.lastName} — {s.projectTitle || "No title"}
+                        </option>
+                      ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={addFinalistToDraft}
+                    disabled={!finalistsAddStudentId}
+                    className="px-3 py-1.5 rounded-lg bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 disabled:opacity-40 whitespace-nowrap"
+                  >
+                    Add
+                  </button>
+                </div>
+
+                {/* Current draft list */}
+                {draftFinalists.length === 0 ? (
+                  <p className="text-sm text-purple-700 italic">No finalists in the list. Add some above.</p>
+                ) : (
+                  <div className="bg-white rounded-lg border border-purple-200 overflow-hidden">
+                    <table className="min-w-full text-sm">
+                      <thead>
+                        <tr className="bg-purple-50 border-b border-purple-200 text-left text-purple-800">
+                          <th className="px-3 py-2">Project ID</th>
+                          <th className="px-3 py-2">Student</th>
+                          <th className="px-3 py-2">Category</th>
+                          <th className="px-3 py-2">Title</th>
+                          <th className="px-3 py-2 w-16"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {draftFinalists.map((f) => (
+                          <tr key={f.studentId} className="border-b border-purple-100 last:border-0">
+                            <td className="px-3 py-2 font-mono text-xs text-indigo-700">{f.projectId || "—"}</td>
+                            <td className="px-3 py-2 font-medium text-gray-900">{f.studentName}</td>
+                            <td className="px-3 py-2 text-gray-600 text-xs">{f.categoryName || "—"}</td>
+                            <td className="px-3 py-2 text-gray-700 max-w-xs truncate">{f.projectTitle || "—"}</td>
+                            <td className="px-3 py-2">
+                              <button
+                                type="button"
+                                onClick={() => removeFinalistFromDraft(f.studentId)}
+                                className="text-red-500 hover:text-red-700 text-xs font-medium"
+                              >
+                                Remove
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                <div className="flex gap-3 items-center">
+                  <button
+                    type="button"
+                    onClick={saveFinalistsDraft}
+                    disabled={savingFinalistsDraft}
+                    className="px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 disabled:opacity-50"
+                  >
+                    {savingFinalistsDraft ? "Saving…" : "Save changes"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingFinalists(false)}
+                    className="text-sm text-gray-500 hover:text-gray-700 underline"
+                  >
+                    Cancel
+                  </button>
+                  <span className="text-xs text-purple-700">{draftFinalists.length} finalist(s)</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">

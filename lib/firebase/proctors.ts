@@ -181,11 +181,52 @@ export async function unpublishFinalists(): Promise<void> {
   });
 }
 
+/** Update the finalists list without changing published/unpublished state. */
+export async function updateFinalistsList(students: PublishedFinalist[]): Promise<void> {
+  const dbInstance = ensureDb();
+  await setDoc(
+    doc(dbInstance, "siteConfig", "finalists"),
+    { students, publishedAt: Timestamp.now() },
+    { merge: true }
+  );
+}
+
 export function subscribeFinalists(
   callback: (data: FinalistsDoc | null) => void
 ): Unsubscribe {
   const dbInstance = ensureDb();
   return onSnapshot(doc(dbInstance, "siteConfig", "finalists"), (snap) => {
     callback(snap.exists() ? (snap.data() as FinalistsDoc) : null);
+  });
+}
+
+// ── Scoring lock ──────────────────────────────────────────────────────────────
+
+export interface ScoringConfigDoc {
+  scoresLocked: boolean;
+  lockedAt?: Timestamp;
+}
+
+export async function getScoringLock(): Promise<boolean> {
+  const dbInstance = ensureDb();
+  const snap = await getDoc(doc(dbInstance, "siteConfig", "scoringConfig"));
+  if (!snap.exists()) return false;
+  return (snap.data() as ScoringConfigDoc).scoresLocked ?? false;
+}
+
+export async function setScoringLock(locked: boolean): Promise<void> {
+  const dbInstance = ensureDb();
+  await setDoc(doc(dbInstance, "siteConfig", "scoringConfig"), {
+    scoresLocked: locked,
+    lockedAt: Timestamp.now(),
+  });
+}
+
+export function subscribeScoringLock(
+  callback: (locked: boolean) => void
+): Unsubscribe {
+  const dbInstance = ensureDb();
+  return onSnapshot(doc(dbInstance, "siteConfig", "scoringConfig"), (snap) => {
+    callback(snap.exists() ? ((snap.data() as ScoringConfigDoc).scoresLocked ?? false) : false);
   });
 }

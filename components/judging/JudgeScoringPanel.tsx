@@ -16,6 +16,7 @@ import {
   type JudgingAssignment,
 } from "@/lib/firebase/judging";
 import { getStudentsByIds } from "@/lib/firebase/database";
+import { subscribeScoringLock } from "@/lib/firebase/proctors";
 
 interface JudgeScoringPanelProps {
   judgeId: string;
@@ -35,9 +36,14 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
   const [savingRanksKey, setSavingRanksKey] = useState<string | null>(null);
   const [savedScoresId, setSavedScoresId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [scoresLocked, setScoresLocked] = useState(false);
   // Drag state
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  useEffect(() => {
+    return subscribeScoringLock((locked) => setScoresLocked(locked));
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -152,6 +158,10 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
 
   // Save rubric + notes for one student; preserve the existing rank from orderedGroups.
   const handleSaveScores = async (groupKey: string, studentId: string) => {
+    if (scoresLocked) {
+      setMessage({ type: "err", text: "Scores are locked by the administrator and cannot be modified." });
+      return;
+    }
     const rubric = rubrics[studentId] || emptyRubricScores();
     for (const c of RUBRIC_CRITERIA) {
       const v = Number(rubric[c.key]);
@@ -186,6 +196,10 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
 
   // Save ranks for every student in a group (derived from orderedGroups position).
   const handleSaveRanks = async (groupKey: string, groupStudentIds: string[], categoryId: string | null) => {
+    if (scoresLocked) {
+      setMessage({ type: "err", text: "Scores are locked by the administrator and cannot be modified." });
+      return;
+    }
     const order = orderedGroups[groupKey] || groupStudentIds;
     setSavingRanksKey(groupStudentIds.join(","));
     setMessage(null);
@@ -274,6 +288,11 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
 
   return (
     <div className="space-y-12">
+      {scoresLocked && (
+        <div className="rounded-lg px-4 py-3 text-sm bg-red-50 border border-red-300 text-red-800 font-medium">
+          ⚠ Scoring is currently locked by the administrator. You cannot save or modify scores at this time.
+        </div>
+      )}
       {message && (
         <div
           className={`rounded-lg px-4 py-3 text-sm ${
@@ -402,11 +421,11 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
-                        disabled={isSaving}
+                        disabled={isSaving || scoresLocked}
                         onClick={() => handleSaveScores(group.key, a.studentId)}
                         className="px-5 py-2.5 rounded-lg bg-primary-green text-white font-semibold hover:bg-primary-darkGreen disabled:opacity-50 text-sm min-h-[40px]"
                       >
-                        {isSaving ? "Saving…" : "Save scores & notes"}
+                        {isSaving ? "Saving…" : scoresLocked ? "Scores locked" : "Save scores & notes"}
                       </button>
                       {justSaved && (
                         <span className="text-sm text-green-600 font-medium">✓ Saved</span>
@@ -498,11 +517,11 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
 
               <button
                 type="button"
-                disabled={savingRanksKey === groupIds.join(",")}
+                disabled={savingRanksKey === groupIds.join(",") || scoresLocked}
                 onClick={() => handleSaveRanks(group.key, groupIds, catId)}
                 className="w-full sm:w-auto px-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 disabled:opacity-50 text-base"
               >
-                {savingRanksKey === groupIds.join(",") ? "Saving rankings…" : "Submit rankings"}
+                {savingRanksKey === groupIds.join(",") ? "Saving rankings…" : scoresLocked ? "Scores locked" : "Submit rankings"}
               </button>
             </div>
           </section>
@@ -517,7 +536,7 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
           </p>
           <button
             type="button"
-            disabled={!!savingRanksKey}
+            disabled={!!savingRanksKey || scoresLocked}
             onClick={async () => {
               setMessage(null);
               for (const group of grouped) {
@@ -528,7 +547,7 @@ export default function JudgeScoringPanel({ judgeId, phase }: JudgeScoringPanelP
             }}
             className="px-8 py-3 rounded-lg bg-indigo-600 text-white font-bold hover:bg-indigo-700 disabled:opacity-50 text-base"
           >
-            {savingRanksKey ? "Saving…" : "Submit all scores & rankings"}
+            {savingRanksKey ? "Saving…" : scoresLocked ? "Scores locked" : "Submit all scores & rankings"}
           </button>
         </div>
       )}
