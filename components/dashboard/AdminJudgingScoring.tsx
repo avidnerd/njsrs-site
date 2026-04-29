@@ -1649,12 +1649,21 @@ export default function AdminJudgingScoring() {
                       {rows.map((r, idx) => {
                         const inFinal = alreadyInFinal.has(r.studentId);
                         const checked = selectedForFinal.has(r.studentId);
+                        const stu = students.find((s) => s.id === r.studentId);
+                        const teamMember = stu?.isTeamProject && stu.teamMemberFirstName
+                          ? `${stu.teamMemberFirstName} ${stu.teamMemberLastName ?? ""}`.trim()
+                          : null;
                         return (
                           <tr key={r.studentId} className={`border-b border-gray-100 hover:bg-gray-50 ${inFinal ? "bg-indigo-50" : ""}`}>
                             <td className="p-3 font-medium text-gray-500">
                               {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : idx + 1}
                             </td>
-                            <td className="p-3 font-medium text-gray-900">{r.studentName}</td>
+                            <td className="p-3">
+                              <span className="font-medium text-gray-900">{r.studentName}</span>
+                              {teamMember && (
+                                <div className="text-xs text-gray-500 mt-0.5">& {teamMember}</div>
+                              )}
+                            </td>
                             <td className="p-3 text-gray-700 max-w-xs truncate">{r.projectTitle || "—"}</td>
                             <td className="p-3 tabular-nums">{r.avgTotalScore.toFixed(2)}</td>
                             <td className="p-3 tabular-nums">
@@ -1947,12 +1956,22 @@ export default function AdminJudgingScoring() {
                     // Exclude the JSHS judge's scores from official final results
                     if (!jshsJudgeId) return true;
                     return sc.judgeId !== jshsJudgeId;
-                  }), assignments).map((r, idx) => (
+                  }), assignments).map((r, idx) => {
+                    const stu = students.find((s) => s.id === r.studentId);
+                    const teamMember = stu?.isTeamProject && stu.teamMemberFirstName
+                      ? `${stu.teamMemberFirstName} ${stu.teamMemberLastName ?? ""}`.trim()
+                      : null;
+                    return (
                     <tr key={r.studentId} className={`border-b border-gray-100 ${r.judgeCount === 0 ? "bg-amber-50" : ""}`}>
                       <td className="p-3 font-medium text-gray-500">
                         {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : idx + 1}
                       </td>
-                      <td className="p-3 font-medium text-gray-900">{r.studentName}</td>
+                      <td className="p-3">
+                        <span className="font-medium text-gray-900">{r.studentName}</span>
+                        {teamMember && (
+                          <div className="text-xs text-gray-500 mt-0.5">& {teamMember}</div>
+                        )}
+                      </td>
                       <td className="p-3 text-gray-700 max-w-xs truncate">{r.projectTitle || "—"}</td>
                       <td className="p-3 tabular-nums">
                         {r.judgeCount === 0 ? <span className="text-amber-600 text-xs">Not scored yet</span> : r.avgTotalScore.toFixed(2)}
@@ -1962,7 +1981,8 @@ export default function AdminJudgingScoring() {
                       </td>
                       <td className="p-3 text-gray-600">{r.judgeCount}</td>
                     </tr>
-                  ))}
+                  );})}
+
                 </tbody>
               </table>
             </div>
